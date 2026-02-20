@@ -284,6 +284,19 @@ Comments are maintenance liabilities. Every comment must earn its place.
 
 ---
 
+## Pull Requests
+
+When creating PRs (including stacked PRs), follow this order:
+
+1. If the repository has a PR template (for example `.github/pull_request_template.md`), use it.
+2. If no template exists, use this default body:
+   - `## Summary` (what changed and why)
+   - `## Changes` (concise bullet list)
+   - `## Validation` (exact commands run and outcomes)
+   - `## Linked Issues` (`Fixes #<issue>` when applicable)
+
+Never submit one-line PR descriptions unless explicitly requested.
+
 ## Pre-Commit Checks (MANDATORY)
 
 Before EVERY commit, run ALL project checks. No exceptions.
