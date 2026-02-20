@@ -2,15 +2,6 @@
 
 Behavioral guidelines for AI coding agents. Merge with project-specific instructions.
 
-## Runtime Targets
-
-These rules are shared across both **Claude Code** and **Codex**.
-
-- `AGENTS.md` is the source of truth.
-- `CLAUDE.md` should symlink to `AGENTS.md` for Claude Code compatibility.
-- Codex should read the same `AGENTS.md` guidance (via root file or `.codex/AGENTS.md` link).
-- Do not fork behavior rules by tool unless explicitly required by a project.
-
 ---
 
 ## General
