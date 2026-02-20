@@ -4,26 +4,32 @@ Maintain project documentation with clear human/agent separation.
 
 ## Convention
 
-Every project uses `docs/` as the single documentation directory. Two zones:
-
 ```
-docs/
-  README.md              ← human: project overview, setup, usage
-  architecture.md        ← human: high-level design, domain concepts
-  *.md                   ← human: guides, ADRs, onboarding
-
-  agent/
-    plan.md              ← agent: living project plan
-    assumptions.md       ← agent: tracked assumptions
-    notes/               ← agent: session notes
-      YYYYMMDD-HHMM-slug.md
+project/
+  AGENTS.md              ← agent instructions (project-specific)
+  CLAUDE.md              ← symlink → AGENTS.md
+  docs/
+    README.md            ← human: project overview, setup, usage
+    architecture.md      ← human: high-level design, domain concepts
+    *.md                 ← human: guides, ADRs, onboarding
+    agent/
+      plan.md            ← agent: living project plan
+      assumptions.md     ← agent: tracked assumptions
+      notes/             ← agent: session notes
+        YYYYMMDD-HHMM-slug.md
 ```
+
+### Project root
+
+- **AGENTS.md** — project-specific agent instructions. Tech stack, commands, conventions, gotchas. Keep under 150 lines.
+- **CLAUDE.md** — always a symlink to AGENTS.md. Ensure this exists: `ln -sf AGENTS.md CLAUDE.md`
+- No README.md at root. It lives in `docs/`.
 
 ### Human zone (`docs/*.md`)
 
 Written by humans, maintained by humans. Agents read these but don't edit unless explicitly asked.
 
-- **README.md** — what the project does, how to set it up, how to use it. No agent jargon.
+- **docs/README.md** — what the project does, how to set it up, how to use it. No agent jargon. The project's public face.
 - **architecture.md** — high-level design. Describe capabilities and domain concepts, not file paths (paths go stale).
 - Other docs as needed: ADRs, API guides, onboarding.
 
@@ -49,10 +55,11 @@ Written and maintained by agents. Committed to git. Survives context windows and
 
 When invoked as docs-keeper (or when documentation is stale):
 
-1. **Audit** — check all docs exist, are accurate, aren't contradicting code
-2. **Fix** — update what you can (agent zone only, unless asked for human zone)
-3. **Flag** — report what needs human attention
-4. **Trim** — CLAUDE.md / AGENTS.md should stay under 150 lines. Move overflow to `docs/`
+1. **Ensure structure** — AGENTS.md exists, CLAUDE.md is symlinked to it, `docs/agent/` exists
+2. **Audit** — check all docs exist, are accurate, aren't contradicting code
+3. **Fix** — update what you can (agent zone only, unless asked for human zone)
+4. **Flag** — report what needs human attention
+5. **Trim** — AGENTS.md should stay under 150 lines. Move overflow to `docs/`
 
 ## Rules
 
