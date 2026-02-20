@@ -16,7 +16,8 @@ git clone git@github.com:uinaf/agents.git ~/projects/agents
 
 This will:
 1. Symlink `~/.claude/CLAUDE.md` → `AGENTS.md`
-2. Install global skills from the lockfile
+2. Symlink `~/.codex/AGENTS.md` → `AGENTS.md`
+3. Install global skills from the lockfile
 
 ## Update
 

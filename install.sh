@@ -14,10 +14,12 @@ else
   cd "$INSTALL_DIR"
 fi
 
-# Symlink global CLAUDE.md
-mkdir -p "$HOME/.claude"
+# Symlink for each agent
+mkdir -p "$HOME/.claude" "$HOME/.codex"
 ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.codex/AGENTS.md"
 echo "Linked: ~/.claude/CLAUDE.md -> AGENTS.md"
+echo "Linked: ~/.codex/AGENTS.md -> AGENTS.md"
 
 # Install skills from lockfile
 if [ -f "$INSTALL_DIR/.skill-lock.json" ]; then
