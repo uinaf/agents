@@ -12,7 +12,7 @@ project/
     README.md            ← human: project overview, setup, usage
     architecture.md      ← human: high-level design, domain concepts
     *.md                 ← human: guides, ADRs, onboarding
-    agent/
+    agents/
       plan.md            ← agent: living project plan
       assumptions.md     ← agent: tracked assumptions
       notes/             ← agent: session notes
@@ -33,7 +33,7 @@ Written by humans, maintained by humans. Agents read these but don't edit unless
 - **architecture.md** — high-level design. Describe capabilities and domain concepts, not file paths (paths go stale).
 - Other docs as needed: ADRs, API guides, onboarding.
 
-### Agent zone (`docs/agent/`)
+### Agent zone (`docs/agents/`)
 
 Written and maintained by agents. Committed to git. Survives context windows and agent rotations.
 
@@ -47,7 +47,7 @@ Written and maintained by agents. Committed to git. Survives context windows and
 
 ## Session Discipline
 
-**Start:** Read `docs/agent/plan.md` and project's `CLAUDE.md` / `AGENTS.md`.
+**Start:** Read `docs/agents/plan.md` and project's `CLAUDE.md` / `AGENTS.md`.
 
 **End:** Update plan if anything changed. Write a note if you learned something worth preserving.
 
@@ -55,9 +55,9 @@ Written and maintained by agents. Committed to git. Survives context windows and
 
 When invoked as docs-keeper (or when documentation is stale):
 
-1. **Ensure structure** — AGENTS.md exists, CLAUDE.md is symlinked to it, `docs/agent/` exists
+1. **Ensure structure** — AGENTS.md exists, CLAUDE.md is symlinked to it, `docs/agents/` exists
 2. **Audit** — check all docs exist, are accurate, aren't contradicting code
-3. **Fix** — update what you can (agent zone only, unless asked for human zone)
+3. **Fix** — update what you can (agents zone only, unless asked for human zone)
 4. **Flag** — report what needs human attention
 5. **Trim** — AGENTS.md should stay under 150 lines. Move overflow to `docs/`
 
@@ -66,5 +66,5 @@ When invoked as docs-keeper (or when documentation is stale):
 - One code example beats three paragraphs
 - Describe capabilities, not file paths (paths go stale)
 - Don't document what agents already know (language syntax, common patterns)
-- Create `docs/agent/` and subdirectories if they don't exist
+- Create `docs/agents/` and subdirectories if they don't exist
 - Never edit human zone docs without explicit permission
