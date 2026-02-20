@@ -297,6 +297,14 @@ When creating PRs (including stacked PRs), follow this order:
 
 Never submit one-line PR descriptions unless explicitly requested.
 
+## Local Verification
+
+Before opening or updating a PR, run the repository's local verification entrypoint if it exists (for example `make verify`, `just verify`, `mage verify`, or `go run ./cmd/verify`).
+
+If no unified entrypoint exists, run the repo's explicit format/lint/test commands directly.
+
+The same verification contract should be used in CI to avoid local-vs-CI drift.
+
 ## Pre-Commit Checks (MANDATORY)
 
 Before EVERY commit, run ALL project checks. No exceptions.
