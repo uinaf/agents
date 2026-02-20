@@ -16,16 +16,16 @@ fi
 
 # Symlink for each agent
 mkdir -p "$HOME/.claude" "$HOME/.codex"
-ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.claude/CLAUDE.md"
-ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.codex/AGENTS.md"
+ln -sf "$INSTALL_DIR/src/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+ln -sf "$INSTALL_DIR/src/AGENTS.md" "$HOME/.codex/AGENTS.md"
 echo "Linked: ~/.claude/CLAUDE.md -> AGENTS.md"
 echo "Linked: ~/.codex/AGENTS.md -> AGENTS.md"
 
 # Install skills from lockfile
-if [ -f "$INSTALL_DIR/.skill-lock.json" ]; then
+if [ -f "$INSTALL_DIR/src/.skill-lock.json" ]; then
   sources=$(python3 -c "
 import json
-with open('$INSTALL_DIR/.skill-lock.json') as f:
+with open('$INSTALL_DIR/src/.skill-lock.json') as f:
     data = json.load(f)
 for skill in data.get('skills', {}).values():
     print(skill['source'])
