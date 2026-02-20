@@ -26,7 +26,7 @@ if [ -f "$INSTALL_DIR/skills/.skill-lock.json" ]; then
   jq -r '.skills | to_entries[] | "\(.key) \(.value.source)"' "$INSTALL_DIR/skills/.skill-lock.json" \
   | while read -r name source; do
     echo "Installing skill: $name from $source"
-    npx skills add "$source" -g -y -s "$name" 2>/dev/null || echo "  Failed: $name"
+    npx skills add "$source" -g -y -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
   done
 fi
 
