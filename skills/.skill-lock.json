@@ -19,15 +19,6 @@
       "installedAt": "2026-02-16T19:47:00.982Z",
       "updatedAt": "2026-02-20T18:09:52.567Z"
     },
-    "skill-creator": {
-      "source": "vercel-labs/agent-browser",
-      "sourceType": "github",
-      "sourceUrl": "https://github.com/vercel-labs/agent-browser.git",
-      "skillPath": ".agents/skills/skill-creator/SKILL.md",
-      "skillFolderHash": "a235030e055c7292a60525ead3c8b06fb2bcf831",
-      "installedAt": "2026-02-20T15:42:30.649Z",
-      "updatedAt": "2026-02-20T18:09:55.699Z"
-    },
     "docs-keeper": {
       "source": "uinaf/agents",
       "sourceType": "github",
