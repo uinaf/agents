@@ -1,3 +1,8 @@
+---
+name: docs-keeper
+description: Maintain project documentation with clear human/agent separation. Use when setting up a new project, auditing docs, creating plans, or managing agent working memory. Triggers include "set up docs", "create a plan", "audit documentation", "init project structure", or any task involving project documentation conventions.
+---
+
 # docs-keeper
 
 Maintain project documentation with clear human/agent separation. Includes planning workflow.
