@@ -284,30 +284,6 @@ Comments are maintenance liabilities. Every comment must earn its place.
 
 ---
 
-## Git
-
-### Conventional Commits
-
-Format: `type(scope): description`
-
-Types: `feat`, `fix`, `refactor`, `docs`, `test`, `chore`, `style`, `perf`, `ci`, `build`
-
-Rules: scope optional but encouraged. Lowercase, imperative mood, no period.
-
-### Atomic Commits
-
-One logical change per commit. If you need "and" in the message, split it.
-
-### Clean Commits
-
-No stray `console.log`, `TODO` comments, or debug code. Review your diff before committing.
-
-### Rebase Over Merge
-
-Use rebase for feature branches to maintain clean linear history.
-
----
-
 ## Pre-Commit Checks (MANDATORY)
 
 Before EVERY commit, run ALL project checks. No exceptions.
