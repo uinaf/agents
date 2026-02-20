@@ -6,7 +6,7 @@ cd "$INSTALL_DIR"
 
 # Sync lockfile from global skills
 if [ -f "$HOME/.agents/.skill-lock.json" ]; then
-  cp "$HOME/.agents/.skill-lock.json" "$INSTALL_DIR/src/.skill-lock.json"
+  cp "$HOME/.agents/.skill-lock.json" "$INSTALL_DIR/skills/.skill-lock.json"
 fi
 
 if [ -z "$(git status --porcelain)" ]; then
