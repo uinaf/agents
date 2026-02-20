@@ -1,3 +1,0 @@
-# Assumptions
-
-- None yet.
