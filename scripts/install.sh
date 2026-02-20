@@ -23,13 +23,8 @@ echo "Linked: ~/.codex/AGENTS.md -> AGENTS.md"
 
 # Install skills from lockfile
 if [ -f "$INSTALL_DIR/skills/.skill-lock.json" ]; then
-  python3 -c "
-import json
-with open('$INSTALL_DIR/skills/.skill-lock.json') as f:
-    data = json.load(f)
-for name, info in data.get('skills', {}).items():
-    print(name + ' ' + info['source'])
-" | while read -r name source; do
+  jq -r '.skills | to_entries[] | "\(.key) \(.value.source)"' "$INSTALL_DIR/skills/.skill-lock.json" \
+  | while read -r name source; do
     echo "Installing skill: $name from $source"
     npx skills add "$source" -g -y -s "$name" 2>/dev/null || echo "  Failed: $name"
   done
