@@ -1,0 +1,24 @@
+{
+  "version": 3,
+  "skills": {
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/agent-browser.git",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-12T07:38:03.678Z",
+      "updatedAt": "2026-02-16T20:03:10.720Z"
+    },
+    "git-commit": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/github/awesome-copilot.git",
+      "skillPath": "skills/git-commit/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-16T19:47:00.982Z",
+      "updatedAt": "2026-02-16T20:19:17.521Z"
+    }
+  },
+  "dismissed": {}
+}

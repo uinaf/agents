@@ -3,8 +3,6 @@ set -euo pipefail
 
 REPO="git@github.com:uinaf/agents.git"
 INSTALL_DIR="${AGENTS_DIR:-$HOME/projects/agents}"
-CLAUDE_DIR="$HOME/.claude"
-SKILLS_DIR="$CLAUDE_DIR/skills"
 
 # Clone or pull
 if [ -d "$INSTALL_DIR/.git" ]; then
@@ -13,21 +11,26 @@ if [ -d "$INSTALL_DIR/.git" ]; then
 else
   echo "Cloning..."
   git clone "$REPO" "$INSTALL_DIR"
+  cd "$INSTALL_DIR"
 fi
 
 # Symlink global CLAUDE.md
-mkdir -p "$CLAUDE_DIR"
-ln -sf "$INSTALL_DIR/AGENTS.md" "$CLAUDE_DIR/CLAUDE.md"
+mkdir -p "$HOME/.claude"
+ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.claude/CLAUDE.md"
 echo "Linked: ~/.claude/CLAUDE.md -> AGENTS.md"
 
-# Install skills
-if [ -d "$INSTALL_DIR/skills" ]; then
-  mkdir -p "$SKILLS_DIR"
-  for skill in "$INSTALL_DIR/skills"/*/; do
-    [ -d "$skill" ] || continue
-    name=$(basename "$skill")
-    ln -sfn "$skill" "$SKILLS_DIR/$name"
-    echo "Linked skill: $name"
+# Install skills from lockfile
+if [ -f "$INSTALL_DIR/.skill-lock.json" ]; then
+  sources=$(python3 -c "
+import json
+with open('$INSTALL_DIR/.skill-lock.json') as f:
+    data = json.load(f)
+for skill in data.get('skills', {}).values():
+    print(skill['source'])
+")
+  for source in $sources; do
+    echo "Installing skill: $source"
+    npx skills add "$source" -g -y 2>/dev/null || echo "  Failed: $source"
   done
 fi
 
