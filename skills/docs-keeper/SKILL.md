@@ -10,11 +10,11 @@ project/
   CLAUDE.md              ← symlink → AGENTS.md
   docs/
     README.md            ← human: project overview, setup, usage
-    architecture.md      ← human: high-level design, domain concepts
+    ARCHITECTURE.md      ← human: high-level design, domain concepts
     *.md                 ← human: guides, ADRs, onboarding
     agents/
-      plan.md            ← agent: living project plan
-      assumptions.md     ← agent: tracked assumptions
+      PLAN.md            ← agent: living project plan
+      ASSUMPTIONS.md     ← agent: tracked assumptions
       notes/             ← agent: session notes
         YYYYMMDD-HHMM-slug.md
 ```
@@ -30,22 +30,22 @@ project/
 Written by humans, maintained by humans. Agents read these but don't edit unless explicitly asked.
 
 - **docs/README.md** — what the project does, how to set it up, how to use it. No agent jargon.
-- **architecture.md** — high-level design. Describe capabilities and domain concepts, not file paths.
+- **ARCHITECTURE.md** — high-level design. Describe capabilities and domain concepts, not file paths.
 - Other docs as needed: ADRs, API guides, onboarding.
 
 ### Agent zone (`docs/agents/`)
 
 Written and maintained by agents. Committed to git. Survives context windows and agent rotations.
 
-- **plan.md** — the living project plan (see Planning below)
-- **assumptions.md** — document assumptions before acting. Update as confirmed or invalidated.
+- **PLAN.md** — the living project plan (see Planning below)
+- **ASSUMPTIONS.md** — document assumptions before acting. Update as confirmed or invalidated.
 - **notes/** — timestamped session notes (see Session Notes below)
 
 ---
 
 ## Planning
 
-Before any multi-step work, create or update `docs/agents/plan.md`.
+Before any multi-step work, create or update `docs/agents/PLAN.md`.
 
 ### Brainstorming (before the plan)
 
@@ -55,7 +55,7 @@ Don't jump into planning. Understand first:
 2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 3. **Propose 2-3 approaches** — with trade-offs and your recommendation
 4. **Present design in sections** — scaled to complexity, get approval after each section
-5. **Save design** — write validated design to `docs/agents/plan.md`
+5. **Save design** — write validated design to `docs/agents/PLAN.md`
 
 Do NOT write code until the design is approved. Every project goes through this, even "simple" ones. Simple projects are where unexamined assumptions waste the most work.
 
@@ -128,7 +128,7 @@ Keep notes concise. Future agents read these for context.
 
 ## Session Discipline
 
-**Start:** Read `docs/agents/plan.md` and `AGENTS.md`.
+**Start:** Read `docs/agents/PLAN.md` and `AGENTS.md`.
 
 **End:** Update plan if anything changed. Write a note if you learned something.
 
