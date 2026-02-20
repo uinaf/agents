@@ -1,8 +1,8 @@
 # docs-keeper
 
-Maintain project documentation with clear human/agent separation.
+Maintain project documentation with clear human/agent separation. Includes planning workflow.
 
-## Convention
+## Project Structure
 
 ```
 project/
@@ -29,33 +29,116 @@ project/
 
 Written by humans, maintained by humans. Agents read these but don't edit unless explicitly asked.
 
-- **docs/README.md** — what the project does, how to set it up, how to use it. No agent jargon. The project's public face.
-- **architecture.md** — high-level design. Describe capabilities and domain concepts, not file paths (paths go stale).
+- **docs/README.md** — what the project does, how to set it up, how to use it. No agent jargon.
+- **architecture.md** — high-level design. Describe capabilities and domain concepts, not file paths.
 - Other docs as needed: ADRs, API guides, onboarding.
 
 ### Agent zone (`docs/agents/`)
 
 Written and maintained by agents. Committed to git. Survives context windows and agent rotations.
 
-- **plan.md** — the living project plan. Updated as scope changes, features ship, priorities shift. Read at session start.
-- **assumptions.md** — document assumptions before acting on them. Update as confirmed or invalidated.
-- **notes/** — timestamped session notes:
-  - Lessons learned from debugging
-  - Architecture decisions and rationale
-  - Failed approaches and why
-  - Investigation findings (API quirks, library gotchas)
+- **plan.md** — the living project plan (see Planning below)
+- **assumptions.md** — document assumptions before acting. Update as confirmed or invalidated.
+- **notes/** — timestamped session notes (see Session Notes below)
+
+---
+
+## Planning
+
+Before any multi-step work, create or update `docs/agents/plan.md`.
+
+### Brainstorming (before the plan)
+
+Don't jump into planning. Understand first:
+
+1. **Explore context** — read existing docs, code, recent commits
+2. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+3. **Propose 2-3 approaches** — with trade-offs and your recommendation
+4. **Present design in sections** — scaled to complexity, get approval after each section
+5. **Save design** — write validated design to `docs/agents/plan.md`
+
+Do NOT write code until the design is approved. Every project goes through this, even "simple" ones. Simple projects are where unexamined assumptions waste the most work.
+
+### Plan format
+
+Plans are bite-sized tasks. Each task is one action (2-5 minutes):
+
+```markdown
+# [Feature] Implementation Plan
+
+**Goal:** One sentence.
+**Approach:** 2-3 sentences.
+**Tech:** Key technologies/libraries.
+
+---
+
+### Task 1: [Component]
+
+**Files:**
+- Create: `exact/path/to/file.go`
+- Modify: `exact/path/to/existing.go`
+- Test: `exact/path/to/file_test.go`
+
+**Steps:**
+1. Write failing test
+2. Run test, verify it fails
+3. Write minimal implementation
+4. Run test, verify it passes
+5. Commit
+
+**Verify:** `go test ./... -run TestSpecificThing`
+```
+
+Rules:
+- Exact file paths, always
+- Complete code in plan (not "add validation")
+- Exact commands with expected output
+- Each step is one action, not a paragraph
+
+### Execution
+
+Execute plans in batches (3 tasks at a time):
+
+1. Follow each step exactly
+2. Run verifications as specified
+3. After each batch: report what was done, show verification output, wait for feedback
+4. Apply feedback, continue next batch
+
+**Stop and ask when:**
+- Hit a blocker (missing dep, test fails, instruction unclear)
+- Plan has gaps
+- Verification fails repeatedly
+- Don't guess through blockers
+
+---
+
+## Session Notes
+
+Write notes to `docs/agents/notes/YYYYMMDD-HHMM-slug.md` when you learn something worth preserving:
+
+- Lessons learned from debugging
+- Architecture decisions and rationale
+- Failed approaches and why they didn't work
+- Investigation findings (API quirks, library gotchas)
+- Mistakes and how to avoid them
+
+Keep notes concise. Future agents read these for context.
+
+---
 
 ## Session Discipline
 
-**Start:** Read `docs/agents/plan.md` and project's `CLAUDE.md` / `AGENTS.md`.
+**Start:** Read `docs/agents/plan.md` and `AGENTS.md`.
 
-**End:** Update plan if anything changed. Write a note if you learned something worth preserving.
+**End:** Update plan if anything changed. Write a note if you learned something.
+
+---
 
 ## Keeper Behavior
 
 When invoked as docs-keeper (or when documentation is stale):
 
-1. **Ensure structure** — AGENTS.md exists, CLAUDE.md is symlinked to it, `docs/agents/` exists
+1. **Ensure structure** — AGENTS.md exists, CLAUDE.md is symlinked, `docs/agents/` exists
 2. **Audit** — check all docs exist, are accurate, aren't contradicting code
 3. **Fix** — update what you can (agents zone only, unless asked for human zone)
 4. **Flag** — report what needs human attention
