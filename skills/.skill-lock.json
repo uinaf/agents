@@ -6,18 +6,36 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/vercel-labs/agent-browser.git",
       "skillPath": "skills/agent-browser/SKILL.md",
-      "skillFolderHash": "",
+      "skillFolderHash": "131c39d9d7a65f0bb08aaa3c3595aba8b0395cee",
       "installedAt": "2026-02-12T07:38:03.678Z",
-      "updatedAt": "2026-02-16T20:03:10.720Z"
+      "updatedAt": "2026-02-20T15:42:30.549Z"
     },
     "git-commit": {
       "source": "github/awesome-copilot",
       "sourceType": "github",
       "sourceUrl": "https://github.com/github/awesome-copilot.git",
       "skillPath": "skills/git-commit/SKILL.md",
-      "skillFolderHash": "",
+      "skillFolderHash": "883a6a7466f55a9cd9f22cf1cce2d9333fc9b998",
       "installedAt": "2026-02-16T19:47:00.982Z",
-      "updatedAt": "2026-02-16T20:19:17.521Z"
+      "updatedAt": "2026-02-20T15:42:40.439Z"
+    },
+    "skill-creator": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/vercel-labs/agent-browser.git",
+      "skillPath": ".agents/skills/skill-creator/SKILL.md",
+      "skillFolderHash": "a235030e055c7292a60525ead3c8b06fb2bcf831",
+      "installedAt": "2026-02-20T15:42:30.649Z",
+      "updatedAt": "2026-02-20T15:42:30.649Z"
+    },
+    "docs-keeper": {
+      "source": "uinaf/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/uinaf/agents.git",
+      "skillPath": "skills/docs-keeper/SKILL.md",
+      "skillFolderHash": "453909f16ebf4ff7dd36eee9e75f5178f58564af",
+      "installedAt": "2026-02-20T15:44:50.798Z",
+      "updatedAt": "2026-02-20T15:44:50.798Z"
     }
   },
   "dismissed": {}
