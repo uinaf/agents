@@ -11,10 +11,10 @@ Maintain project documentation with clear human/agent separation. Includes plann
 
 ```
 project/
+  README.md              ← project entrypoint (human-facing)
   AGENTS.md              ← agent instructions (project-specific)
   CLAUDE.md              ← symlink → AGENTS.md
   docs/
-    README.md            ← human: project overview, setup, usage
     ARCHITECTURE.md      ← human: high-level design, domain concepts
     *.md                 ← human: guides, ADRs, onboarding
     agents/
@@ -26,16 +26,16 @@ project/
 
 ### Project root
 
+- **README.md** — canonical project entrypoint (setup, usage, status).
 - **AGENTS.md** — project-specific agent instructions. Tech stack, commands, conventions, gotchas. Keep under 150 lines.
 - **CLAUDE.md** — always a symlink to AGENTS.md. Ensure this exists: `ln -sf AGENTS.md CLAUDE.md`
-- No README.md at root. It lives in `docs/`.
 
 ### Human zone (`docs/*.md`)
 
 Written by humans, maintained by humans. Agents read these but don't edit unless explicitly asked.
 
-- **docs/README.md** — what the project does, how to set it up, how to use it. No agent jargon.
-- **ARCHITECTURE.md** — high-level design. Describe capabilities and domain concepts, not file paths.
+- `README.md` at project root is the primary project overview.
+- **docs/ARCHITECTURE.md** — high-level design. Describe capabilities and domain concepts, not file paths.
 - Other docs as needed: ADRs, API guides, onboarding.
 
 ### Agent zone (`docs/agents/`)
