@@ -6,6 +6,7 @@ Shared AI agent guidelines and skills. One file, every machine.
 
 - **AGENTS.md** — coding rules for AI agents (Claude Code, Codex, Cursor, etc.)
 - **skills/skills.json** — stable, portable skills manifest (source-of-truth)
+  - includes `version` + `manifestHash` for sync integrity
 
 ## Setup
 

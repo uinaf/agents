@@ -7,10 +7,32 @@ cd "$INSTALL_DIR"
 GLOBAL_LOCK="$HOME/.agents/.skill-lock.json"
 MANIFEST_PATH="$INSTALL_DIR/skills/skills.json"
 
-# Sync stable skills manifest from global lock (ignore machine-specific hash/timestamps)
 if [ -f "$GLOBAL_LOCK" ]; then
-  jq '{version:1, skills:(.skills | to_entries | map({name:.key, source:.value.source}) | sort_by(.name))}' "$GLOBAL_LOCK" > "$MANIFEST_PATH"
-  echo "Synced $MANIFEST_PATH from global skill lock"
+  TMP_MANIFEST=$(mktemp)
+
+  # Build stable skills array from global lock
+  jq '{skills:(.skills | to_entries | map({name:.key, source:.value.source}) | sort_by(.name))}' "$GLOBAL_LOCK" > "$TMP_MANIFEST"
+
+  NEW_HASH=$(jq -c '.skills' "$TMP_MANIFEST" | shasum -a 256 | awk '{print $1}')
+  CURRENT_VERSION=$(jq -r '.version // 0' "$MANIFEST_PATH" 2>/dev/null || echo 0)
+  CURRENT_HASH=$(jq -r '.manifestHash // ""' "$MANIFEST_PATH" 2>/dev/null || echo "")
+
+  if [ "$NEW_HASH" != "$CURRENT_HASH" ]; then
+    NEXT_VERSION=$((CURRENT_VERSION + 1))
+  else
+    NEXT_VERSION=$CURRENT_VERSION
+  fi
+
+  UPDATED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+  jq --argjson version "$NEXT_VERSION" \
+     --arg manifestHash "$NEW_HASH" \
+     --arg updatedAt "$UPDATED_AT" \
+     '. + {version:$version, manifestHash:$manifestHash, updatedAt:$updatedAt}' \
+     "$TMP_MANIFEST" > "$MANIFEST_PATH"
+
+  rm -f "$TMP_MANIFEST"
+  echo "Synced $MANIFEST_PATH (version=$NEXT_VERSION, hash=$NEW_HASH)"
 fi
 
 if [ -z "$(git status --porcelain)" ]; then

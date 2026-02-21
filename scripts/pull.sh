@@ -25,6 +25,10 @@ MANIFEST="$INSTALL_DIR/skills/skills.json"
 
 # Install skills only from stable manifest (portable across machines)
 if [ -f "$MANIFEST" ]; then
+  VERSION=$(jq -r '.version // "?"' "$MANIFEST")
+  HASH=$(jq -r '.manifestHash // ""' "$MANIFEST")
+  echo "Using skills manifest version=$VERSION hash=$HASH"
+
   jq -r '.skills[] | "\(.name) \(.source)"' "$MANIFEST" |
   while read -r name source; do
     echo "Installing skill: $name from $source"
