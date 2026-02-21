@@ -45,6 +45,87 @@
       "skillFolderHash": "28d7822c112f22cf499099881856fdec07bc83a8",
       "installedAt": "2026-02-20T19:20:06.497Z",
       "updatedAt": "2026-02-20T19:20:06.497Z"
+    },
+    "api-design-principles": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/api-design-principles/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "architecture-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/architecture-patterns/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "architecture-decision-records": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/architecture-decision-records/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "error-handling-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/error-handling-patterns/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "github-actions-templates": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/github-actions-templates/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "security-requirement-extraction": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/security-requirement-extraction/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "auth-implementation-patterns": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/auth-implementation-patterns/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "deployment-pipeline-design": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/deployment-pipeline-design/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
+    },
+    "openapi-spec-generation": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/wshobson/agents.git",
+      "skillPath": "skills/openapi-spec-generation/SKILL.md",
+      "skillFolderHash": "",
+      "installedAt": "2026-02-21T09:29:48.657Z",
+      "updatedAt": "2026-02-21T09:29:48.657Z"
     }
   },
   "dismissed": {}
