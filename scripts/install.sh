@@ -21,10 +21,20 @@ ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.codex/AGENTS.md"
 echo "Linked: ~/.claude/CLAUDE.md -> AGENTS.md"
 echo "Linked: ~/.codex/AGENTS.md -> AGENTS.md"
 
-# Install skills from lockfile
-if [ -f "$INSTALL_DIR/skills/.skill-lock.json" ]; then
-  jq -r '.skills | to_entries[] | "\(.key) \(.value.source)"' "$INSTALL_DIR/skills/.skill-lock.json" \
-  | while read -r name source; do
+MANIFEST="$INSTALL_DIR/skills/skills.json"
+LOCKFILE="$INSTALL_DIR/skills/.skill-lock.json"
+
+# Install skills from stable manifest first (portable across machines)
+if [ -f "$MANIFEST" ]; then
+  jq -r '.skills[] | "\(.name) \(.source)"' "$MANIFEST" |
+  while read -r name source; do
+    echo "Installing skill: $name from $source"
+    npx skills add "$source" -g -y -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
+  done
+# Backward-compat fallback
+elif [ -f "$LOCKFILE" ]; then
+  jq -r '.skills | to_entries[] | "\(.key) \(.value.source)"' "$LOCKFILE" |
+  while read -r name source; do
     echo "Installing skill: $name from $source"
     npx skills add "$source" -g -y -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
   done

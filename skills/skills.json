@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "skills": [
+    {
+      "name": "agent-browser",
+      "source": "vercel-labs/agent-browser"
+    },
+    {
+      "name": "api-design-principles",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "architecture-decision-records",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "architecture-patterns",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "auth-implementation-patterns",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "deployment-pipeline-design",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "docs-keeper",
+      "source": "uinaf/agents"
+    },
+    {
+      "name": "error-handling-patterns",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "git-commit",
+      "source": "github/awesome-copilot"
+    },
+    {
+      "name": "github-actions-templates",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "graphite-stacks",
+      "source": "outfitter-dev/agents"
+    },
+    {
+      "name": "openapi-spec-generation",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "security-requirement-extraction",
+      "source": "wshobson/agents"
+    },
+    {
+      "name": "tdd",
+      "source": "mattpocock/skills"
+    }
+  ]
+}
