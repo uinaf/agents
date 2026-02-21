@@ -42,8 +42,14 @@ fi
 
 git add -A
 git diff --cached --stat
-echo ""
-read -rp "Commit message: " msg
+
+auto_version=$(jq -r '.version // 0' "$MANIFEST_PATH" 2>/dev/null || echo 0)
+auto_hash=$(jq -r '.manifestHash // ""' "$MANIFEST_PATH" 2>/dev/null | cut -c1-8)
+auto_msg="chore(skills): sync manifest v${auto_version} (${auto_hash})"
+
+# Optional override: COMMIT_MSG="..." scripts/push.sh
+msg="${COMMIT_MSG:-$auto_msg}"
+echo "Auto-commit: $msg"
 git commit -m "$msg"
 git push
 echo "Pushed."
