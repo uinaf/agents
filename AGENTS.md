@@ -70,6 +70,17 @@ Before writing or changing code: STOP.
 
 If mid-implementation something feels wrong: STOP and re-plan. Sunk cost is not a reason to continue down a bad path.
 
+### Obstacle-First Execution
+
+When blocked, do not jump to patch fixes just to keep moving.
+
+1. Isolate the blocker and reproduce it.
+2. Find the root cause with evidence (logs, docs, failing command/output).
+3. Fix the underlying issue first.
+4. Only apply temporary workarounds when explicitly approved, and label them as temporary.
+
+Long game wins: fewer quick patches, fewer regressions, lower token waste.
+
 ### Goal-Driven Verification
 
 Transform tasks into verifiable goals. Loop until verified.
