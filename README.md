@@ -6,13 +6,12 @@ Shared AI agent guidelines and skills. One file, every machine.
 
 - **AGENTS.md** — coding rules for AI agents (Claude Code, Codex, Cursor, etc.)
 - **skills/skills.json** — stable, portable skills manifest (source-of-truth)
-- **skills/.skill-lock.json** — legacy lockfile reference (fallback only)
 
 ## Setup
 
 ```bash
 git clone git@github.com:uinaf/agents.git ~/projects/agents
-~/projects/agents/scripts/install.sh
+~/projects/agents/scripts/pull.sh
 ```
 
 This will:
@@ -23,7 +22,7 @@ This will:
 ## Update
 
 ```bash
-~/projects/agents/scripts/install.sh
+~/projects/agents/scripts/pull.sh
 ```
 
 ## Push changes
