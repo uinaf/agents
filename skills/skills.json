@@ -27,7 +27,7 @@
     },
     {
       "name": "docs-keeper",
-      "source": "uinaf/agents"
+      "source": "uinaf/skills"
     },
     {
       "name": "error-handling-patterns",
