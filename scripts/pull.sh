@@ -16,12 +16,12 @@ fi
 
 # Symlink for each agent
 mkdir -p "$HOME/.claude" "$HOME/.codex"
-ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.claude/CLAUDE.md"
-ln -sf "$INSTALL_DIR/AGENTS.md" "$HOME/.codex/AGENTS.md"
-echo "Linked: ~/.claude/CLAUDE.md -> AGENTS.md"
-echo "Linked: ~/.codex/AGENTS.md -> AGENTS.md"
+ln -sf "$INSTALL_DIR/src/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+ln -sf "$INSTALL_DIR/src/AGENTS.md" "$HOME/.codex/AGENTS.md"
+echo "Linked: ~/.claude/CLAUDE.md -> src/AGENTS.md"
+echo "Linked: ~/.codex/AGENTS.md -> src/AGENTS.md"
 
-MANIFEST="$INSTALL_DIR/skills/skills.json"
+MANIFEST="$INSTALL_DIR/src/skills.json"
 
 # Install skills only from stable manifest (portable across machines)
 if [ -f "$MANIFEST" ]; then

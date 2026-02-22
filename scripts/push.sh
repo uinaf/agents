@@ -5,7 +5,7 @@ INSTALL_DIR="${AGENTS_DIR:-$HOME/projects/agents}"
 cd "$INSTALL_DIR"
 
 GLOBAL_LOCK="$HOME/.agents/.skill-lock.json"
-MANIFEST_PATH="$INSTALL_DIR/skills/skills.json"
+MANIFEST_PATH="$INSTALL_DIR/src/skills.json"
 
 if [ -f "$GLOBAL_LOCK" ]; then
   TMP_MANIFEST=$(mktemp)
