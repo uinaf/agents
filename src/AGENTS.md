@@ -1,6 +1,6 @@
 # Agent Guidelines
 
-Portable core guidelines for AI coding agents. Keep this file generic so it works across personal and work setups.
+Behavioral guidelines for AI coding agents. Merge with project-specific instructions.
 
 ---
 
