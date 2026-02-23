@@ -9,7 +9,7 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 - Don’t assume. State assumptions explicitly before non-trivial implementation.
 - If anything is ambiguous, stop and ask before coding.
 - Be direct. Lead with the answer, then reasoning.
-- If an approach is bad, say so clearly and propose a better option.
+- If an approach is weak, say so clearly and propose a better option.
 - Cite evidence when relevant (docs, file paths, command output, errors).
 - Match user tone and requested depth.
 
@@ -22,7 +22,7 @@ Before implementation, confirm:
 3. What “done” looks like.
 4. Any constraints (performance, compatibility, security, style).
 
-If multiple interpretations exist, present them and ask.
+If multiple interpretations exist, present options and ask.
 
 ---
 
@@ -34,12 +34,24 @@ For non-trivial tasks:
 
 1. Research current code/docs/contracts.
 2. Make a short plan (what changes, where, why, verification).
-3. Validate plan against edge cases and existing patterns.
+3. Validate the plan against edge cases and existing patterns.
 4. **Wait for explicit go/yes** before implementation.
 5. Implement.
 6. Verify.
 
 If the plan breaks mid-flight, stop and re-plan.
+
+### Verification-driven execution
+
+Translate requests into checks:
+
+- bug fix -> reproducing test first, then pass
+- refactor -> before/after behavior parity
+- feature -> contract-level tests + runtime check
+
+Use repo guardrails first (`make verify`, `just verify`, project scripts). If none exists, run explicit format/lint/typecheck/test commands.
+
+If it isn’t verified, it isn’t done.
 
 ### Obstacle-first execution
 
@@ -49,16 +61,6 @@ When blocked:
 2. Find root cause with evidence.
 3. Fix root cause.
 4. Use temporary workaround only with explicit approval.
-
-### Verification-driven loop
-
-Translate requests into checks:
-
-- bug fix -> reproducing test first, then pass
-- refactor -> before/after behavior parity
-- feature -> contract-level tests + runtime check
-
-If it isn’t verified, it isn’t done.
 
 ### Parallelize independent work
 
@@ -73,18 +75,26 @@ Batch independent reads/checks/tests in parallel. Sequence only when dependent.
 - Prefer clear composition over deep branching.
 - Touch only requested scope, avoid side-quests.
 
+### Conventions over invention
+
+- Inspect and follow existing repo conventions (structure, naming, patterns, test style).
+- Don’t invent new patterns unless necessary.
+- If a new pattern is necessary, explain why.
+- If you notice flaky/wonky patterns, flag them with evidence.
+- Don’t silently refactor unrelated areas.
+
+### Boundaries and safety
+
+- Parse external data at boundaries, then operate on typed/validated structures internally.
+- Don’t bypass safety checks to force progress.
+- Don’t disable/suppress lint, type, or test checks as a shortcut.
+- Don’t use unsafe casts/ignore directives as a workaround unless explicitly approved.
+
 ### Error handling
 
 - No silent catches.
 - Add context to errors.
-- Validate external inputs at boundaries.
 - Surface useful failures, not vague messages.
-
-### Type safety
-
-- Don’t bypass type systems as a shortcut (`any`, `@ts-ignore`, unsafe casts).
-- Model domain constraints in types where practical.
-- Prefer boundary schemas/parsers when language/ecosystem supports them.
 
 ---
 
