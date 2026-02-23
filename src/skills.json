@@ -46,10 +46,6 @@
       "source": "outfitter-dev/agents"
     },
     {
-      "name": "openapi-spec-generation",
-      "source": "wshobson/agents"
-    },
-    {
       "name": "security-requirement-extraction",
       "source": "wshobson/agents"
     },

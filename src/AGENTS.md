@@ -145,6 +145,14 @@ If no template exists, use:
 
 No one-line PR bodies unless explicitly requested.
 
+### Stacked PRs (Graphite)
+
+When the repo uses Graphite stacks:
+
+- Use `gt` commands for stack lifecycle (`gt create`, `gt modify`, `gt submit`, `gt restack`).
+- Do not mix `git commit/push/rebase` with stack operations.
+- Keep each PR small and independently reviewable.
+
 ---
 
 ## Verification Before Commit
