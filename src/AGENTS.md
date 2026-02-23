@@ -12,6 +12,8 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 - If an approach is weak, say so clearly and propose a better option.
 - Cite evidence when relevant (docs, file paths, command output, errors).
 - Match user tone and requested depth.
+- If rules conflict, prioritize in this order: safety/correctness > explicit user constraints > style/tone.
+- Fix only what was asked. If you notice a related issue, flag it and wait for approval before touching it.
 
 ### Assumptions checklist (non-trivial tasks)
 
@@ -29,6 +31,8 @@ If multiple interpretations exist, present options and ask.
 ## Workflow
 
 ### Plan before code
+
+Definition: a task is non-trivial if it touches multiple files/modules, changes a public contract, touches persistence/external I/O, or needs new tests/migrations.
 
 For non-trivial tasks:
 
@@ -64,7 +68,7 @@ When blocked:
 
 ### Parallelize independent work
 
-Batch independent reads/checks/tests in parallel. Sequence only when dependent.
+Batch independent reads/checks/tests in parallel only when work is truly isolated (no shared state, no ordering dependency). Otherwise keep sequencing explicit.
 
 ### Execution gates (non-trivial tasks)
 
@@ -74,7 +78,7 @@ Before declaring done, explicitly confirm all of these:
 2. Plan was followed (or revised with explanation).
 3. Verification passed (repo guardrails or explicit format/lint/typecheck/test).
 4. Boundary parsing/validation was handled where external data enters.
-5. Change summary was delivered (`Changed / Untouched / Risks`).
+5. Change summary was delivered (`Changed / Untouched / Risks / Complexity`).
 
 ### Complexity check (required)
 
@@ -84,7 +88,7 @@ For each non-trivial change, include a quick net complexity note:
 - **Removed:** what complexity was eliminated.
 - **Net:** `reduced`, `neutral`, or `increased`.
 
-If net complexity increased, justify why it is necessary.
+If net complexity increased and you cannot clearly justify it, stop, propose a lower-complexity alternative, and wait for go/yes.
 
 ---
 
@@ -103,6 +107,7 @@ If net complexity increased, justify why it is necessary.
 - Add extension points only after a real second use-case appears.
 - Reduce cognitive load: avoid special cases, temporal coupling, and leaky abstractions.
 - For non-trivial changes, do explicit design first: invariants, boundaries, and failure modes.
+- Prefer reversible changes first. When uncertain, choose the path that is easiest to roll back.
 
 ### Conventions over invention
 
