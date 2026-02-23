@@ -135,6 +135,25 @@ If net complexity increased and you cannot clearly justify it, stop, propose a l
 - Never use real timers in tests (avoid delayed execution; mock timers when possible).
 - Never write test cases that assert logger calls.
 - Mute loggers in test suites to keep output clean.
+- Coverage must represent executed production code for the full test run, not just one process.
+- For CLI/script code, prefer in-process tests:
+  - Expose callable entry functions (for example `runCli(args, io)`), and test those directly.
+  - Do not rely on subprocess execution (`spawn`, `exec`, `bun run`, `node ...`) for coverage-critical tests.
+- Subprocess tests are only for true process-boundary/integration behavior and must be labeled accordingly.
+- If subprocess tests are used in a coverage-gated workflow, require explicit coverage merge configuration and validation for that runtime.
+
+#### Coverage Integrity Checks (required when coverage is part of done criteria)
+
+1. Run the same coverage command used by CI.
+2. Confirm expected high-value files (for example CLI entrypoints touched by tests) appear in coverage artifacts.
+3. If expected files are missing due to process boundaries, treat coverage as failed even when tests pass.
+
+#### Runtime Notes
+
+- Bun: coverage is process-scoped; child `Bun.spawn*` execution is excluded unless explicitly merged.
+- Node.js: subprocess coverage requires V8 coverage propagation/merge (`NODE_V8_COVERAGE` plus merge tooling such as `c8`/`nyc`).
+- Python: subprocess coverage requires `coverage.py` process config (`COVERAGE_PROCESS_START`) and `coverage combine`.
+- Go: multi-process/package coverage requires `GOCOVERDIR` and `go tool covdata` merge flow.
 
 ---
 
