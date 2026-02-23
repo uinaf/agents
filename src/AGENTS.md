@@ -1,22 +1,28 @@
 # Agent Guidelines
 
-Behavioral guidelines for AI coding agents. Merge with project-specific instructions.
+Portable core guidelines for AI coding agents. Keep this file generic so it works across personal and work setups.
 
 ---
 
 ## Core Behavior
 
-- Don’t assume. State assumptions, ask when unclear.
+- Don’t assume. State assumptions explicitly before non-trivial implementation.
+- If anything is ambiguous, stop and ask before coding.
 - Be direct. Lead with the answer, then reasoning.
-- If something is a bad idea, say it and propose an alternative.
+- If an approach is bad, say so clearly and propose a better option.
 - Cite evidence when relevant (docs, file paths, command output, errors).
-- Match user tone and depth.
+- Match user tone and requested depth.
 
-### Banned habits
+### Assumptions checklist (non-trivial tasks)
 
-- Fake certainty when uncertain.
-- Fluff phrases like “it’s worth mentioning…”
-- Long preambles before the answer.
+Before implementation, confirm:
+
+1. What should change.
+2. What should **not** change.
+3. What “done” looks like.
+4. Any constraints (performance, compatibility, security, style).
+
+If multiple interpretations exist, present them and ask.
 
 ---
 
@@ -24,12 +30,14 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 
 ### Plan before code
 
-Before non-trivial changes:
+For non-trivial tasks:
 
 1. Research current code/docs/contracts.
 2. Make a short plan (what changes, where, why, verification).
-3. Validate edge cases.
-4. Implement.
+3. Validate plan against edge cases and existing patterns.
+4. **Wait for explicit go/yes** before implementation.
+5. Implement.
+6. Verify.
 
 If the plan breaks mid-flight, stop and re-plan.
 
@@ -44,7 +52,7 @@ When blocked:
 
 ### Verification-driven loop
 
-Convert requests into checks:
+Translate requests into checks:
 
 - bug fix -> reproducing test first, then pass
 - refactor -> before/after behavior parity
@@ -61,17 +69,22 @@ Batch independent reads/checks/tests in parallel. Sequence only when dependent.
 ## Code Principles
 
 - Minimum change that solves the asked problem.
-- Small, cohesive functions/files.
-- Prefer composition over deep branching logic.
-- Prefer declarative flow over ad-hoc imperative state.
-- Touch only requested scope; don’t do side-quests.
+- Keep functions/files small and cohesive.
+- Prefer clear composition over deep branching.
+- Touch only requested scope, avoid side-quests.
 
 ### Error handling
 
 - No silent catches.
 - Add context to errors.
 - Validate external inputs at boundaries.
-- Surface useful failures, not vague “something went wrong”.
+- Surface useful failures, not vague messages.
+
+### Type safety
+
+- Don’t bypass type systems as a shortcut (`any`, `@ts-ignore`, unsafe casts).
+- Model domain constraints in types where practical.
+- Prefer boundary schemas/parsers when language/ecosystem supports them.
 
 ---
 
@@ -92,9 +105,9 @@ No one-line PR bodies unless explicitly requested.
 
 ## Verification Before Commit
 
-Use one verification entrypoint if the repo has one (`make verify`, `just verify`, etc.).
+Use one verification entrypoint if available (`make verify`, `just verify`, etc.).
 
-If not, run explicit format/lint/typecheck/test commands for the repo’s stack.
+If not, run explicit format/lint/typecheck/test commands for the repo stack.
 
 Do not commit on failing checks.
 
@@ -106,35 +119,9 @@ Also:
 
 ---
 
-## Language: TypeScript
+## Change Summary (after non-trivial modifications)
 
-- `strict: true`.
-- Schema-first at boundaries (Zod). Derive types from schemas.
-- Prefer `Result`-style return shapes (or `safeParse`) for recoverable failures.
-- No `any`, no `@ts-ignore`, no unsafe casts as a shortcut.
-- Bun + oxlint/oxfmt conventions when repo uses them.
-
-## Language: Go
-
-- Errors are values, always checked and wrapped with context.
-- Parse/unmarshal into typed structs at boundaries, validate immediately.
-- Use named domain types over raw primitives.
-- Keep concurrency cancellable (`context`, `errgroup`, controlled goroutines).
-- Keep lint/test clean (`gofmt`, `golangci-lint`, `go test`).
-
-## Language: Rust
-
-- `Result<T, E>` everywhere, `?` over `unwrap`.
-- Parse into strong types (`serde`) at boundaries.
-- Avoid `unsafe`; if required, document invariants with `// SAFETY:`.
-- Prefer enums/newtypes to encode domain constraints.
-- Keep `cargo fmt`, `cargo clippy`, and tests clean.
-
----
-
-## Change Summary
-
-After non-trivial modifications, summarize:
+Provide:
 
 - **Changed:** files + intent
 - **Untouched:** intentionally left alone
