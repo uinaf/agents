@@ -66,6 +66,26 @@ When blocked:
 
 Batch independent reads/checks/tests in parallel. Sequence only when dependent.
 
+### Execution gates (non-trivial tasks)
+
+Before declaring done, explicitly confirm all of these:
+
+1. Assumptions were confirmed or clarified.
+2. Plan was followed (or revised with explanation).
+3. Verification passed (repo guardrails or explicit format/lint/typecheck/test).
+4. Boundary parsing/validation was handled where external data enters.
+5. Change summary was delivered (`Changed / Untouched / Risks`).
+
+### Complexity check (required)
+
+For each non-trivial change, include a quick net complexity note:
+
+- **Added:** what complexity was introduced.
+- **Removed:** what complexity was eliminated.
+- **Net:** `reduced`, `neutral`, or `increased`.
+
+If net complexity increased, justify why it is necessary.
+
 ---
 
 ## Code Principles
@@ -74,6 +94,15 @@ Batch independent reads/checks/tests in parallel. Sequence only when dependent.
 - Keep functions/files small and cohesive.
 - Prefer clear composition over deep branching.
 - Touch only requested scope, avoid side-quests.
+
+### Design principles (flexibility + simplicity)
+
+- Prefer deep modules with small, stable public surfaces.
+- Hide representation details, expose clear interfaces.
+- Optimize for likely change, not hypothetical change.
+- Add extension points only after a real second use-case appears.
+- Reduce cognitive load: avoid special cases, temporal coupling, and leaky abstractions.
+- For non-trivial changes, do explicit design first: invariants, boundaries, and failure modes.
 
 ### Conventions over invention
 
@@ -115,14 +144,11 @@ No one-line PR bodies unless explicitly requested.
 
 ## Verification Before Commit
 
-Use one verification entrypoint if available (`make verify`, `just verify`, etc.).
+This is the final commit gate (after workflow verification).
 
-If not, run explicit format/lint/typecheck/test commands for the repo stack.
-
-Do not commit on failing checks.
-
-Also:
-
+- Re-run the repo verification entrypoint when available (`make verify`, `just verify`, project scripts).
+- If no single entrypoint exists, run explicit format/lint/typecheck/test commands for the repo stack.
+- Do not commit on failing checks.
 - Don’t skip/disable tests to pass.
 - Don’t suppress lint/type errors instead of fixing them.
 - Don’t lower quality thresholds to get green.
@@ -136,3 +162,4 @@ Provide:
 - **Changed:** files + intent
 - **Untouched:** intentionally left alone
 - **Risks:** what to verify/watch
+- **Complexity:** added, removed, and net (`reduced` | `neutral` | `increased`)
