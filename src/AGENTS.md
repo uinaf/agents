@@ -130,6 +130,12 @@ If net complexity increased and you cannot clearly justify it, stop, propose a l
 - Add context to errors.
 - Surface useful failures, not vague messages.
 
+### Testing
+
+- Never use real timers in tests (avoid delayed execution; mock timers when possible).
+- Never write test cases that assert logger calls.
+- Mute loggers in test suites to keep output clean.
+
 ---
 
 ## Pull Requests
