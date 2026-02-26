@@ -1,5 +1,4 @@
 {
-  "version": 1,
   "skills": [
     {
       "name": "agent-browser",
@@ -46,6 +45,10 @@
       "source": "outfitter-dev/agents"
     },
     {
+      "name": "openapi-spec-generation",
+      "source": "wshobson/agents"
+    },
+    {
       "name": "security-requirement-extraction",
       "source": "wshobson/agents"
     },
@@ -54,6 +57,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "manifestHash": "c785357bf9227ae67b1337804fc7e6cf85e66f9a256ba490eaa3d8add43a777f",
-  "updatedAt": "2026-02-21T09:36:10Z"
+  "version": 2,
+  "manifestHash": "5fbbe43560ea99912e01a116c1aadc45b72f6ef1c1d53fde684f610bd8ba3bf7",
+  "updatedAt": "2026-02-26T18:35:15Z"
 }
