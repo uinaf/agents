@@ -53,7 +53,7 @@ One sentence goal or split the task. Always include in prompt:
 
 ## Delegation
 
-Read the [coding-agent](https://github.com/openclaw/openclaw/blob/main/skills/coding-agent/SKILL.md) skill first. Use its `exec pty:true background:true` patterns.
+Use `exec pty:true background:true` patterns from coding-agent.
 
 - Isolate in worktree: `git worktree add -b <slug> ~/worktrees/<repo>/<slug>`
 - Always append wake trigger to task prompt:
