@@ -1,117 +1,81 @@
 ---
 name: dev-orchestrator
-description: Orchestrate non-trivial coding work via tmux-based coding agents. Use for plan → delegate → steer → verify workflows on real repositories.
+description: "SDLC-YOLO: ALL coding goes through here. Scope → delegate to coding agent → agent self-reviews → guardrails → orchestrator reviews → auto-merge or escalate. Use for any code changes — features, fixes, refactors, configs. Never hand-code unless told 'do it here'."
 ---
 
-# Dev Orchestrator
+# SDLC-YOLO
 
-Use this skill for non-trivial coding tasks.
-Keep behavior/style/quality rules in `AGENTS.md`.
+ALL coding goes through here. Never hand-code — always delegate.
+Uses the **coding-agent** skill for running agents.
 
-## Workflow
+## The Loop
 
-research → short plan → delegate in tmux → steer if needed → verify
+Inspired by [Boris Tane's SDLC collapse](https://boristane.com/blog/the-software-development-lifecycle-is-dead/).
 
-## Task Brief Template
+```mermaid
+graph TD
+  A[Agent generates code] --> B[Agent self-verifies]
+  B --> C[Orchestrator reviews]
+  C --> D[Automated checks]
+  D --> E{All clear?}
+  E -->|Yes| F[Ship]
+  E -->|No - resolvable| A
+  E -->|No - novel issue| G[Human review]
+  style F fill:#d1fae5,stroke:#6ee7b7,color:#065f46
+```
+
+1. **Scope** — write task brief
+2. **Delegate** — spin up coding agent in isolated worktree
+3. **Agent self-verifies** — edge cases, error handling, test coverage, runs verification
+4. **Orchestrator reviews** — I read key diffs, check constraints, no scope creep
+5. **Automated checks** — tests, lint, typecheck
+6. **All clear → merge + notify user**
+7. **Resolvable issue → respawn agent with fix prompt**
+8. **Novel issue → escalate to user**
+
+User only gets pulled in for novel issues.
+
+## Task Brief
 
 ```markdown
 ## Task: <title>
 **Goal:** one sentence
 **Context:** key files/docs/APIs
 **Constraints:** what NOT to do
-**Tests:** what to add/update
 **Done when:** verifiable success criteria
 **Verify:** concrete commands
 **Read first:** AGENTS.md
 ```
 
-If the goal cannot fit in one sentence, split the task.
+One sentence goal or split the task. Always include in prompt:
+- Self-review before finishing: edge cases, error handling, test coverage
+- Run verification commands before declaring done
 
-## Pre-flight
+## Delegation
 
-- Confirm instruction links/files are present.
-- Confirm CI/workflow scaffolding exists.
-- If setup is broken, fix setup separately before feature work.
+Read the **coding-agent** skill first. Use its `exec pty:true background:true` patterns.
 
-## Execution
+- Isolate in worktree: `git worktree add -b <slug> ~/worktrees/<repo>/<slug>`
+- Always append wake trigger to task prompt:
+  `When finished, run: openclaw system event --text "Done: <summary>" --mode now`
+- One task per agent. Don't mix setup and feature work.
+- Agent fails → respawn with clearer prompt, don't take over.
 
-- Use tmux sessions for coding agents.
-- Do not use one-shot execution.
-- Use an isolated task context (repo clone or worktree).
-- Prefer worktrees under `~/worktrees` (not inside project roots), e.g. `~/worktrees/<repo>/<task-slug>`.
-- Session name format: `<agent>-<repo>-<task-slug>`.
-- For Codex, always start with per-workdir trust config so first-run trust prompts do not block delegation.
-
-## Helper Script
-
-Use `scripts/tmux-agent.sh` to avoid repeating fragile shell quoting.
-
-### Start sessions
+## Merge + Cleanup
 
 ```bash
-SESSION="codex-<repo>-<task>"
-WORKDIR="$HOME/worktrees/<repo>/<task-slug>"   # preferred
-PROMPT_FILE="/tmp/task-prompt.md"
-
-scripts/tmux-agent.sh start codex "$SESSION" "$WORKDIR" "$PROMPT_FILE"
-# or
-scripts/tmux-agent.sh start claude "$SESSION" "$WORKDIR" "$PROMPT_FILE"
+cd ~/projects/<repo> && git merge <slug> && git push
+git worktree remove ~/worktrees/<repo>/<slug>
+git branch -d <slug>
 ```
 
-### First-run handshake + readiness
-
-```bash
-scripts/tmux-agent.sh handshake "$SESSION"
-scripts/tmux-agent.sh ready "$SESSION"
-```
-
-### Monitor / steer / stop
-
-```bash
-scripts/tmux-agent.sh ls
-scripts/tmux-agent.sh tail "$SESSION" 220
-scripts/tmux-agent.sh done "$SESSION"   # checks for __DONE__ marker
-scripts/tmux-agent.sh steer "$SESSION" "Stop. Focus on <specific scope>."
-scripts/tmux-agent.sh stop "$SESSION"
-scripts/tmux-agent.sh kill "$SESSION"   # last resort
-```
-
-## Delegation Rules
-
-- Delegate non-trivial coding work; do not implement directly in orchestrator mode.
-- Do not mix setup fixes and feature work in one run.
-- Keep scope tight and testable.
-- If agent drifts, steer in-session before restarting.
-- Return concrete verification output with final result.
-
-## Failure Handling
-
-- Missing context: provide exact files/constraints.
-- Environment/setup issue: stop and report root cause.
-- Retry only with a clearer scoped prompt.
-- Escalate when risky tradeoffs need user input.
-
-## Git / PR
-
-- Follow repo strategy (direct push vs branch+PR).
-- Use concise conventional commits.
-- For PRs, include: Summary, Changes, Validation, Linked Issues.
-
-## Completion Standard
-
-Complete only when:
-- success criteria are met,
-- verification commands pass,
-- and outputs are clearly reported.
-
-## Final Report Format
+## Report
 
 ```markdown
 ## Result
-- Status: done | blocked
+- Status: done | blocked | escalated
 - Scope delivered:
 - Files changed:
-- Verification run:
-- Verification output summary:
+- Verification:
 - Risks / follow-ups:
 ```
