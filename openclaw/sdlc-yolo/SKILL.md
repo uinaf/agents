@@ -6,7 +6,7 @@ description: "ALL coding work. Features, fixes, refactors — never hand-code. D
 # SDLC-YOLO
 
 ALL coding goes through here. Never hand-code — always delegate.
-Uses the **coding-agent** skill for running agents.
+Uses the [coding-agent](https://github.com/openclaw/openclaw/blob/main/skills/coding-agent/SKILL.md) skill for running agents.
 
 ## The Loop
 
@@ -53,7 +53,7 @@ One sentence goal or split the task. Always include in prompt:
 
 ## Delegation
 
-Read the **coding-agent** skill first. Use its `exec pty:true background:true` patterns.
+Read the [coding-agent](https://github.com/openclaw/openclaw/blob/main/skills/coding-agent/SKILL.md) skill first. Use its `exec pty:true background:true` patterns.
 
 - Isolate in worktree: `git worktree add -b <slug> ~/worktrees/<repo>/<slug>`
 - Always append wake trigger to task prompt:
