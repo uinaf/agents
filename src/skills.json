@@ -5,26 +5,6 @@
       "source": "vercel-labs/agent-browser"
     },
     {
-      "name": "api-design-principles",
-      "source": "wshobson/agents"
-    },
-    {
-      "name": "architecture-decision-records",
-      "source": "wshobson/agents"
-    },
-    {
-      "name": "architecture-patterns",
-      "source": "wshobson/agents"
-    },
-    {
-      "name": "auth-implementation-patterns",
-      "source": "wshobson/agents"
-    },
-    {
-      "name": "deployment-pipeline-design",
-      "source": "wshobson/agents"
-    },
-    {
       "name": "docs-keeper",
       "source": "uinaf/skills"
     },
@@ -37,27 +17,15 @@
       "source": "github/awesome-copilot"
     },
     {
-      "name": "github-actions-templates",
-      "source": "wshobson/agents"
-    },
-    {
       "name": "graphite-stacks",
       "source": "outfitter-dev/agents"
-    },
-    {
-      "name": "openapi-spec-generation",
-      "source": "wshobson/agents"
-    },
-    {
-      "name": "security-requirement-extraction",
-      "source": "wshobson/agents"
     },
     {
       "name": "tdd",
       "source": "mattpocock/skills"
     }
   ],
-  "version": 2,
-  "manifestHash": "5fbbe43560ea99912e01a116c1aadc45b72f6ef1c1d53fde684f610bd8ba3bf7",
-  "updatedAt": "2026-02-26T18:35:15Z"
+  "version": 3,
+  "manifestHash": "979be6f31e79acce00e1e429eda102f1210aac3cfe76d9dcf4018cd9f664487d",
+  "updatedAt": "2026-02-26T18:47:22Z"
 }
