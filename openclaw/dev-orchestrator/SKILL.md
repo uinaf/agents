@@ -1,6 +1,6 @@
 ---
 name: dev-orchestrator
-description: "SDLC-YOLO: ALL coding goes through here. Scope → delegate to coding agent → agent self-reviews → guardrails → orchestrator reviews → auto-merge or escalate. Use for any code changes — features, fixes, refactors, configs. Never hand-code unless told 'do it here'."
+description: "ALL coding work. Features, fixes, refactors — never hand-code. Delegates to coding-agent, reviews, auto-merges or escalates."
 ---
 
 # SDLC-YOLO
