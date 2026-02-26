@@ -38,8 +38,9 @@ If the goal cannot fit in one sentence, split the task.
 - Use tmux sessions for coding agents.
 - Do not use one-shot execution.
 - Use an isolated task context (repo clone or worktree).
-- Worktrees are optional.
+- Prefer worktrees under `~/worktrees` (not inside project roots), e.g. `~/worktrees/<repo>/<task-slug>`.
 - Session name format: `<agent>-<repo>-<task-slug>`.
+- For Codex, always start with per-workdir trust config so first-run trust prompts do not block delegation.
 
 ## Helper Script
 
@@ -49,7 +50,7 @@ Use `scripts/tmux-agent.sh` to avoid repeating fragile shell quoting.
 
 ```bash
 SESSION="codex-<repo>-<task>"
-WORKDIR="/absolute/path/to/repo-or-worktree"
+WORKDIR="$HOME/worktrees/<repo>/<task-slug>"   # preferred
 PROMPT_FILE="/tmp/task-prompt.md"
 
 scripts/tmux-agent.sh start codex "$SESSION" "$WORKDIR" "$PROMPT_FILE"

@@ -24,26 +24,52 @@ start() {
   [[ -f "$prompt_file" ]] || { echo "prompt file not found: $prompt_file" >&2; exit 1; }
   [[ -d "$workdir" ]] || { echo "workdir not found: $workdir" >&2; exit 1; }
 
-  local prompt shell_cmd
+  local workdir_abs prompt shell_cmd
+  workdir_abs="$(cd "$workdir" && pwd -P)"
   prompt="$(cat "$prompt_file")
 
 When finished, print exactly: __DONE__"
 
+  # Write prompt to temp file to avoid shell escaping issues (backticks etc.)
+  local prompt_tmp
+  prompt_tmp="$(mktemp /tmp/tmux-agent-prompt-XXXXXX.txt)"
+  printf '%s' "$prompt" > "$prompt_tmp"
+
+  local wrapper
+  wrapper="$(mktemp /tmp/tmux-agent-run-XXXXXX.sh)"
   case "$agent" in
     codex)
-      shell_cmd="$(printf 'codex --yolo %q' "$prompt")"
+      local trust_cfg
+      trust_cfg="projects.\"$workdir_abs\".trust_level=\"trusted\""
+      cat > "$wrapper" <<RUNEOF
+#!/usr/bin/env bash
+PROMPT=\$(cat "$prompt_tmp")
+codex -c '$trust_cfg' --yolo "\$PROMPT"
+rm -f "$prompt_tmp" "$wrapper"
+echo "Agent exited. Session kept alive for inspection. Ctrl-C to close."
+sleep 86400
+RUNEOF
       ;;
     claude)
-      shell_cmd="$(printf 'claude --dangerously-skip-permissions -p %q' "$prompt")"
+      cat > "$wrapper" <<RUNEOF
+#!/usr/bin/env bash
+PROMPT=\$(cat "$prompt_tmp")
+claude --dangerously-skip-permissions -p "\$PROMPT"
+rm -f "$prompt_tmp" "$wrapper"
+echo "Agent exited. Session kept alive for inspection. Ctrl-C to close."
+sleep 86400
+RUNEOF
       ;;
     *)
       echo "unknown agent: $agent (use codex|claude)" >&2
+      rm -f "$prompt_tmp" "$wrapper"
       exit 1
       ;;
   esac
+  chmod +x "$wrapper"
 
   tmux kill-session -t "$session" 2>/dev/null || true
-  tmux new-session -d -s "$session" -c "$workdir" "bash -lc $shell_cmd"
+  tmux new-session -d -s "$session" -c "$workdir" "bash -l $wrapper"
   echo "started: $session"
 }
 
@@ -57,17 +83,17 @@ handshake() {
 
 ready() {
   local session="$1"
-  tmux capture-pane -pt "$session" -S -120 | tee /dev/stderr | rg -q '❯|for shortcuts|esc to interrupt'
+  tmux capture-pane -ept "$session" -S -120 | tee /dev/stderr | rg -q '❯|for shortcuts|esc to interrupt'
 }
 
 tail_out() {
   local session="$1" lines="${2:-220}"
-  tmux capture-pane -pt "$session" -S "-$lines"
+  tmux capture-pane -ept "$session" -S "-$lines"
 }
 
 done_check() {
   local session="$1"
-  tmux capture-pane -pt "$session" -S -260 | rg -q '__DONE__'
+  tmux capture-pane -ept "$session" -S -260 | sed 's/\x1b\[[0-9;]*m//g' | rg -q '__DONE__|^•\s*DONE$'
 }
 
 steer() {
