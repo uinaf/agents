@@ -29,11 +29,25 @@ if [ -f "$MANIFEST" ]; then
   HASH=$(jq -r '.manifestHash // ""' "$MANIFEST")
   echo "Using skills manifest version=$VERSION hash=$HASH"
 
+  MANIFEST_NAMES=$(jq -r '.skills[].name' "$MANIFEST")
+
   jq -r '.skills[] | "\(.name) \(.source)"' "$MANIFEST" |
   while read -r name source; do
     echo "Installing skill: $name from $source"
     npx skills add "$source" -g -y -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
   done
+
+  # Remove installed skills no longer in the manifest
+  SKILLS_DIR="$HOME/.agents/skills"
+  if [ -d "$SKILLS_DIR" ]; then
+    for skill_dir in "$SKILLS_DIR"/*/; do
+      skill_name=$(basename "$skill_dir")
+      if ! echo "$MANIFEST_NAMES" | grep -qx "$skill_name"; then
+        echo "Removing stale skill: $skill_name"
+        npx skills remove "$skill_name" -g -y </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
+      fi
+    done
+  fi
 else
   echo "No skills manifest found at $MANIFEST"
 fi
