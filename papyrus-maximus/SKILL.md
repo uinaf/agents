@@ -16,7 +16,6 @@ project/
   CLAUDE.md          ← symlink → AGENTS.md
   docs/
     ARCHITECTURE.md  ← how the system works (diagrams > text)
-    ASSUMPTIONS.md   ← confirmed/active/invalidated assumptions
     *.md             ← guides, references, anything useful
     plans/           ← specs, execution plans, living docs
 ```
