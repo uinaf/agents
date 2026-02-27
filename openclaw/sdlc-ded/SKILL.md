@@ -61,6 +61,16 @@ Use `exec pty:true background:true` patterns from coding-agent.
 - One task per agent. Don't mix setup and feature work.
 - Agent fails → respawn with clearer prompt, don't take over.
 
+### ⚠️ Stay available — never block on agents
+
+After launching a background agent, **move on immediately**. Do not poll or wait.
+
+1. `exec pty:true background:true` — fire and forget
+2. System event wakes you when agent finishes
+3. Then use `process:log` to read results and review
+4. **Never use `process:poll` with long timeouts** — it blocks your turn and makes you unresponsive to the user
+5. If the user asks for status, check `process:log` at that point
+
 ## Merge + Cleanup
 
 ```bash
