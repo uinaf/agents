@@ -17,6 +17,10 @@
       "source": "github/awesome-copilot"
     },
     {
+      "name": "golang-pro",
+      "source": "jeffallan/claude-skills"
+    },
+    {
       "name": "graphite-stacks",
       "source": "outfitter-dev/agents"
     },
@@ -25,7 +29,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "version": 3,
-  "manifestHash": "979be6f31e79acce00e1e429eda102f1210aac3cfe76d9dcf4018cd9f664487d",
-  "updatedAt": "2026-02-26T18:47:22Z"
+  "version": 4,
+  "manifestHash": "5f5573ec2f0d525e713d4e16f26f89f6ca7e2900649d73d5f8ddaa64025e8ae2",
+  "updatedAt": "2026-02-27T09:57:32Z"
 }
