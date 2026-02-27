@@ -56,6 +56,8 @@ Passing tests is necessary but not sufficient. Before declaring done:
 
 Tests verify your logic is internally consistent. Sanity checks verify it matches the real world.
 
+**When uncertain — ask.** If you can't verify an API field, a response shape, or an identifier from docs or real responses, don't guess. Stop and ask. A wrong guess that passes tests is worse than a blocker that gets flagged.
+
 ### When blocked
 
 Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarounds only with explicit approval.
