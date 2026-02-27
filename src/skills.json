@@ -25,11 +25,15 @@
       "source": "outfitter-dev/agents"
     },
     {
+      "name": "react-doctor",
+      "source": "millionco/react-doctor"
+    },
+    {
       "name": "tdd",
       "source": "mattpocock/skills"
     }
   ],
-  "version": 4,
-  "manifestHash": "5f5573ec2f0d525e713d4e16f26f89f6ca7e2900649d73d5f8ddaa64025e8ae2",
-  "updatedAt": "2026-02-27T09:57:32Z"
+  "version": 5,
+  "manifestHash": "130c1ead5103598ed846111503dcdee42d2a81d9944a800bfde00fe17f21197c",
+  "updatedAt": "2026-02-27T18:15:27Z"
 }
