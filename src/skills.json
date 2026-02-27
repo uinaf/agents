@@ -25,11 +25,15 @@
       "source": "uinaf/skills"
     },
     {
+      "name": "react-doctor",
+      "source": "millionco/react-doctor"
+    },
+    {
       "name": "tdd",
       "source": "mattpocock/skills"
     }
   ],
-  "version": 7,
-  "manifestHash": "09167db04413225050546b28d2b717093fcd791ae4253e87581086e6dacb003f",
-  "updatedAt": "2026-02-27T19:03:35Z"
+  "version": 8,
+  "manifestHash": "4e0d47989d37626f9309bba0466c8be90de348a306cea6f6e21e1a091a2484d1",
+  "updatedAt": "2026-02-27T19:14:10Z"
 }
