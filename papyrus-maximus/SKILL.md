@@ -105,6 +105,8 @@ Anything useful for humans or agents:
 - **DECISIONS.md** — notable past decisions (lightweight ADR: what, why, when — no template ceremony)
 
 ### docs/plans/*.md — Specs & Execution Plans
+
+Filename convention: `kebab-case-slug.md` (e.g. `kalshi-hardening.md`, `loss-reduction.md`). No SHOUTING, no date suffix — the date goes in the file header.
 Living documents. Specs before code. Updated as work progresses.
 
 ```markdown
