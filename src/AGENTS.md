@@ -45,6 +45,17 @@ Use repo guardrails first (`make verify`, `just verify`, project scripts). If no
 
 If it isn't verified, it isn't done.
 
+### Sanity-check with reality
+
+Passing tests is necessary but not sufficient. Before declaring done:
+
+- **Run the program with real data/APIs** (dry-run if available) and check the output makes sense.
+- **Cross-check external API usage against actual docs** — don't guess field names, enum values, or response shapes. Verify every identifier against real API responses.
+- **Smell-test the outputs** — if a number looks wrong, a date seems off, or a result is implausible, investigate before shipping.
+- If the project has no dry-run mode, at minimum call the real endpoints in a throwaway script and confirm the response matches your code's assumptions.
+
+Tests verify your logic is internally consistent. Sanity checks verify it matches the real world.
+
 ### When blocked
 
 Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarounds only with explicit approval.
