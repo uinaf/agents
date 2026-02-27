@@ -1,5 +1,5 @@
 ---
-name: bird
+name: definitely-not-bird
 description: X/Twitter CLI for reading, searching, etc..
 ---
 
