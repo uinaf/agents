@@ -1,5 +1,5 @@
 ---
-name: sdlc-yolo
+name: sdlc-ded
 description: "ALL coding work. Features, fixes, refactors — never hand-code. Delegates to coding-agent, reviews, auto-merges or escalates."
 ---
 
