@@ -68,6 +68,12 @@ Green CI ≠ working software. The agent AND the orchestrator must verify with r
 
 A model that says ETH will hit $2,200 when it's at $1,900 in 3 hours is broken, no matter how many tests pass.
 
+### API contract verification (include in prompt when there are external APIs):
+- **Read the actual API docs** before implementing — don't guess field names, endpoints, or response shapes
+- Cross-check implementation against docs: are we using the right fields? Right endpoints? Right response keys?
+- If the API has a playground/explorer, hit it and verify the real response matches assumptions
+- Invented/assumed identifiers (tickers, enum values, field names) are a top source of silent failures — verify every one against real API responses
+
 ## Delegation
 
 Use `exec pty:true background:true` patterns from coding-agent.
