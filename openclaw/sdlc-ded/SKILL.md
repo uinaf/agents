@@ -43,13 +43,30 @@ User only gets pulled in for novel issues.
 **Context:** key files/docs/APIs
 **Constraints:** what NOT to do
 **Done when:** verifiable success criteria
-**Verify:** concrete commands
+**Verify:** concrete commands (tests + real-data run)
 **Read first:** AGENTS.md
 ```
 
 One sentence goal or split the task. Always include in prompt:
 - Self-review before finishing: edge cases, error handling, test coverage
 - Run verification commands before declaring done
+- **Run the actual thing with real data/APIs and verify outputs make sense** — passing tests is not enough
+
+## Verification: Tests Are Not Enough
+
+Green CI ≠ working software. The agent AND the orchestrator must verify with reality.
+
+### Agent must (include in every prompt):
+- Run the full test suite
+- **Execute the program against real APIs/data** (dry-run mode if available)
+- Check that outputs are sane: do numbers make sense? Are fields correct? Would a human look at this and say "yeah that's right"?
+
+### Orchestrator must (before pushing/merging):
+- **Dry-run with real data** and read the output
+- Smell-test the results: are prices reasonable? Are dates correct? Do edge cases produce garbage?
+- If something looks off, dig in before pushing — don't trust "tests pass"
+
+A model that says ETH will hit $2,200 when it's at $1,900 in 3 hours is broken, no matter how many tests pass.
 
 ## Delegation
 
