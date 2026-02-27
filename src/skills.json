@@ -5,6 +5,10 @@
       "source": "vercel-labs/agent-browser"
     },
     {
+      "name": "code-review",
+      "source": "coderabbitai/skills"
+    },
+    {
       "name": "error-handling-patterns",
       "source": "wshobson/agents"
     },
@@ -33,7 +37,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "version": 8,
-  "manifestHash": "4e0d47989d37626f9309bba0466c8be90de348a306cea6f6e21e1a091a2484d1",
-  "updatedAt": "2026-02-27T19:14:10Z"
+  "version": 9,
+  "manifestHash": "0240d47770e71aa3e56822276249eeba2ded61859e830210c1ffd9cd7ec6133a",
+  "updatedAt": "2026-02-27T23:36:40Z"
 }
