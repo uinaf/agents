@@ -16,12 +16,12 @@ project/
   CLAUDE.md          ← symlink → AGENTS.md
   docs/
     ARCHITECTURE.md  ← how the system works (diagrams > text)
+    ASSUMPTIONS.md   ← confirmed/active/invalidated assumptions
     *.md             ← guides, references, anything useful
-  plans/
-    *.md             ← specs, execution plans, living docs
+    plans/           ← specs, execution plans, living docs
 ```
 
-That's it. No nested agent zones. No session notes folder. No assumptions file.
+That's it. No nested agent zones. No session notes folder.
 
 ## File Roles
 
@@ -105,7 +105,7 @@ Anything useful for humans or agents:
 - **DEPLOYMENT.md** — how to ship it
 - **DECISIONS.md** — notable past decisions (lightweight ADR: what, why, when — no template ceremony)
 
-### plans/*.md — Specs & Execution Plans
+### docs/plans/*.md — Specs & Execution Plans
 Living documents. Specs before code. Updated as work progresses.
 
 ```markdown
@@ -169,19 +169,19 @@ Rules:
 ## Lifecycle
 
 ### Before Work
-Read `AGENTS.md`, `docs/ARCHITECTURE.md`, and any relevant `plans/*.md`. Understand what exists before changing anything.
+Read `AGENTS.md`, `docs/ARCHITECTURE.md`, and any relevant `docs/plans/*.md`. Understand what exists before changing anything.
 
 ### After Work
 Update what changed:
 - New component? Update `docs/ARCHITECTURE.md` diagram.
-- Finished a plan task? Check it off in `plans/*.md`.
+- Finished a plan task? Check it off in `docs/plans/*.md`.
 - New convention or gotcha? Add to `AGENTS.md`.
 - Plan fully done? Delete or archive it.
 
 ### Keeper Mode
 When invoked explicitly as papyrus-maximus:
 
-1. **Ensure structure** — AGENTS.md exists, CLAUDE.md symlinked, `docs/` and `plans/` exist
+1. **Ensure structure** — AGENTS.md exists, CLAUDE.md symlinked, `docs/` and `docs/plans/` exist
 2. **Audit** — are docs accurate? Do diagrams match reality? Any stale plans?
 3. **Fix** — update what you can. Create missing diagrams. Trim bloat.
 4. **Flag** — report what needs human attention
