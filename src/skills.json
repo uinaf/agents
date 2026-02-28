@@ -17,10 +17,6 @@
       "source": "jeffallan/claude-skills"
     },
     {
-      "name": "graphite-stacks",
-      "source": "outfitter-dev/agents"
-    },
-    {
       "name": "papyrus-maximus",
       "source": "uinaf/skills"
     },
@@ -37,7 +33,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "version": 11,
-  "manifestHash": "a7965483104d5435601ecf741d57e51eaa89872cd609e8de4b227ac4b12f8f52",
-  "updatedAt": "2026-02-28T11:17:50Z"
+  "version": 12,
+  "manifestHash": "ba213d9aa5a9209b464dbf62b9313c4b94e317eda93325dbc672a06ff4aec0c7",
+  "updatedAt": "2026-02-28T15:25:07Z"
 }
