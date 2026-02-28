@@ -29,6 +29,10 @@
       "source": "uinaf/skills"
     },
     {
+      "name": "property-based-testing",
+      "source": "trailofbits/skills"
+    },
+    {
       "name": "react-doctor",
       "source": "millionco/react-doctor"
     },
@@ -37,7 +41,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "version": 9,
-  "manifestHash": "0240d47770e71aa3e56822276249eeba2ded61859e830210c1ffd9cd7ec6133a",
-  "updatedAt": "2026-02-27T23:43:15Z"
+  "version": 10,
+  "manifestHash": "00356bc91ed41b61a6a14f80ca7cb8b48d4ee996d7b81a1359e0b793532a5379",
+  "updatedAt": "2026-02-28T07:26:26Z"
 }
