@@ -24,13 +24,9 @@ A task is non-trivial if it touches multiple files/modules, changes a public con
 For non-trivial tasks:
 
 1. Research current code/docs/contracts.
-2. Confirm assumptions:
-   - What should change.
-   - What must **not** change.
-   - What "done" looks like.
-   - Constraints (performance, compatibility, security, style).
-3. Short plan: what changes, where, why, verification. Include non-goals (what's explicitly out of scope).
-4. **Wait for explicit go/yes.**
+2. Confirm assumptions: what changes, what must NOT change, what "done" looks like, constraints.
+3. Short plan: what, where, why, verification, non-goals.
+4. **Interactive:** wait for explicit go/yes. **Autonomous** (--full-auto/--yolo/--dangerously-skip-permissions): proceed unless the plan has unresolvable ambiguities — then stop and surface them.
 5. Implement, then verify using the checks below.
 
 If the plan breaks mid-flight, stop and re-plan.
@@ -60,7 +56,7 @@ Tests verify your logic is internally consistent. Sanity checks verify it matche
 
 ### When blocked
 
-Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarounds only with explicit approval.
+Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarounds only with explicit approval. In autonomous mode, **stop and surface the blocker** — do not burn tokens on workarounds.
 
 ---
 
@@ -110,11 +106,9 @@ Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarou
 
 ---
 
-## Pull Requests and Commit Gate
+## Commit Gate
 
-Use repo PR template if one exists. Otherwise: Summary, Changes, Validation, Linked Issues.
-
-All checks green before commit.
+All checks green before commit. If creating a PR, use repo template or: Summary, Changes, Validation, Linked Issues.
 
 ### Change Summary (non-trivial tasks)
 
