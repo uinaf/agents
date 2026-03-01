@@ -118,8 +118,8 @@ User says Codex → use Codex. Tool fails → fix invocation, max 2 retries. The
 ### Respawn limit
 Max 3 agent attempts per task. Then escalate with: what was tried, what failed, error output.
 
-### One task per agent
-Never combine multiple fixes/features into one prompt. They time out and produce worse results.
+### One concern per agent
+Don't batch unrelated issues. Related or chained tasks (fix + update docs, refactor + add tests) are fine in one prompt.
 
 ## Tool Reference
 
