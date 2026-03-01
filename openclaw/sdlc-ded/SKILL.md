@@ -1,41 +1,32 @@
 ---
 name: sdlc-ded
-description: "ALL coding work. Features, fixes, refactors — never hand-code. Delegates to coding-agent, reviews, auto-merges or escalates."
+description: "ALL coding work. Features, fixes, refactors — never hand-code. Delegates to coding-agent, reviews, ships or escalates."
 ---
 
 # sdlc-ded
 
 ALL coding goes through here. Never hand-code — always delegate.
-Uses the [coding-agent](https://github.com/openclaw/openclaw/blob/main/skills/coding-agent/SKILL.md) skill for running agents.
+[coding-agent](https://github.com/openclaw/openclaw/blob/main/skills/coding-agent/SKILL.md) provides exec patterns (pty, background, worktree, process monitoring). This skill provides the workflow.
 
 ## The Loop
 
-Inspired by [Boris Tane's SDLC collapse](https://boristane.com/blog/the-software-development-lifecycle-is-dead/).
-
-```mermaid
-graph TD
-  A[Agent generates code] --> B[Agent self-verifies]
-  B --> C[Orchestrator reviews]
-  C --> D[Automated checks]
-  D --> E{All clear?}
-  E -->|Yes| F[Ship]
-  E -->|No - resolvable| A
-  E -->|No - novel issue| G[Human review]
-  style F fill:#d1fae5,stroke:#6ee7b7,color:#065f46
+```
+Scope → Delegate → Agent verifies → Orchestrator reviews → Guardrails pass → Ship
+                                                              ↓ fail
+                                                         Respawn (max 3) → Escalate
 ```
 
-1. **Scope** — write task brief
-2. **Delegate** — spin up coding agent in isolated worktree
-3. **Agent self-verifies** — edge cases, error handling, test coverage, runs verification
-4. **Orchestrator reviews** — I read key diffs, check constraints, no scope creep
-5. **Automated checks** — tests, lint, typecheck
-6. **All clear → merge + notify user**
-7. **Resolvable issue → respawn agent with fix prompt**
-8. **Novel issue → escalate to user**
+1. **Scope** — write task brief (mandatory, see template below)
+2. **Delegate** — spin up coding agent in worktree
+3. **Agent self-verifies** — tests, lint, typecheck, real-data sanity check (per AGENTS.md)
+4. **Orchestrator reviews** — read key diffs, check constraints, no scope creep
+5. **Guardrails pass** → ship (push to main by default)
+6. **Guardrails fail** → respawn agent with fix prompt (max 3 attempts)
+7. **3 respawns exhausted or novel issue** → escalate to user with full context
 
-User only gets pulled in for novel issues.
+## Task Brief (mandatory)
 
-## Task Brief
+No structured brief = no delegation. Every prompt must include:
 
 ```markdown
 ## Task: <title>
@@ -47,52 +38,48 @@ User only gets pulled in for novel issues.
 **Read first:** AGENTS.md
 ```
 
-One sentence goal or split the task. Always include in prompt:
+Always append to prompt:
 - Self-review before finishing: edge cases, error handling, test coverage
 - Run verification commands before declaring done
-- **Run the actual thing with real data/APIs and verify outputs make sense** — passing tests is not enough
+- Run the actual thing with real data and verify outputs make sense
 
-## Verification: Tests Are Not Enough
+## Verification
 
-Green CI ≠ working software. The agent AND the orchestrator must verify with reality.
-
-### Agent must (include in every prompt):
-- Run the full test suite
-- **Execute the program against real APIs/data** (dry-run mode if available)
-- Check that outputs are sane: do numbers make sense? Are fields correct? Would a human look at this and say "yeah that's right"?
-
-### Orchestrator must (before pushing/merging):
-- **Dry-run with real data** and read the output
-- Smell-test the results: are prices reasonable? Are dates correct? Do edge cases produce garbage?
-- If something looks off, dig in before pushing — don't trust "tests pass"
-
-A model that says ETH will hit $2,200 when it's at $1,900 in 3 hours is broken, no matter how many tests pass.
-
-### API contract verification (include in prompt when there are external APIs):
-- **Read the actual API docs** before implementing — don't guess field names, endpoints, or response shapes
-- Cross-check implementation against docs: are we using the right fields? Right endpoints? Right response keys?
-- If the API has a playground/explorer, hit it and verify the real response matches assumptions
-- Invented/assumed identifiers (tickers, enum values, field names) are a top source of silent failures — verify every one against real API responses
+Agent owns verification (per `agents/src/AGENTS.md`). Orchestrator sanity-checks:
+- Read key diffs — does the change match the brief?
+- Smell-test outputs if applicable (numbers, dates, API responses)
+- If something looks off, dig in before pushing
 
 ## Delegation
 
-Use `exec pty:true background:true` patterns from coding-agent.
+Use `exec pty:true background:true` patterns from coding-agent skill.
 
 - Isolate in worktree: `git worktree add -b <slug> ~/worktrees/<repo>/<slug>`
-- Always append wake trigger to task prompt:
-  `When finished, run: openclaw system event --text "Done: <summary>" --mode now`
-- One task per agent. Don't mix setup and feature work.
-- Agent fails → respawn with clearer prompt, don't take over.
+- Append wake trigger to every prompt:
+  `When finished, run: openclaw system event --text "Done (pass|fail): <summary>" --mode now`
+- One task per agent. Don't mix concerns.
+- If no system event after ~15min, check `process:log`.
 
-### ⚠️ Stay available — never block on agents
+### After launch: fire and forget
 
-After launching a background agent, **move on immediately**. Do not poll or wait.
+1. `exec pty:true background:true` — launch
+2. **Move on immediately.** Respond to user. Do other work.
+3. System event wakes you when agent finishes
+4. Then `process:log` to read results and review
+5. **Never poll. Never block. Never wait.**
 
-1. `exec pty:true background:true` — fire and forget
-2. System event wakes you when agent finishes
-3. Then use `process:log` to read results and review
-4. **Never use `process:poll` with long timeouts** — it blocks your turn and makes you unresponsive to the user
-5. If the user asks for status, check `process:log` at that point
+## Ship Modes
+
+**Default: push to main.** User controls ceremony level per task.
+
+| Mode | Trigger | Flow |
+|---|---|---|
+| **Yolo** (default) | nothing / "push it" | guardrails green → push to main |
+| **PR** | "make a PR" | branch + push + PR, merge on user's call |
+| **Stacked** | "stack it" | graphite stacked PRs |
+| **Review** | "review this" | `codex review --base main` before push |
+
+**Never push red.** If any guardrail fails (tests, lint, typecheck) → fix first or escalate. This is the one absolute gate.
 
 ## Merge + Cleanup
 
@@ -102,46 +89,49 @@ git worktree remove ~/worktrees/<repo>/<slug>
 git branch -d <slug>
 ```
 
+Cleanup is part of "done." No cleanup = not done.
+
 ## Report
 
 ```markdown
 ## Result
 - Status: done | blocked | escalated
-- Scope delivered:
-- Files changed:
-- Verification:
+- Changes: what shipped
+- Verification: what passed
+- Worktree: cleaned up yes/no
 - Risks / follow-ups:
 ```
 
-### ⚠️ Tool choice is sacred
+## Hard Rules
 
-When the user specifies which tool to use (Claude Code, Codex, etc.), **that is the tool. Period.**
+### Never hand-patch
+CI failing, tests red, agent output broken → **delegate to coding agent.** Not "let me just look at it." Delegate. If agent fails 3 times → escalate to user. You are an orchestrator, not a coder.
 
-- If the specified tool fails → **fix the invocation** (flags, env, working dir). Do NOT silently swap to a different tool.
-- If you can't figure out the correct invocation → **ask the user**. Do NOT substitute.
-- If the tool genuinely can't do the job → **tell the user** and ask what they want to do.
-- Never rationalize a swap ("it's faster", "it already failed"). The user chose deliberately.
+### Never swap tools
+User says Codex → use Codex. Tool fails → fix the invocation (flags, env, workdir). Max 2 retries on invocation issues. Then escalate to user with the error. **Never silently switch to another tool.**
 
-### ⚠️ Don't merge without permission
+### Respawn limit
+Max 3 agent attempts on the same task. After that → escalate with: what was tried, what failed, error output. Stop burning tokens.
 
-- Default: **push branch + create PR**. Let the user review/merge.
-- Only merge directly if the user explicitly says "ship it" or "merge it".
-- Never merge and then ask. Always ask and then merge.
-- If a previous task was merged directly, that doesn't mean the next one should be too.
+## Tool Reference
 
-### Tool reference: Codex CLI
+⚠️ **Both Codex CLI and Claude Code require PTY.** Always use `exec pty:true background:true`. Never `& disown` — process dies silently without TTY.
 
-\`\`\`bash
-# Non-interactive (full auto, no approval prompts):
+### Codex CLI
+```bash
+# Default — no sandbox, no approvals:
+codex --yolo exec "<prompt>"
+
+# Sandboxed alternative (when user asks):
 codex exec --full-auto "<prompt>"
 
-# With explicit writable paths:
-codex exec --full-auto -w . "<prompt>"
-\`\`\`
+# Review:
+codex review --base main
+codex review --uncommitted
+codex review --commit <sha>
+```
 
-### Tool reference: Claude Code
-
-\`\`\`bash
-# Non-interactive (skip permission prompts):
+### Claude Code
+```bash
 claude --dangerously-skip-permissions -p "<prompt>"
-\`\`\`
+```
