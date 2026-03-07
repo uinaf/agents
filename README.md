@@ -5,6 +5,7 @@ Shared agent skill library.
 | Skill | Scope | Description |
 |-------|-------|-------------|
 | **papyrus-maximus** | universal | Project docs that stay alive. Specs, architecture diagrams, execution plans. |
+| **sanity-check** | universal | Post-implementation reality check. Run after tests pass, before declaring done. |
 | **sdlc-ded** | openclaw | Coding workflow — delegates to coding agents, reviews, auto-merges. |
 | **definitely-not-bird** | openclaw | X/Twitter CLI for reading, searching, etc. |
 
