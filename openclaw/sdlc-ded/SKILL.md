@@ -82,7 +82,7 @@ acp-router handles: `sessions_spawn` calls, agentId mapping, thread vs one-shot,
 - Never let raw ACP agent chatter reach the user.
 - Require announce suppression in task briefs (`ANNOUNCE_SKIP`).
 - Send only sanitized orchestrator updates: status + final diff/verify summary.
-- If announce leakage is observed, auto-disable ACP-from-chat immediately and switch to local Codex/Claude CLI fallback until gateway routing is fixed.
+- **No fallback to running CLI directly.** Always use ACPX via `sessions_spawn`. If ACPX leaks or misbehaves, escalate — don't work around it by running `codex` or `claude` in a PTY.
 
 ## Review
 
