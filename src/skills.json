@@ -1,6 +1,10 @@
 {
   "skills": [
     {
+      "name": "Release",
+      "source": "schpet/linear-cli"
+    },
+    {
       "name": "agent-browser",
       "source": "vercel-labs/agent-browser"
     },
@@ -9,12 +13,20 @@
       "source": "wshobson/agents"
     },
     {
+      "name": "frontend-design",
+      "source": "anthropics/skills"
+    },
+    {
       "name": "git-commit",
       "source": "github/awesome-copilot"
     },
     {
       "name": "golang-pro",
       "source": "jeffallan/claude-skills"
+    },
+    {
+      "name": "linear-cli",
+      "source": "schpet/linear-cli"
     },
     {
       "name": "papyrus-maximus",
@@ -29,11 +41,15 @@
       "source": "millionco/react-doctor"
     },
     {
+      "name": "sanity-check",
+      "source": "uinaf/skills"
+    },
+    {
       "name": "tdd",
       "source": "mattpocock/skills"
     }
   ],
-  "version": 12,
-  "manifestHash": "ba213d9aa5a9209b464dbf62b9313c4b94e317eda93325dbc672a06ff4aec0c7",
-  "updatedAt": "2026-02-28T15:25:07Z"
+  "version": 13,
+  "manifestHash": "1b02332055ad7c80837e25294eb7d8543d19425b57fd2107d65a6dbd4bbf26dc",
+  "updatedAt": "2026-03-07T12:08:32Z"
 }
