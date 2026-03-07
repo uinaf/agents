@@ -43,16 +43,7 @@ If it isn't verified, it isn't done.
 
 ### Sanity-check with reality
 
-Passing tests is necessary but not sufficient. Before declaring done:
-
-- **Run the program with real data/APIs** (dry-run if available) and check the output makes sense.
-- **Cross-check external API usage against actual docs** — don't guess field names, enum values, or response shapes. Verify every identifier against real API responses.
-- **Smell-test the outputs** — if a number looks wrong, a date seems off, or a result is implausible, investigate before shipping.
-- If the project has no dry-run mode, at minimum call the real endpoints in a throwaway script and confirm the response matches your code's assumptions.
-
-Tests verify your logic is internally consistent. Sanity checks verify it matches the real world.
-
-**When uncertain — ask.** If you can't verify an API field, a response shape, or an identifier from docs or real responses, don't guess. Stop and ask. A wrong guess that passes tests is worse than a blocker that gets flagged.
+After tests pass, run the `sanity-check` skill before declaring done. Tests verify internal consistency; sanity checks verify it matches the real world.
 
 ### When blocked
 
