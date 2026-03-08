@@ -22,19 +22,21 @@ echo "Linked: ~/.claude/CLAUDE.md -> src/AGENTS.md"
 echo "Linked: ~/.codex/AGENTS.md -> src/AGENTS.md"
 
 MANIFEST="$INSTALL_DIR/src/skills.json"
+SKILL_AGENTS=(codex claude opencode)
 
 # Install skills only from stable manifest (portable across machines)
 if [ -f "$MANIFEST" ]; then
   VERSION=$(jq -r '.version // "?"' "$MANIFEST")
   HASH=$(jq -r '.manifestHash // ""' "$MANIFEST")
   echo "Using skills manifest version=$VERSION hash=$HASH"
+  echo "Installing skills for agents: ${SKILL_AGENTS[*]}"
 
   MANIFEST_NAMES=$(jq -r '.skills[].name' "$MANIFEST")
 
   jq -r '.skills[] | "\(.name) \(.source)"' "$MANIFEST" |
   while read -r name source; do
     echo "Installing skill: $name from $source"
-    npx skills add "$source" -g -y -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
+    npx skills add "$source" -g -y -a "${SKILL_AGENTS[@]}" -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
   done
 
   # Remove installed skills no longer in the manifest
@@ -44,7 +46,7 @@ if [ -f "$MANIFEST" ]; then
       skill_name=$(basename "$skill_dir")
       if ! echo "$MANIFEST_NAMES" | grep -qx "$skill_name"; then
         echo "Removing stale skill: $skill_name"
-        npx skills remove "$skill_name" -g -y </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
+        npx skills remove "$skill_name" -g -y -a "${SKILL_AGENTS[@]}" </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
       fi
     done
   fi
