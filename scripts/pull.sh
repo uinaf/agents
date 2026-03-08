@@ -22,7 +22,7 @@ echo "Linked: ~/.claude/CLAUDE.md -> src/AGENTS.md"
 echo "Linked: ~/.codex/AGENTS.md -> src/AGENTS.md"
 
 MANIFEST="$INSTALL_DIR/src/skills.json"
-SKILL_AGENTS=(codex claude opencode)
+SKILL_AGENTS=(codex claude-code opencode)
 
 # Install skills only from stable manifest (portable across machines)
 if [ -f "$MANIFEST" ]; then

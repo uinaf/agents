@@ -1,10 +1,6 @@
 {
   "skills": [
     {
-      "name": "Release",
-      "source": "schpet/linear-cli"
-    },
-    {
       "name": "agent-browser",
       "source": "vercel-labs/agent-browser"
     },
@@ -49,7 +45,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "version": 13,
-  "manifestHash": "1b02332055ad7c80837e25294eb7d8543d19425b57fd2107d65a6dbd4bbf26dc",
-  "updatedAt": "2026-03-07T12:08:32Z"
+  "version": 14,
+  "manifestHash": "3dc829ac7071e3d82fa3af46b9ae89ff135c83068517b05d06d9cc15c3781f97",
+  "updatedAt": "2026-03-08T19:53:56Z"
 }
