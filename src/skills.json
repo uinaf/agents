@@ -21,10 +21,6 @@
       "source": "jeffallan/claude-skills"
     },
     {
-      "name": "linear-cli",
-      "source": "schpet/linear-cli"
-    },
-    {
       "name": "papyrus-maximus",
       "source": "uinaf/skills"
     },
@@ -45,7 +41,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "version": 14,
+  "version": 15,
   "manifestHash": "3dc829ac7071e3d82fa3af46b9ae89ff135c83068517b05d06d9cc15c3781f97",
-  "updatedAt": "2026-03-08T19:53:56Z"
+  "updatedAt": "2026-03-10T16:11:00Z"
 }
