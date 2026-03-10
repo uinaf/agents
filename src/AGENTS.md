@@ -112,7 +112,7 @@ Work is tracked in Linear (workspace: `uinaf`). When a task references an issue 
 
 Use conventional commit format: `type(scope): description` — e.g. `feat:`, `fix:`, `refactor:`, `test:`, `chore:`, `docs:`.
 
-If the task has a linked issue, mention the issue ID in the commit message. Not all tasks have issues — only add this when one exists.
+If the task has a linked issue, include it parenthesized at the end: `type: description (fixes UINAF-42)`. Lowercase `fixes`. Not all tasks have issues — only add this when one exists.
 
 ---
 
