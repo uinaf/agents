@@ -123,3 +123,4 @@ All checks green before commit. If creating a PR, use repo template or: Summary,
 
 - **Changed:** files + intent
 - **Risks:** what to verify/watch
+- **Complexity:** net `reduced` | `neutral` | `increased` — if increased, justify it or propose a simpler alternative
