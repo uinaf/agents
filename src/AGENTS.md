@@ -101,9 +101,9 @@ Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarou
 
 Work is tracked in Linear (workspace: `uinaf`). When a task references an issue ID (e.g. `UINAF-42`), that's the canonical spec. Read it for context before starting.
 
-When committing, include `Fixes UINAF-XX` (or `Closes UINAF-XX`) in the commit message footer when the change fully resolves an issue.
-
 Use conventional commit format: `type(scope): description` — e.g. `feat:`, `fix:`, `refactor:`, `test:`, `chore:`, `docs:`.
+
+If the task has a linked issue, include `Fixes <issue-id>` or `Closes <issue-id>` in the commit message footer. Not all tasks have issues — only add this when one exists.
 
 ---
 
