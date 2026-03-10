@@ -26,7 +26,7 @@ For non-trivial tasks:
 1. Research current code/docs/contracts.
 2. Confirm assumptions: what changes, what must NOT change, what "done" looks like, constraints.
 3. Short plan: what, where, why, verification, non-goals.
-4. **Interactive:** wait for explicit go/yes. **Autonomous** (--full-auto/--yolo/--dangerously-skip-permissions): proceed unless the plan has unresolvable ambiguities — then stop and surface them.
+4. Proceed with implementation unless the plan has unresolvable ambiguities — then stop and surface them.
 5. Implement, then verify using the checks below.
 
 If the plan breaks mid-flight, stop and re-plan.
