@@ -73,6 +73,7 @@ These aren't suggestions — they're the standard. Internalize them.
 
 - Inspect and follow existing repo conventions (structure, naming, patterns, test style).
 - Don't invent new patterns unless necessary — if you do, explain why.
+- Never hardcode volatile metrics in docs (test counts, line counts, file sizes, coverage numbers). These go stale instantly and become lies. If it can be derived from a command, let the command be the source of truth.
 
 ### Safety
 
