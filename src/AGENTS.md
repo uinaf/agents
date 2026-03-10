@@ -43,7 +43,7 @@ If it isn't verified, it isn't done.
 
 ### Sanity-check with reality
 
-After tests pass, run the `sanity-check` skill before declaring done. Tests verify internal consistency; sanity checks verify it matches the real world.
+After tests pass, verify the change works in practice — not just in tests. Run the binary, hit the endpoint, check the output. If a `sanity-check` skill is available, use it.
 
 ### When blocked
 
@@ -53,11 +53,19 @@ Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarou
 
 ## Code Principles
 
+These aren't suggestions — they're the standard. Internalize them.
+
+**SICP:** Composition over layered complexity. Build from small, composable pieces. Understand abstractions before using them.
+
+**A Philosophy of Software Design (Ousterhout):** Deep modules with small stable surfaces. Minimize cognitive load. Complexity is the enemy — fight it actively.
+
+**Software Design for Flexibility (Hanson & Sussman):** Extension points are earned by real use-cases, not speculation. Don't build for hypothetical futures.
+
 ### Design and structure
 
-- Deep modules, small stable surfaces, minimal cognitive load (Ousterhout).
-- Composition over layered complexity (SICP).
-- Extension points earned by real use-cases, not speculation (Hanson & Sussman).
+- Deep modules, small stable surfaces, minimal cognitive load.
+- Composition over layered complexity.
+- Extension points earned by real use-cases, not speculation.
 - Prefer reversible changes when uncertain.
 - For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR.
 
@@ -114,17 +122,4 @@ All checks green before commit. If creating a PR, use repo template or: Summary,
 ### Change Summary (non-trivial tasks)
 
 - **Changed:** files + intent
-- **Untouched:** intentionally left alone
 - **Risks:** what to verify/watch
-- **Complexity:**
-  - Added: what complexity was introduced
-  - Removed: what complexity was eliminated
-  - Net: `reduced` | `neutral` | `increased`
-
-If net increased and you can't clearly justify it, stop and propose a lower-complexity alternative.
-
----
-
-## Foundational References
-
-SICP, A Philosophy of Software Design (Ousterhout), Software Design for Flexibility (Hanson & Sussman). These inform the design principles above.
