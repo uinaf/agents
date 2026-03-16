@@ -70,6 +70,9 @@ These aren't suggestions — they're the standard. Internalize them.
 - **SICP:** Composition over layered complexity. Build from small, composable pieces. Understand abstractions before using them.
 - **Ousterhout:** Deep modules with small stable surfaces. Minimize cognitive load. Complexity is the enemy — fight it actively.
 - **Hanson & Sussman:** Extension points are earned by real use-cases, not speculation. Don't build for hypothetical futures.
+- **Elm Architecture:** Unidirectional data flow. Model → Update → View. State is explicit, updates are pure functions, side effects are at the edges.
+- **Domain Modeling Made Functional (Wlaschin):** Make illegal states unrepresentable. Use types to encode domain rules. Railway-oriented programming — compose operations that can fail without nested error handling.
+- **Hexagonal Architecture (Ports & Adapters):** Business logic knows nothing about infrastructure. Dependencies point inward. Swap databases, APIs, UIs without touching the core.
 - Prefer reversible changes when uncertain.
 - For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR.
 
