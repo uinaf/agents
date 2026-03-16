@@ -1,6 +1,14 @@
 {
   "skills": [
     {
+      "name": "docs",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "emil-design-eng",
+      "source": "emilkowalski/skill"
+    },
+    {
       "name": "error-handling-patterns",
       "source": "wshobson/agents"
     },
@@ -13,10 +21,6 @@
       "source": "jeffallan/claude-skills"
     },
     {
-      "name": "docs",
-      "source": "uinaf/skills"
-    },
-    {
       "name": "property-based-testing",
       "source": "trailofbits/skills"
     },
@@ -25,15 +29,15 @@
       "source": "millionco/react-doctor"
     },
     {
-      "name": "verify",
-      "source": "uinaf/skills"
-    },
-    {
       "name": "tdd",
       "source": "mattpocock/skills"
+    },
+    {
+      "name": "verify",
+      "source": "uinaf/skills"
     }
   ],
-  "version": 16,
-  "manifestHash": "911d15f50dd6252bb033459126294ac0845f50e4ddfbaac8a59c1d2f268c9f69",
-  "updatedAt": "2026-03-16T21:09:20Z"
+  "version": 17,
+  "manifestHash": "2b600bc30c057ed6961e51c54f865a57686056a7a6618699b71edc1cf130ab27",
+  "updatedAt": "2026-03-16T23:05:04Z"
 }
