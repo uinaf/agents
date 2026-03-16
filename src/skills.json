@@ -25,6 +25,10 @@
       "source": "jeffallan/claude-skills"
     },
     {
+      "name": "improve-codebase-architecture",
+      "source": "mattpocock/skills"
+    },
+    {
       "name": "property-based-testing",
       "source": "trailofbits/skills"
     },
@@ -33,15 +37,11 @@
       "source": "millionco/react-doctor"
     },
     {
-      "name": "tdd",
-      "source": "mattpocock/skills"
-    },
-    {
-      "name": "improve-codebase-architecture",
-      "source": "mattpocock/skills"
-    },
-    {
       "name": "request-refactor-plan",
+      "source": "mattpocock/skills"
+    },
+    {
+      "name": "tdd",
       "source": "mattpocock/skills"
     },
     {
@@ -49,7 +49,7 @@
       "source": "uinaf/skills"
     }
   ],
-  "version": 18,
-  "manifestHash": "cddb3340dd8c5c4174c58795c09e6c8e2a411f13a57a2d242390af37974dcda3",
-  "updatedAt": "2026-03-16T23:21:50Z"
+  "version": 19,
+  "manifestHash": "e9d7c90302ecf5f5800df9ccb3bbc006ec8162a4bd17f6f7af2ebd69cd16fac6",
+  "updatedAt": "2026-03-16T23:54:18Z"
 }
