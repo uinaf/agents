@@ -8,8 +8,7 @@ Use narrow review lanes. Each subagent should own one concern, gather evidence, 
 - `tests`: missing behavioral coverage, weak edge-case coverage, brittle tests.
 - `silent-failures`: swallowed errors, broad catches, hidden fallbacks, poor user feedback.
 - `types-and-contracts`: type design, invariants, API contracts, schema drift.
-- `maintainability`: unnecessary complexity, duplication, awkward abstractions, simplification opportunities.
-- `comments-and-docs`: inaccurate comments, misleading docs, comment rot.
+- `maintainability`: unnecessary complexity, duplication, awkward abstractions, simplification opportunities, inaccurate comments, misleading docs.
 
 ## Good Sanity-Check Lanes
 

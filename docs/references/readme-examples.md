@@ -6,26 +6,26 @@ Pick one primary shape. Copy the structure, not the wording.
 
 ### Minimal product README
 
-- `shadcn/ui`: short value proposition, one clear docs link, minimal contributor overhead.
-- `standard-readme` minimal example: clean baseline for install, usage, contributing, license.
+- [`shadcn/ui`](https://github.com/shadcn-ui/ui): short value proposition, one clear docs link, minimal contributor overhead.
+- [`standard-readme`](https://github.com/RichardLitt/standard-readme) minimal example: clean baseline for install, usage, contributing, license.
 - Use when deeper docs already exist and README should stay short.
 
 ### CLI README
 
 - A strong CLI README: install first, then quickstart, then docs links. Keep human usage near the top and avoid burying the first successful command.
-- `opencode`: concise product statement, badges/language switcher, then an installation matrix near the top.
-- `SST`: short pitch, installation, framework-specific getting started links, concept links, contributing, then local development notes.
+- [`opencode`](https://github.com/nicholasgriffintn/opencode): concise product statement, badges/language switcher, then an installation matrix near the top.
+- [`SST`](https://github.com/sst/sst): short pitch, installation, framework-specific getting started links, concept links, contributing, then local development notes.
 - Use when the fastest path to value is "install, run one command, confirm it works."
 
 ### Product + contributor README
 
-- `Zed`: short product intro, installation, development entry points, contributing, licensing notes.
-- `Ghostty`: strong hero block, top navigation, then progressively deeper sections for download, docs, contribution, roadmap, and operational details.
+- [`Zed`](https://github.com/zed-industries/zed): short product intro, installation, development entry points, contributing, licensing notes.
+- [`Ghostty`](https://github.com/ghostty-org/ghostty): strong hero block, top navigation, then progressively deeper sections for download, docs, contribution, roadmap, and operational details.
 - Use when one README must serve both end users and contributors without becoming a handbook.
 
 ### README with navigation and examples
 
-- `FastColabCopy`: table of contents, visual demo, usage examples, best-practice section.
+- [`FastColabCopy`](https://github.com/McPizza0/FastColabCopy): table of contents, visual demo, usage examples, best-practice section.
 - Use when examples or visuals materially help adoption.
 
 ## Layout Rules

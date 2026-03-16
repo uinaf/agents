@@ -1,6 +1,6 @@
 # skills
 
-Shared agent skill library. Bias toward harness engineering: small AGENTS files, repo-first truth, and command-backed verification.
+Reusable agent skills for coding workflows. Small by design — harness engineering over prompt engineering: repo-first truth, progressive disclosure, and command-backed verification.
 
 | Skill | Description |
 |-------|-------------|
