@@ -41,6 +41,15 @@ Keep the repo legible to humans and agents.
 6. Delete or archive stale plans, duplicated guidance, and AI slop.
 7. If drift keeps recurring, add a check or template instead of another paragraph.
 
+## Keep docs alive
+
+Docs rot silently. Every code change is a potential doc change. Update docs as part of the work, not after.
+
+- After implementing a feature, check if AGENTS.md, README, or architecture docs need updating.
+- After renaming, moving, or deleting code, grep docs for stale references.
+- After a design decision, record it in a decision doc or plan before moving on.
+- Treat doc drift the same as test failure — it degrades every future agent's performance.
+
 ## Hygiene
 
 Run periodically or after a burst of changes to keep docs tight.
