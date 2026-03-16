@@ -1,0 +1,4 @@
+interface:
+  display_name: "Verify"
+  short_description: "Reality-check code after tests pass"
+  default_prompt: "Use $verify to prove the change works end to end."
