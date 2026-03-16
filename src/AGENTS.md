@@ -41,9 +41,9 @@ Use repo guardrails first (`make verify`, `just verify`, project scripts). If no
 
 If it isn't verified, it isn't done.
 
-### Sanity-check with reality
+### Sanity-check
 
-After tests pass, verify the change works in practice — not just in tests. Run the binary, hit the endpoint, check the output. If a `sanity-check` skill is available, use it.
+After tests pass, verify the change works in practice — not just in tests. Run the binary, hit the endpoint, check the output. If `sanity-check` skill is available, use it.
 
 ### When blocked
 
@@ -83,7 +83,7 @@ These aren't suggestions — they're the standard. Internalize them.
 
 ### Dependencies
 
-- Don't add or update dependencies unless necessary. Justify new deps in the PR.
+- Don't add or update dependencies unless necessary.
 - Prefer what's already in the stack before reaching for something new.
 
 ### Error handling
@@ -103,16 +103,6 @@ These aren't suggestions — they're the standard. Internalize them.
 - Subprocess tests only for true process-boundary behavior.
 - Coverage must represent executed production code for the full test run.
 - Coverage integrity: run the same coverage command as CI, confirm expected files appear, and treat missing files (e.g. due to process boundaries) as failure.
-
----
-
-## Project Tracking
-
-Work is tracked in Linear (workspace: `uinaf`). When a task references an issue ID (e.g. `UINAF-42`), that's the canonical spec. Read it for context before starting.
-
-Use conventional commit format: `type(scope): description` — e.g. `feat:`, `fix:`, `refactor:`, `test:`, `chore:`, `docs:`.
-
-If the task has a linked issue, include it parenthesized at the end: `type: description (fixes UINAF-42)`. Lowercase `fixes`. Not all tasks have issues — only add this when one exists.
 
 ---
 

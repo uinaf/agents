@@ -1,20 +1,8 @@
 {
   "skills": [
     {
-      "name": "Release",
-      "source": "schpet/linear-cli"
-    },
-    {
-      "name": "agent-browser",
-      "source": "vercel-labs/agent-browser"
-    },
-    {
       "name": "error-handling-patterns",
       "source": "wshobson/agents"
-    },
-    {
-      "name": "frontend-design",
-      "source": "anthropics/skills"
     },
     {
       "name": "git-commit",
@@ -25,24 +13,8 @@
       "source": "jeffallan/claude-skills"
     },
     {
-      "name": "merge-pr",
-      "source": "openclaw/maintainers"
-    },
-    {
-      "name": "mintlify",
-      "source": "openclaw/maintainers"
-    },
-    {
-      "name": "papyrus-maximus",
+      "name": "docs",
       "source": "uinaf/skills"
-    },
-    {
-      "name": "pr-cluster",
-      "source": "openclaw/maintainers"
-    },
-    {
-      "name": "prepare-pr",
-      "source": "openclaw/maintainers"
     },
     {
       "name": "property-based-testing",
@@ -53,11 +25,7 @@
       "source": "millionco/react-doctor"
     },
     {
-      "name": "review-pr",
-      "source": "openclaw/maintainers"
-    },
-    {
-      "name": "sanity-check",
+      "name": "verify",
       "source": "uinaf/skills"
     },
     {
