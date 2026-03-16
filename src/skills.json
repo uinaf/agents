@@ -37,6 +37,14 @@
       "source": "mattpocock/skills"
     },
     {
+      "name": "improve-codebase-architecture",
+      "source": "mattpocock/skills"
+    },
+    {
+      "name": "request-refactor-plan",
+      "source": "mattpocock/skills"
+    },
+    {
       "name": "verify",
       "source": "uinaf/skills"
     }
