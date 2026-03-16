@@ -73,6 +73,7 @@ These aren't suggestions — they're the standard. Internalize them.
 - **Elm Architecture:** Unidirectional data flow. Model → Update → View. State is explicit, updates are pure functions, side effects are at the edges.
 - **Domain Modeling Made Functional (Wlaschin):** Make illegal states unrepresentable. Use types to encode domain rules. Railway-oriented programming — compose operations that can fail without nested error handling.
 - **Hexagonal Architecture (Ports & Adapters):** Business logic knows nothing about infrastructure. Dependencies point inward. Swap databases, APIs, UIs without touching the core.
+- **[Great software is composed, not written](https://altay.wtf/decade/):** Types are the ultimate contract. Declarative over imperative. Simplicity over cleverness. Pragmatism over perfection — great software today beats perfect software tomorrow.
 - Prefer reversible changes when uncertain.
 - For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR.
 
