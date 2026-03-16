@@ -36,14 +36,24 @@ If the plan breaks mid-flight, stop and re-plan.
 - Bug fix → reproducing test first, then fix.
 - Refactor → before/after behavior parity.
 - Feature → contract-level tests + runtime check.
+- Fresh worktree → bootstrap first (`pnpm install`, `cargo fetch`, codegen, etc.) before running checks.
 
 Use repo guardrails first (`make verify`, `just verify`, project scripts). If none exist, run explicit format/lint/typecheck/test.
 
+After tests pass, verify the change works in practice. Run the binary, hit the endpoint, check the output. If a `verify` skill is available, use it.
+
+For code review, split by concern when the work is parallelizable: security, test gaps, silent failures, types/contracts, maintainability. Each concern gathers evidence independently; merge into one prioritized result.
+
 If it isn't verified, it isn't done.
 
-### Sanity-check
+### Keep docs alive
 
-After tests pass, verify the change works in practice — not just in tests. Run the binary, hit the endpoint, check the output. If `sanity-check` skill is available, use it.
+Doc drift degrades every future agent's performance. Update docs as part of the work, not after.
+
+- After implementing a feature, check if AGENTS.md, README, or architecture docs need updating.
+- After renaming, moving, or deleting code, grep docs for stale references.
+- After a design decision, record it before moving on.
+- If it's not in the repo, it doesn't exist to the next agent.
 
 ### When blocked
 
@@ -53,19 +63,13 @@ Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarou
 
 ## Code Principles
 
-These aren't suggestions — they're the standard. Internalize them.
-
-**SICP:** Composition over layered complexity. Build from small, composable pieces. Understand abstractions before using them.
-
-**A Philosophy of Software Design (Ousterhout):** Deep modules with small stable surfaces. Minimize cognitive load. Complexity is the enemy — fight it actively.
-
-**Software Design for Flexibility (Hanson & Sussman):** Extension points are earned by real use-cases, not speculation. Don't build for hypothetical futures.
+These aren't suggestions — they're the standard.
 
 ### Design and structure
 
-- Deep modules, small stable surfaces, minimal cognitive load.
-- Composition over layered complexity.
-- Extension points earned by real use-cases, not speculation.
+- Deep modules, small stable surfaces, minimal cognitive load. *(Ousterhout)*
+- Composition over layered complexity. Understand abstractions before using them. *(SICP)*
+- Extension points earned by real use-cases, not speculation. *(Hanson & Sussman)*
 - Prefer reversible changes when uncertain.
 - For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR.
 
