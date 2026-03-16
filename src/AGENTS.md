@@ -63,13 +63,19 @@ Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarou
 
 ## Code Principles
 
-These aren't suggestions — they're the standard.
+These aren't suggestions — they're the standard. Internalize them.
+
+**SICP:** Composition over layered complexity. Build from small, composable pieces. Understand abstractions before using them.
+
+**A Philosophy of Software Design (Ousterhout):** Deep modules with small stable surfaces. Minimize cognitive load. Complexity is the enemy — fight it actively.
+
+**Software Design for Flexibility (Hanson & Sussman):** Extension points are earned by real use-cases, not speculation. Don't build for hypothetical futures.
 
 ### Design and structure
 
-- Deep modules, small stable surfaces, minimal cognitive load. *(Ousterhout)*
-- Composition over layered complexity. Understand abstractions before using them. *(SICP)*
-- Extension points earned by real use-cases, not speculation. *(Hanson & Sussman)*
+- Deep modules, small stable surfaces, minimal cognitive load.
+- Composition over layered complexity.
+- Extension points earned by real use-cases, not speculation.
 - Prefer reversible changes when uncertain.
 - For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR.
 
