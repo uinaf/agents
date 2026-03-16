@@ -40,3 +40,14 @@ Keep the repo legible to humans and agents.
 5. Record boot steps, validation steps, and handoff details in plans when they matter.
 6. Delete or archive stale plans, duplicated guidance, and AI slop.
 7. If drift keeps recurring, add a check or template instead of another paragraph.
+
+## Hygiene
+
+Run periodically or after a burst of changes to keep docs tight.
+
+1. **Dedup**: search for the same fact stated in multiple files. Pick one canonical location, remove or replace the others with a pointer.
+2. **Consistency**: verify that names, lanes, commands, and file paths mentioned in one doc match what the referenced doc actually says.
+3. **Conciseness**: if a section restates what a referenced doc already covers, replace it with a one-line pointer.
+4. **Structure**: if a file is growing past ~80 lines of prose, split detail into `references/` and keep the parent file as a routing layer.
+5. **Staleness**: delete or archive docs that describe removed features, finished plans, or superseded decisions.
+6. **Symlinks over copies**: if two files must have identical content, use a symlink. Never maintain two copies of the same text.

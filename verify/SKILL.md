@@ -11,20 +11,11 @@ Passing tests is necessary, not sufficient. Use the harness to prove the change 
 
 - If you did not run it, you did not verify it.
 - Prefer generic tools the model already understands: shell commands, app entrypoints, HTTP clients, browser automation.
-- For code review or sanity checks, explicitly use subagents when the work splits cleanly by concern or surface area.
-- Good subagent splits: security, test gaps, performance, maintainability, UI checks, API checks.
-- Tell the main agent to wait for all subagents, then merge their findings into one prioritized result.
-- Use subagents for read-heavy exploration and validation, not parallel writes to the same files.
-- Avoid subagents when checks depend on each other sequentially.
 - Record the commands and artifacts so another agent can repeat the check.
 
 ## Subagents
 
-- For review prompts, ask for parallel subagents by concern.
-- Example: spawn one subagent for security, one for missing tests, one for maintainability, then summarize.
-- For sanity checks, split by surface: UI flow, API behavior, persistence/config, external contracts.
-- Let subagents gather evidence; the main agent decides priorities and final confidence.
-- For named review lanes and what each one should look for, read `references/subagent-lanes.md`.
+When the work splits cleanly by concern, use parallel subagents. For named lanes, model guidance, and what each lane should look for, read `references/subagent-lanes.md`.
 
 ## Checks
 

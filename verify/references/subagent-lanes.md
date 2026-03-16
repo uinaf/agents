@@ -54,17 +54,30 @@ Unnecessary complexity, duplication, awkward abstractions, simplification opport
 
 ## Sanity-Check Lanes
 
+These are run-it-and-prove-it lanes. Each one should execute commands and capture evidence, not just read code.
+
 ### `ui-surface`
 Browser flow, DOM state, screenshots, navigation, regressions.
+- Navigate the real UI flow end to end with browser automation or CDP.
+- Capture screenshots at each step as proof.
+- Check for console errors, broken links, missing assets.
 
 ### `api-surface`
 Endpoints, status codes, payloads, error shapes.
+- Hit real local endpoints with representative requests.
+- Verify status codes, response shapes, and error responses match expectations.
+- Check auth and unauthenticated paths both work correctly.
 
 ### `state-and-config`
 Persistence round trips, config boot, migrations, environment assumptions.
+- Write data, restart, read it back.
+- Boot with the new config and confirm the app starts cleanly.
+- Verify migrations run without errors on a fresh and existing state.
 
 ### `external-contracts`
 Third-party APIs, enum values, response shapes, integration assumptions.
+- Compare actual API responses against expected shapes in code.
+- If you cannot hit the real API, surface the gap explicitly.
 
 ## Model and reasoning effort
 
