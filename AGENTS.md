@@ -12,3 +12,4 @@ Instructions for contributors in this repo.
 - Keep the repo as the system of record. If guidance matters, write it into versioned files.
 - Prefer mechanical enforcement over prose when a rule can be checked by scripts, templates, or CI.
 - Prefer harness evidence over intuition. Inspect files, run commands, and tune wording from what the repo actually does.
+- In checked-in Markdown, use repo-relative links for local docs and references. Never commit absolute filesystem targets such as `/Users/...`, `file://...`, or `vscode://...`.

@@ -18,6 +18,7 @@ Keep the repo legible to humans and agents.
 - Turning `AGENTS.md` into a manual.
 - Turning `README.md` into a full project handbook.
 - Putting every detail in `SKILL.md` instead of routing to deeper docs or `references/`.
+- Leaking chat-only absolute filesystem links into checked-in docs or skill references.
 - Writing long prose when a table, diagram, pseudocode block, or check would work better.
 - Leaving durable guidance in chat, tickets, or external docs.
 - Keeping stale plans or duplicated instructions around.
@@ -37,9 +38,11 @@ Keep the repo legible to humans and agents.
 2. Keep `README.md` and `AGENTS.md` short. Move task-specific detail into `docs/*`. For README work, pick a shape from `references/readme-examples.md`.
 3. Keep `SKILL.md` to triggers and workflow; move heavier detail to `references/` when it helps repeated use.
 4. Update only the docs touched by the change, and ground claims in the repo or command output.
-5. Record boot steps, validation steps, and handoff details in plans when they matter.
-6. Delete or archive stale plans, duplicated guidance, and AI slop.
-7. If drift keeps recurring, add a check or template instead of another paragraph.
+5. In checked-in docs, use repo-relative Markdown links for local files. Reserve absolute filesystem paths for chat/UI file references, not versioned docs.
+6. When changing Markdown links, run `scripts/check-doc-links.sh`.
+7. Record boot steps, validation steps, and handoff details in plans when they matter.
+8. Delete or archive stale plans, duplicated guidance, and AI slop.
+9. If drift keeps recurring, add a check or template instead of another paragraph.
 
 ## Keep docs alive
 
