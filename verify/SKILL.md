@@ -10,6 +10,8 @@ Passing tests is necessary, not sufficient. Use the harness to prove the change 
 ## Rules
 
 - If you did not run it, you did not verify it.
+- Verify outcomes, not prompt compliance.
+- For non-trivial changes, check nearby flows and likely regressions, not just the exact diff.
 - Prefer generic tools the model already understands: shell commands, app entrypoints, HTTP clients, browser automation.
 - Record the commands and artifacts so another agent can repeat the check.
 
@@ -21,23 +23,29 @@ When the work splits cleanly by concern, use parallel subagents. For named lanes
 
 ### 1. Real Surface
 - Run the shipped CLI, service, job, or UI flow with representative inputs.
-- For UI flows, prefer browser automation or CDP and inspect the DOM, screenshots, and network behavior.
+- For UI, use browser automation or CDP and inspect behavior, structure, legibility, and responsiveness.
 - For services, hit the real local endpoint and confirm the full round trip.
 
-### 2. External Contracts
+### 2. Change Review
+- Screenshots are evidence, not the verdict.
+- If the result is weak, fix it and re-run verification.
+- Check nearby surfaces and follow-on states, not just the named change.
+- If one perspective is too narrow, use independent subagent lanes and merge the findings.
+
+### 3. External Contracts
 - Verify field names, enums, and response shapes against docs or real responses.
 - If you cannot verify a contract detail, stop and surface the gap.
 
-### 3. State and Config
+### 4. State and Config
 - Verify public interfaces still work end to end.
 - Verify persistence/state round trips with real data where relevant.
 - Verify config changes by starting the program with the new config.
 
-### 4. Smell Test
+### 5. Smell Test
 - Check that outputs look plausible to a human.
 - Investigate anything odd instead of rationalizing it.
 
-### 5. Proof of Work
+### 6. Proof of Work
 - Keep the evidence: screenshots, logs, traces, sample responses, generated files.
 
 ## Output
