@@ -1,6 +1,10 @@
 {
   "skills": [
     {
+      "name": "agent-dx-cli-scale",
+      "source": "jpoehnelt/skills"
+    },
+    {
       "name": "docs",
       "source": "uinaf/skills"
     },
@@ -33,6 +37,14 @@
       "source": "trailofbits/skills"
     },
     {
+      "name": "putio-frontend-docs",
+      "source": "putdotio/skills"
+    },
+    {
+      "name": "putio-frontend-packages",
+      "source": "putdotio/skills"
+    },
+    {
       "name": "react-doctor",
       "source": "millionco/react-doctor"
     },
@@ -49,7 +61,7 @@
       "source": "uinaf/skills"
     }
   ],
-  "version": 19,
-  "manifestHash": "e9d7c90302ecf5f5800df9ccb3bbc006ec8162a4bd17f6f7af2ebd69cd16fac6",
-  "updatedAt": "2026-03-16T23:54:18Z"
+  "version": 20,
+  "manifestHash": "20de85e1fa66e95c20c7f0a9e9087ea210983ccb3b5b30793f6d1121513302d6",
+  "updatedAt": "2026-03-17T22:12:34Z"
 }
