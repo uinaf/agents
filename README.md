@@ -13,9 +13,3 @@ Reusable agent skills for coding workflows. Small by design — harness engineer
 ```bash
 npx skills add uinaf/skills -g -s effect-ts
 ```
-
-## Validation
-
-```bash
-./docs/scripts/check-doc-links.sh
-```

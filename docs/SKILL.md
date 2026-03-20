@@ -39,7 +39,7 @@ Keep the repo legible to humans and agents.
 3. Keep `SKILL.md` to triggers and workflow; move heavier detail to `references/` when it helps repeated use.
 4. Update only the docs touched by the change, and ground claims in the repo or command output.
 5. In checked-in docs, use repo-relative Markdown links for local files. Reserve absolute filesystem paths for chat/UI file references, not versioned docs.
-6. When changing Markdown links, run `scripts/check-doc-links.sh`.
+6. When changing Markdown links, verify that each local link target exists and that every claimed doc path resolves inside the repo.
 7. Record boot steps, validation steps, and handoff details in plans when they matter.
 8. Delete or archive stale plans, duplicated guidance, and AI slop.
 9. If drift keeps recurring, add a check or template instead of another paragraph.
