@@ -37,14 +37,6 @@
       "source": "trailofbits/skills"
     },
     {
-      "name": "putio-frontend-docs",
-      "source": "putdotio/skills"
-    },
-    {
-      "name": "putio-frontend-packages",
-      "source": "putdotio/skills"
-    },
-    {
       "name": "react-doctor",
       "source": "millionco/react-doctor"
     },
