@@ -85,6 +85,14 @@ These aren't suggestions — they're the standard. Internalize them.
 - Never hardcode volatile metrics in docs (test counts, line counts, file sizes, coverage numbers). These go stale instantly and become lies. If it can be derived from a command, let the command be the source of truth.
 - In checked-in Markdown, use repo-relative links for local docs and references. Never commit absolute filesystem targets such as `/Users/...`, `file://...`, or `vscode://...`.
 
+### Style
+
+- Never put a period directly after a code span, URL, or code block. End the sentence before the code or restructure.
+  - ❌ `Clone some-repo-name.`
+  - ✅ `Clone some-repo-name`
+  - ❌ `Go to example.com.`
+  - ✅ `Go to example.com`
+
 ### Safety
 
 - Parse external data at boundaries; operate on typed/validated structures internally.
