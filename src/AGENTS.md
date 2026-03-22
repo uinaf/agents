@@ -88,10 +88,10 @@ These aren't suggestions — they're the standard. Internalize them.
 ### Style
 
 - Never put a period directly after a code span, URL, or code block. End the sentence before the code or restructure.
-  - ❌ `Clone some-repo-name.`
-  - ✅ `Clone some-repo-name`
-  - ❌ `Go to example.com.`
-  - ✅ `Go to example.com`
+  - ❌ Clone `some-repo-name`.
+  - ✅ Clone `some-repo-name`
+  - ❌ Go to `example.com`.
+  - ✅ Go to `example.com`
 
 ### Safety
 
