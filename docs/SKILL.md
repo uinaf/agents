@@ -53,6 +53,14 @@ Docs rot silently. Every code change is a potential doc change. Update docs as p
 - After a design decision, record it in a decision doc or plan before moving on.
 - Treat doc drift the same as test failure — it degrades every future agent's performance.
 
+## Style
+
+- Never put a period directly after a code span, URL, or code block. End the sentence before the code or restructure.
+  - ❌ Clone `some-repo-name`.
+  - ✅ Clone `some-repo-name`
+  - ❌ Go to `example.com`.
+  - ✅ Go to `example.com`
+
 ## Hygiene
 
 Run periodically or after a burst of changes to keep docs tight.
