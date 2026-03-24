@@ -1,151 +1,220 @@
 # Harness Patterns by Project Type
 
-Concrete setup patterns for common project types.
+Concrete patterns for common project types. All examples use placeholder boot commands — substitute your project's actual tool (npm scripts, cargo, mise tasks, just, vite, etc.).
 
-## Web App (React, Next.js, Vue, etc.)
+## Boot Scripts
 
-### Bootable
+Every project needs a single command to start. The tool doesn't matter — consistency does.
+
 ```bash
-# Makefile or package.json script
-make dev        # starts dev server on predictable port
-make dev-check  # starts server + waits for health endpoint
+# Whatever your stack uses:
+npm run dev          # Node/frontend
+cargo run            # Rust
+mise run dev         # mise-managed
+just dev             # justfile
+docker compose up -d # containerized stack
+python -m app        # Python
 ```
 
-### Interaction Layer
+### Init Script
+
+Create a script that boots the app and confirms it's alive before any work begins. Run this at the start of every agent session.
+
 ```bash
-# Playwright CLI for smoke tests
-npx playwright test smoke.spec.ts --headed=false
+#!/usr/bin/env bash
+# scripts/init.sh — boot and verify
+set -euo pipefail
+
+# Start the app (background if needed)
+<your-boot-command> &
+APP_PID=$!
+
+# Wait for health
+for i in $(seq 1 30); do
+  curl -sf http://localhost:${PORT:-3000}/health > /dev/null 2>&1 && break
+  sleep 1
+done
+
+curl -sf http://localhost:${PORT:-3000}/health > /dev/null 2>&1 || {
+  echo "ERROR: App failed to start"
+  kill $APP_PID 2>/dev/null
+  exit 1
+}
+
+echo "App is ready"
 ```
 
-Key smoke test shape:
-```typescript
-test('app loads and key flow works', async ({ page }) => {
-  await page.goto('http://localhost:3000');
-  await expect(page).toHaveTitle(/App/);
-  await page.click('[data-testid="main-action"]');
-  await expect(page.locator('.result')).toBeVisible();
-});
+## Containerized Stacks
+
+For services with dependencies (DB, Redis, queues, etc.), use Docker Compose.
+
+```yaml
+# docker-compose.yml
+services:
+  app:
+    build: .
+    ports: ["${PORT:-3000}:3000"]
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16
+    healthcheck:
+      test: pg_isready
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    environment:
+      POSTGRES_PASSWORD: test
 ```
 
-### Observability
-- `GET /api/health` returning `{ status: "ok", version: "..." }`
-- Structured JSON logs to stdout (parseable by agent)
-
-## API / Backend Service
-
-### Bootable
+Boot pattern:
 ```bash
-make serve              # starts the API
-make serve-check        # starts + confirms health endpoint responds
+docker compose up -d --wait  # waits for all health checks
+# or:
+docker compose up -d && scripts/wait-for-health.sh
 ```
 
-### Interaction Layer
+## Smoke Tests
+
+Fast (< 5 seconds) check that the app is alive. Not user flows — just "did it start."
+
 ```bash
-# curl scripts for key endpoints
-curl -s http://localhost:8080/health | jq .
-curl -s -X POST http://localhost:8080/api/v1/resource \
+# HTTP service
+curl -sf http://localhost:3000/health | jq .
+
+# CLI tool
+./dist/my-cli --version
+
+# UI app (Playwright)
+npx playwright test smoke.spec.ts
+# where smoke.spec.ts just checks the page loads:
+# test('app loads', async ({ page }) => {
+#   await page.goto('http://localhost:3000');
+#   await expect(page).toHaveTitle(/.+/);
+# });
+```
+
+## E2e Tests
+
+Key user flows exercised on the real running app.
+
+### UI (Playwright CLI)
+```bash
+npx playwright test e2e/
+```
+
+### API (curl/httpie)
+```bash
+# Create → Read → Delete round-trip
+ID=$(curl -s -X POST http://localhost:8080/api/v1/items \
   -H "Content-Type: application/json" \
-  -d '{"name": "test"}' | jq .
+  -d '{"name": "test"}' | jq -r '.id')
+
+curl -s http://localhost:8080/api/v1/items/$ID | jq .
+
+curl -s -X DELETE http://localhost:8080/api/v1/items/$ID
 ```
 
-### Verification
-- Request/response pairs as test fixtures
-- Contract tests against OpenAPI spec if available
-- Seed data script for consistent test state
-
-## CLI Tool
-
-### Bootable
+### CLI (golden file diff)
 ```bash
-make build && ./dist/my-cli --version
-```
-
-### Interaction Layer
-```bash
-# Smoke test script
 ./dist/my-cli process --input fixtures/sample.json --output /tmp/out.json
 diff /tmp/out.json fixtures/expected-output.json
 ```
 
-### Verification
-- Golden file tests (expected output vs actual output)
-- Exit code verification
-- stderr/stdout capture and assertion
-
-## SDK / Library
-
-### Bootable
+### SDK / Library (consumer test)
 ```bash
-make build && make test   # builds and runs test suite
-```
-
-### Interaction Layer
-```bash
-# Consumer test — use the built artifact, not source
-make build
+# Build, then use the artifact as a downstream would
+npm run build
 node -e "const sdk = require('./dist'); console.log(sdk.version)"
 ```
 
-### Verification Layers
-1. **Static**: type check, lint
-2. **Unit**: pure logic tests (these can mock)
-3. **Integration**: tests against real/local instance of the upstream service
-4. **Consumer**: install the built package and use it as a downstream would
+## Mechanical Enforcement
 
-## Monorepo
+### Git Hooks
 
-### Bootable
+Commit hooks in `.git-hooks/` and wire via `git config core.hooksPath .git-hooks`
+
 ```bash
-# Root-level dev command that boots relevant services
-make dev                  # boots all services
-make dev SERVICE=api      # boots specific service
+# .git-hooks/pre-push
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Running lint..."
+<your-lint-command>
+echo "Running smoke test..."
+<your-smoke-command>
 ```
 
-### Per-worktree Isolation
-- Each worktree gets its own port range or docker-compose project name
-- Use env vars: `PORT_OFFSET`, `COMPOSE_PROJECT_NAME=$WORKTREE_NAME`
-- Avoid hardcoded ports in config
+### CI Gate
 
-### Verification
-- Affected-service detection (what changed → what to test)
-- Cross-service smoke tests for integration points
+Smoke + integration tests must run on every PR. Example (GitHub Actions):
 
-## Universal Patterns
+```yaml
+# .github/workflows/verify.yml
+on: [pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: <your-boot-command>
+      - run: <your-smoke-command>
+      - run: <your-test-command>
+```
 
 ### Custom Lint Rules
+
+Error messages should tell the agent exactly how to fix the issue:
+
 ```javascript
-// eslint rule with agent-readable message
-module.exports = {
-  meta: {
-    messages: {
-      noDirectApiCall: 'Use the API client from lib/api instead of fetch(). See docs/api-conventions.md for the pattern.'
-    }
+// Bad: "Don't use fetch directly"
+// Good:
+meta: {
+  messages: {
+    noDirectFetch: 'Use the API client from lib/api instead of fetch(). See docs/api-conventions.md for the pattern.'
   }
-};
-```
-
-Error messages should tell the agent exactly how to fix the issue.
-
-### Progress Tracking (JSON)
-```json
-{
-  "features": [
-    { "id": "auth-flow", "status": "done", "verified": true },
-    { "id": "dashboard", "status": "in-progress", "verified": false },
-    { "id": "settings", "status": "pending", "verified": false }
-  ],
-  "harness_grade": "C",
-  "last_updated": "2026-03-24T18:00:00Z"
 }
 ```
 
-### Makefile Convention
-```makefile
-# Every project should have these targets
-dev:          # Boot the app for development
-dev-check:    # Boot + wait for health
-test:         # Run all tests
-test-smoke:   # Run smoke tests only (fast, real surfaces)
-lint:         # Static analysis
-verify:       # Full verification pipeline
+## Seed Data / Fixtures
+
+For APIs and backends, reproducible test state prevents non-deterministic test failures.
+
+```bash
+# scripts/seed.sh — reset DB and load test data
+<your-db-reset-command>
+<your-seed-command>
+```
+
+Keep fixture data in `fixtures/` or `test/fixtures/` — version it with the repo
+
+## Per-Worktree Isolation
+
+For parallel agents working on the same repo, each worktree needs its own running instance.
+
+```bash
+# Create isolated worktree
+git worktree add ../feature-xyz -b feature-xyz origin/main
+
+# Derive port from worktree to avoid collisions
+export PORT=$((3000 + $(echo "$PWD" | cksum | cut -d' ' -f1) % 1000))
+
+# For Docker Compose, use worktree-scoped project name
+export COMPOSE_PROJECT_NAME="app-$(basename $PWD)"
+docker compose up -d --wait
+```
+
+Key rules:
+- No hardcoded ports in config — use env vars or port derivation
+- Each worktree gets its own Docker Compose project (separate containers, networks, volumes)
+- Tear down after task completion: `docker compose down -v`
+
+## Observability
+
+```bash
+# Structured JSON logs to stdout (parseable by agent)
+{"level":"info","ts":"...","msg":"request","method":"GET","path":"/api/items","status":200,"duration_ms":12}
+
+# Health endpoint returning machine-readable status
+GET /health → {"status":"ok","version":"1.2.3","uptime":3600}
 ```
