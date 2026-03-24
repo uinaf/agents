@@ -44,18 +44,6 @@ Source: https://www.anthropic.com/engineering/harness-design-long-running-apps
 
 **Key lesson:** Init.sh + smoke test before every session prevents "it was already broken" failures.
 
-## uinaf SDK — Four-Layer Verification
-
-**Setup**: TypeScript SDK with live API testing
-
-**Harness:**
-1. **Static**: TypeScript strict + ESLint
-2. **Unit**: Pure logic tests
-3. **Integration**: Tests against real uinaf API with test account
-4. **Consumer**: Build the dist, install it as a package, use it as a downstream would
-
-**Key lesson:** Consumer test catches packaging/export bugs that unit and integration tests miss entirely.
-
 ## Common Traits Across All
 
 1. **Single-command boot** — no setup wiki, no "first install X then configure Y"
