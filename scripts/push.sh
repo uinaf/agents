@@ -1,11 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
-INSTALL_DIR="${AGENTS_DIR:-$HOME/projects/agents}"
-cd "$INSTALL_DIR"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="${AGENTS_DIR:-$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)}"
+cd "$REPO_DIR"
 
 GLOBAL_LOCK="$HOME/.agents/.skill-lock.json"
-MANIFEST_PATH="$INSTALL_DIR/src/skills.json"
+MANIFEST_PATH="$REPO_DIR/src/skills.json"
 
 if [ -f "$GLOBAL_LOCK" ]; then
   TMP_MANIFEST=$(mktemp)

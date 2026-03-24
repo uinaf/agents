@@ -11,8 +11,8 @@ Shared AI agent guidelines and skills. One file, every machine.
 ## Setup
 
 ```bash
-git clone git@github.com:uinaf/agents.git ~/projects/agents
-cd ~/projects/agents
+git clone git@github.com:uinaf/agents.git
+cd agents
 ./scripts/pull.sh
 ```
 
@@ -25,14 +25,14 @@ This will:
 ## Update
 
 ```bash
-cd ~/projects/agents
+cd agents
 ./scripts/pull.sh
 ```
 
 ## Push changes
 
 ```bash
-~/projects/agents/scripts/push.sh
+./scripts/push.sh
 ```
 
 Syncs your local global skill set into `src/skills.json`, commits, and pushes.
@@ -41,5 +41,5 @@ Syncs your local global skill set into `src/skills.json`, commits, and pushes.
 
 ```bash
 npx skills add owner/repo -g
-~/projects/agents/scripts/push.sh
+./scripts/push.sh
 ```

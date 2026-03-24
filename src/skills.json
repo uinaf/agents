@@ -29,12 +29,28 @@
       "source": "jeffallan/claude-skills"
     },
     {
+      "name": "harness",
+      "source": "uinaf/skills"
+    },
+    {
       "name": "improve-codebase-architecture",
       "source": "mattpocock/skills"
     },
     {
       "name": "property-based-testing",
       "source": "trailofbits/skills"
+    },
+    {
+      "name": "putio-frontend-docs",
+      "source": "putdotio/skills"
+    },
+    {
+      "name": "putio-frontend-packages",
+      "source": "putdotio/skills"
+    },
+    {
+      "name": "putio-frontend-viteplus",
+      "source": "putdotio/skills"
     },
     {
       "name": "react-doctor",
@@ -53,7 +69,7 @@
       "source": "uinaf/skills"
     }
   ],
-  "version": 20,
-  "manifestHash": "20de85e1fa66e95c20c7f0a9e9087ea210983ccb3b5b30793f6d1121513302d6",
-  "updatedAt": "2026-03-17T22:12:34Z"
+  "version": 21,
+  "manifestHash": "7055cbd25437d8fb1a572a5be7593c3bf9642ddb643e1f8d01518b83c2ab2d73",
+  "updatedAt": "2026-03-24T18:51:50Z"
 }
