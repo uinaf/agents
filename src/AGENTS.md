@@ -6,12 +6,12 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 
 ## Core Behavior
 
-- Be direct. Lead with the answer, then reasoning.
-- Cite evidence when relevant (file paths, command output, errors, docs).
-- If an approach is weak, say so and propose better.
-- Fix only what was asked. Flag related issues, wait for approval.
-- If instructions are unclear, contradictory, or have multiple interpretations, pause and ask.
-- Priority order when rules conflict: safety/correctness > explicit user constraints > style/tone.
+- Be direct. Lead with the answer, then reasoning
+- Cite evidence when relevant (file paths, command output, errors, docs)
+- If an approach is weak, say so and propose better
+- Fix only what was asked. Flag related issues, wait for approval
+- If instructions are unclear, contradictory, or have multiple interpretations, pause and ask
+- Priority order when rules conflict: safety/correctness > explicit user constraints > style/tone
 
 ---
 
@@ -23,20 +23,20 @@ A task is non-trivial if it touches multiple files/modules, changes a public con
 
 For non-trivial tasks:
 
-1. Research current code/docs/contracts.
-2. Confirm assumptions: what changes, what must NOT change, what "done" looks like, constraints.
-3. Short plan: what, where, why, verification, non-goals.
-4. Proceed with implementation unless the plan has unresolvable ambiguities — then stop and surface them.
-5. Implement, then verify using the checks below.
+1. Research current code/docs/contracts
+2. Confirm assumptions: what changes, what must NOT change, what "done" looks like, constraints
+3. Short plan: what, where, why, verification, non-goals
+4. Proceed with implementation unless the plan has unresolvable ambiguities — then stop and surface them
+5. Implement, then verify using the checks below
 
 If the plan breaks mid-flight, stop and re-plan.
 
 ### Verification
 
-- Bug fix → reproducing test first, then fix.
-- Refactor → before/after behavior parity.
-- Feature → contract-level tests + runtime check.
-- Fresh worktree → bootstrap first (`pnpm install`, `cargo fetch`, codegen, etc.) before running checks.
+- Bug fix → reproducing test first, then fix
+- Refactor → before/after behavior parity
+- Feature → contract-level tests + runtime check
+- Fresh worktree → bootstrap first (`pnpm install`, `cargo fetch`, codegen, etc.) before running checks
 
 Use repo guardrails first (`make verify`, `just verify`, project scripts). If none exist, run explicit format/lint/typecheck/test.
 
@@ -44,11 +44,13 @@ After tests pass, verify the change works in practice. Run the binary, hit the e
 
 For code review, split by concern using parallel subagents: correctness, safety, test quality, contracts/types. Each concern gathers evidence independently; merge into one prioritized result.
 
+**Spawn a separate evaluator subagent to verify runtime behavior. The builder should never grade their own work.**
+
 If it isn't verified, it isn't done.
 
 ### Feedback loops
 
-- **Deterministic steps first**: lint, format, type check — always run before pushing, never left to agent judgment
+- **Deterministic vs agentic split**: lint, format, type check, push hooks = hardcoded, never left to agent judgment. Implementation, fixes, review = agentic
 - **Cap retries**: max 2 CI rounds per change. Diminishing returns on more. Partial success beats infinite retry
 - **Subagents for parallelism**: independent concerns = independent subagents. Don't serialize what can be parallelized
 
@@ -56,77 +58,78 @@ If it isn't verified, it isn't done.
 
 Doc drift degrades every future agent's performance. Update docs as part of the work, not after.
 
-- After implementing a feature, check if AGENTS.md, README, or architecture docs need updating.
-- After renaming, moving, or deleting code, grep docs for stale references.
-- After a design decision, record it before moving on.
-- If it's not in the repo, it doesn't exist to the next agent.
+- After implementing a feature, check if AGENTS.md, README, or architecture docs need updating
+- After renaming, moving, or deleting code, grep docs for stale references
+- After a design decision, record it before moving on
+- If it's not in the repo, it doesn't exist to the next agent
+- If a `docs` skill is available, use it for audits and structural updates
 
 ### When blocked
 
-Reproduce the issue. Find root cause with evidence. Fix root cause. Use workarounds only with explicit approval. In autonomous mode, **stop and surface the blocker** — do not burn tokens on workarounds.
+Stop. Reproduce. Find root cause with evidence. Fix root cause only. No workarounds without explicit approval. In autonomous mode, **surface the blocker** — don't burn tokens speculating.
+
+---
+
+## Anti-Patterns
+
+- Big AGENTS.md (> 150 lines) — fails. Keep it a table of contents, load detail on demand
+- Self-evaluation — agent grades own work, always passes. Use an independent evaluator subagent
+- Mocked tests as verification — pass by construction, verify nothing real
+- Infinite retry — max 2 CI rounds. Partial success beats token burn
+- All-agentic pipeline — deterministic steps left to LLM judgment waste context and reliability
 
 ---
 
 ## Code Principles
 
-These aren't suggestions — they're the standard. Internalize them.
-
 ### Design and structure
 
-- **SICP:** Composition over layered complexity. Build from small, composable pieces. Understand abstractions before using them.
-- **Ousterhout:** Deep modules with small stable surfaces. Minimize cognitive load. Complexity is the enemy — fight it actively.
-- **Hanson & Sussman:** Extension points are earned by real use-cases, not speculation. Don't build for hypothetical futures.
-- **Elm Architecture:** Unidirectional data flow. Model → Update → View. State is explicit, updates are pure functions, side effects are at the edges.
-- **Domain Modeling Made Functional (Wlaschin):** Make illegal states unrepresentable. Use types to encode domain rules. Railway-oriented programming — compose operations that can fail without nested error handling.
-- **Hexagonal Architecture (Ports & Adapters):** Business logic knows nothing about infrastructure. Dependencies point inward. Swap databases, APIs, UIs without touching the core.
-- **Parse, don't validate** ([original](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/), [TypeScript edition](https://bardeworks.com/blog/parse-dont-validate-typescript/)): Push validation to the boundary and produce typed evidence of correctness. Once data is parsed into a strong type, the rest of the system trusts it without re-checking.
-- **[Great software is composed, not written](https://altay.wtf/decade/):** Types are the ultimate contract. Declarative over imperative. Simplicity over cleverness. Pragmatism over perfection — great software today beats perfect software tomorrow.
-- Prefer reversible changes when uncertain.
-- For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR.
+- **SICP:** Composition over layered complexity. Build from small, composable pieces
+- **Ousterhout:** Deep modules with small stable surfaces. Minimize cognitive load. Complexity is the enemy
+- **Hanson & Sussman:** Extension points are earned by real use-cases, not speculation
+- **Elm Architecture:** Unidirectional data flow. Model → Update → View. State is explicit, side effects at edges
+- **Domain Modeling (Wlaschin):** Make illegal states unrepresentable. Types encode domain rules. Railway-oriented error handling
+- **Hexagonal Architecture:** Business logic knows nothing about infrastructure. Dependencies point inward
+- **Parse, don't validate** ([original](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/), [TS edition](https://bardeworks.com/blog/parse-dont-validate-typescript/)): Push validation to the boundary, produce typed evidence of correctness
+- **[Great software is composed, not written](https://altay.wtf/decade/):** Types are the ultimate contract. Declarative over imperative. Simplicity over cleverness. Pragmatism over perfection
+- Prefer reversible changes when uncertain
+- For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR
 
 ### Conventions
 
-- Inspect and follow existing repo conventions (structure, naming, patterns, test style).
-- Don't invent new patterns unless necessary — if you do, explain why.
-- Never hardcode volatile metrics in docs (test counts, line counts, file sizes, coverage numbers). These go stale instantly and become lies. If it can be derived from a command, let the command be the source of truth.
-- In checked-in Markdown, use repo-relative links for local docs and references. Never commit absolute filesystem targets such as `/Users/...`, `file://...`, or `vscode://...`.
-
-### Style
-
-- Never put a period directly after a code span, URL, or code block. End the sentence before the code or restructure.
-  - ❌ Clone `some-repo-name`.
-  - ✅ Clone `some-repo-name`
-  - ❌ Go to `example.com`.
-  - ✅ Go to `example.com`
+- Inspect and follow existing repo conventions (structure, naming, patterns, test style)
+- Don't invent new patterns unless necessary — if you do, explain why
+- Never hardcode volatile metrics in docs (test counts, line counts, coverage numbers). Let commands be the source of truth
+- In checked-in Markdown, use repo-relative links. Never commit absolute filesystem paths
+- Never put a period directly after a code span, URL, or code block
 
 ### Safety
 
-- Parse external data at boundaries; operate on typed/validated structures internally.
-- No unsafe casts, ignore directives, suppressed checks, skipped tests, or lowered thresholds unless explicitly approved.
-- Never log or surface secrets in error output.
+- Parse external data at boundaries; operate on typed/validated structures internally
+- No unsafe casts, ignore directives, suppressed checks, skipped tests, or lowered thresholds unless explicitly approved
+- Never log or surface secrets in error output
 
 ### Dependencies
 
-- Don't add or update dependencies unless necessary.
-- Prefer what's already in the stack before reaching for something new.
+- Don't add or update dependencies unless necessary
+- Prefer what's already in the stack before reaching for something new
 
 ### Error handling
 
-- No silent catches. Add context to errors. Surface useful failures.
+- No silent catches. Add context to errors. Surface useful failures
 
 ### Migrations and state changes
 
-- Schema/state changes must be forward-compatible. Document rollback path in the PR.
-- If a migration is not safely reversible, flag it before proceeding.
+- Schema/state changes must be forward-compatible. Document rollback path in the PR
+- If a migration is not safely reversible, flag it before proceeding
 
 ### Testing
 
-- No real timers in tests (mock them).
-- No assertions on logger calls. Mute loggers in test suites.
-- Prefer in-process tests: expose callable entry functions, test those directly.
-- Subprocess tests only for true process-boundary behavior.
-- Coverage must represent executed production code for the full test run.
-- Coverage integrity: run the same coverage command as CI, confirm expected files appear, and treat missing files (e.g. due to process boundaries) as failure.
+- No real timers in tests (mock them)
+- No assertions on logger calls. Mute loggers in test suites
+- Prefer in-process tests: expose callable entry functions, test those directly
+- Subprocess tests only for true process-boundary behavior
+- Coverage must represent executed production code for the full test run
 
 ---
 
@@ -134,8 +137,4 @@ These aren't suggestions — they're the standard. Internalize them.
 
 All checks green before commit. If creating a PR, use repo template or: Summary, Changes, Validation, Linked Issues.
 
-### Change Summary (non-trivial tasks)
-
-- **Changed:** files + intent
-- **Risks:** what to verify/watch
-- **Complexity:** net `reduced` | `neutral` | `increased` — if increased, justify it or propose a simpler alternative
+**Change Summary** (non-trivial): Changed (files + intent), Risks (what to verify), Complexity (net reduced / neutral / increased — if increased, justify).
