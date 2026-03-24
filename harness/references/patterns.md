@@ -209,6 +209,42 @@ Key rules:
 - Each worktree gets its own Docker Compose project (separate containers, networks, volumes)
 - Tear down after task completion: `docker compose down -v`
 
+## Retry Caps and Partial Success
+
+Agents show diminishing returns on retries. Cap CI loops and accept partial success.
+
+```
+Recommended flow:
+1. Agent implements change
+2. Local lint + smoke (deterministic, < 5 seconds)
+3. Push to CI — if failures, autofix known patterns
+4. If unfixed failures → agent gets ONE more attempt
+5. After 2nd CI failure → hand back to human
+
+Max 2 CI rounds. No infinite loops.
+```
+
+A PR that's 80% correct and an engineer polishes in 20 minutes is a better outcome than an agent retrying indefinitely at escalating token cost.
+
+## Deterministic vs Agentic Steps
+
+Not everything should be left to agent judgment. Split your pipeline:
+
+**Always deterministic** (hardcoded, no LLM):
+- Linting and formatting
+- Branch creation and push
+- PR template and description
+- Test runner invocation
+- Docker/service startup
+
+**Agentic** (LLM decides):
+- Understanding the task
+- Implementation
+- Fixing test failures
+- Deciding which files to change
+
+This split saves tokens, reduces errors, and guarantees critical steps happen every time.
+
 ## Observability
 
 ```bash
