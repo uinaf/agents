@@ -59,8 +59,9 @@ Priority order (each piece should be independently useful — stop after any ste
    - CLIs: shell scripts with golden file assertions
 4. **E2e test flows** — executable tests for key user journeys on real surfaces
 5. **Mechanical enforcement** — git hooks (`pre-push` running smoke + lint), CI gate (smoke/integration on every PR), custom lint rules with agent-readable error messages
-6. **Observability** — structured logs, health endpoints, queryable by agent
-7. **Seed data / fixtures** — reproducible test state for APIs and backends
+6. **Deterministic steps** — some steps should never be agentic: linting, pushing, PR template, formatting. Hardcode these. Only let the agent loop on implementation and fixing failures
+7. **Observability** — structured logs, health endpoints, queryable by agent
+8. **Seed data / fixtures** — reproducible test state for APIs and backends
 
 For containerized stacks, see `references/patterns.md` → "Containerized Stacks."
 For per-worktree isolation, see `references/patterns.md` → "Per-Worktree Isolation."
@@ -78,7 +79,9 @@ Self-evaluation is unreliable. When the project needs quality grading beyond "do
 - **The harness matters more than the prompt** — environment > instruction
 - **Mechanical enforcement > documentation** — git hooks, CI gates, and lint rules with error messages > rules in AGENTS.md
 - **Separate builder from judge** — self-evaluation is unreliable; spawn evaluator sub-agents
-- **JSON > Markdown for agent-consumed state** — models corrupt Markdown more than JSON
+- **Deterministic where possible, agentic where needed** — lint/push/format are deterministic; implementation/fix are agentic. "Putting LLMs into contained boxes compounds into system-wide reliability"
+- **Cap retries** — max 2 CI rounds, then hand back to human. Diminishing returns on more. Partial success (80% PR an engineer polishes in 20 min) beats infinite retry
+- **Scoped rules over global rules** — don't dump everything in root AGENTS.md. Scope rules to subdirectories and file patterns so agents pick up only what's relevant as they navigate
 - **CLI > MCP for standard tools** — more token-efficient, better training data coverage. Exception: use MCP when interactive agent navigation is needed
 - **Progressive disclosure** — small entry point + pointers to deeper docs
 

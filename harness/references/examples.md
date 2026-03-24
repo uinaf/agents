@@ -8,9 +8,12 @@ Every team running agents at scale converges on these:
 2. **Real surfaces** — tests hit the actual running app, not mocks
 3. **Agent can see results** — screenshots, logs, response bodies available as evidence
 4. **Mechanical enforcement** — git hooks, CI gates, and lint rules catch issues before "done"
-5. **Isolation** — parallel agents don't step on each other (per-worktree, per-container)
-6. **Init before work** — boot + smoke test at the start of every session, preventing "it was already broken"
-7. **Separate builder from judge** — the agent that writes code doesn't evaluate its own output
+5. **Deterministic + agentic split** — lint/push/format are hardcoded, implementation is agentic
+6. **Isolation** — parallel agents don't step on each other (per-worktree, per-container)
+7. **Init before work** — boot + smoke test at the start of every session, preventing "it was already broken"
+8. **Separate builder from judge** — the agent that writes code doesn't evaluate its own output
+9. **Hard retry cap** — max 2 CI rounds, then hand back. Partial success > infinite retry
+10. **Scoped rules** — rules attached per subdirectory/file pattern, not global dump
 
 ## OpenAI — Codex Frontend
 
@@ -53,3 +56,18 @@ Initializer + Coding agent, incremental per session.
 - Progress file + git history give each session full context without re-evaluation
 
 Key lesson: init.sh + smoke test before every session prevents "it was already broken" failures. This is the simplest, most portable pattern — works in any stack.
+
+## Stripe — Minions (1,300+ PRs/week, zero human-written code)
+
+Fully unattended agents. Engineer sends Slack message, walks away, comes back to finished PR.
+
+- **Devboxes**: cloud machines pre-loaded with codebase, 10-second spin-up via warm pool. QA-isolated, no confirmation prompts. Built for humans years before LLMs — agents just slotted in
+- **Blueprints**: hybrid orchestration mixing deterministic nodes (lint, push, PR template) with agentic nodes (implement, fix CI). "Putting LLMs into contained boxes compounds into reliability"
+- **Scoped rules**: global rules used "very judiciously." Almost all rules scoped to subdirectories/file patterns, auto-attached as agent navigates. Same rules for Minions, Cursor, Claude Code — no duplication
+- **Feedback loops**: pre-push lint < 5 seconds (background daemon precomputes), then selective CI from 3M+ tests with autofixes, max 2 CI rounds then hand back to human
+- **Partial success**: "A not-entirely-correct minion run is often still an excellent starting point"
+- **Toolshed**: centralized MCP server with ~500 tools. Agents get curated subsets, not kitchen sink
+
+Key lesson: "Investments in human developer productivity over time have returned to pay dividends in the world of agents." The infra that made humans productive is exactly what made agents possible.
+
+Sources: https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents (Part 1 & 2)
