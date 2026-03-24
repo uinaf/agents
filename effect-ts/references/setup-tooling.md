@@ -6,7 +6,7 @@ Use this file when bootstrapping an Effect repo, auditing project setup, or deci
 
 - `effect-solutions` is the opinionated setup guide and recommends the language service, strict TypeScript defaults, and a local Effect source checkout.
 - `effect.website` is the canonical reference for runtime, config, and package APIs.
-- The Effect monorepo confirms current package names such as `effect`, `@effect/platform`, `@effect/cli`, `@effect/vitest`, and `@effect/platform-node`.
+- The Effect monorepo confirms current package names such as `effect`, `@effect/platform`, `@effect/cli`, `@effect/vitest`, and `@effect/platform-node`
 
 ## Package Selection
 
@@ -18,11 +18,11 @@ Use this file when bootstrapping an Effect repo, auditing project setup, or deci
   - `@effect/platform-browser`
 - Add `@effect/cli` for CLIs.
 - Add `vitest` and `@effect/vitest` for tests.
-- Do not install `@effect/schema` for new work. `Schema` lives in `effect`.
+- Do not install `@effect/schema` for new work — `Schema` lives in `effect`
 
 ## Language Service
 
-`effect-solutions` recommends installing `@effect/language-service` and wiring it into `tsconfig.json`.
+`effect-solutions` recommends installing `@effect/language-service` and wiring it into `tsconfig.json`
 
 ```json
 {
@@ -60,8 +60,8 @@ From `effect-solutions`, these are the main defaults worth checking before code 
 
 Module settings depend on the project shape:
 
-- Bundled apps: use `"module": "preserve"` with `"moduleResolution": "bundler"`.
-- Node apps and libraries: use `"module": "NodeNext"`.
+- Bundled apps: use `"module": "preserve"` with `"moduleResolution": "bundler"`
+- Node apps and libraries: use `"module": "NodeNext"`
 
 ## Local Reference Checkout
 
@@ -69,7 +69,7 @@ Module settings depend on the project shape:
 
 ## Setup Audit Checklist
 
-1. Inspect `package.json`, lockfiles, and `tsconfig*`.
+1. Inspect `package.json`, lockfiles, and `tsconfig*`
 2. Check whether the repo already uses Effect and which runtime package it uses.
 3. Check whether `@effect/language-service` is present and configured.
 4. Confirm test tooling and scripts.

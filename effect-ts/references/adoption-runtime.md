@@ -24,7 +24,7 @@ Wrap Promise APIs instead of letting them leak through the codebase.
 
 - Use `Effect.tryPromise` when the Promise can reject or throw.
 - Use `Effect.promise` when the Promise is already trustworthy and failure semantics are clear.
-- Preserve cancellation when the underlying API accepts `AbortSignal`.
+- Preserve cancellation when the underlying API accepts `AbortSignal`
 
 Prefer a narrow wrapper at the boundary instead of sprinkling Promise conversion throughout the app.
 
@@ -86,7 +86,7 @@ When an effect will not compose because of missing services:
 
 ## Review Smells During Migration
 
-- `async` functions returning `Effect` values or mixing `await` with `yield*`.
+- `async` functions returning `Effect` values or mixing `await` with `yield*`
 - Repeated `Effect.runPromise` inside handlers that should stay inside Effect.
-- Promise wrappers that lose cancellation or collapse typed errors to `unknown`.
+- Promise wrappers that lose cancellation or collapse typed errors to `unknown`
 - Partial migration where schemas and tagged errors exist but raw objects still flow through the core.
