@@ -40,8 +40,6 @@ Inspect the repo and grade the current harness across four dimensions. For each,
 
 **Verifiable** — Can the agent produce evidence (screenshots, response logs, traces) that another agent or human can review?
 
-Write results to `.harness/state.json` — see `references/state-schema.md` for the format.
-
 Grade the project using the scale in `references/grading.md`
 
 ### 2. Act
@@ -84,22 +82,15 @@ Self-evaluation is unreliable. When the project needs quality grading beyond "do
 - **CLI > MCP for standard tools** — more token-efficient, better training data coverage. Exception: use MCP when interactive agent navigation is needed
 - **Progressive disclosure** — small entry point + pointers to deeper docs
 
-## State File
-
-After every evaluation or change, write to `.harness/state.json` in the project root. Commit this file. See `references/state-schema.md` for the schema.
-
-This lets future sessions start with context instead of re-evaluating from scratch.
-
 ## References
 
 - `references/grading.md` — harness quality grading scale with mechanical criteria
 - `references/patterns.md` — concrete setup patterns by project type
 - `references/examples.md` — real-world harness examples (OpenAI, Anthropic)
-- `references/state-schema.md` — JSON schema for `.harness/state.json`
 
 ## Output
 
-After any harness work, write to `.harness/state.json` and report:
+After any harness work, report:
 
 - **Grade**: before and after (if changes made)
 - **Dimensions**: bootable / testable / observable / verifiable — each with status + evidence
