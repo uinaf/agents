@@ -12,7 +12,8 @@ Shared AI agent guidelines and skills. One file, every machine.
 
 ```bash
 git clone git@github.com:uinaf/agents.git ~/projects/agents
-~/projects/agents/scripts/pull.sh
+cd ~/projects/agents
+./scripts/pull.sh
 ```
 
 This will:
@@ -24,7 +25,8 @@ This will:
 ## Update
 
 ```bash
-~/projects/agents/scripts/pull.sh
+cd ~/projects/agents
+./scripts/pull.sh
 ```
 
 ## Push changes

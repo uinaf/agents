@@ -1,27 +1,20 @@
 #!/bin/bash
 set -euo pipefail
 
-REPO="git@github.com:uinaf/agents.git"
-INSTALL_DIR="${AGENTS_DIR:-$HOME/projects/agents}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_DIR="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
 
-# Clone or pull
-if [ -d "$INSTALL_DIR/.git" ]; then
-  echo "Pulling latest..."
-  cd "$INSTALL_DIR" && git pull --ff-only
-else
-  echo "Cloning..."
-  git clone "$REPO" "$INSTALL_DIR"
-  cd "$INSTALL_DIR"
-fi
+echo "Pulling latest in $REPO_DIR..."
+git -C "$REPO_DIR" pull --ff-only
 
 # Symlink for each agent
 mkdir -p "$HOME/.claude" "$HOME/.codex"
-ln -sf "$INSTALL_DIR/src/AGENTS.md" "$HOME/.claude/CLAUDE.md"
-ln -sf "$INSTALL_DIR/src/AGENTS.md" "$HOME/.codex/AGENTS.md"
+ln -sf "$REPO_DIR/src/AGENTS.md" "$HOME/.claude/CLAUDE.md"
+ln -sf "$REPO_DIR/src/AGENTS.md" "$HOME/.codex/AGENTS.md"
 echo "Linked: ~/.claude/CLAUDE.md -> src/AGENTS.md"
 echo "Linked: ~/.codex/AGENTS.md -> src/AGENTS.md"
 
-MANIFEST="$INSTALL_DIR/src/skills.json"
+MANIFEST="$REPO_DIR/src/skills.json"
 SKILL_AGENTS=(codex claude-code opencode)
 
 # Install skills only from stable manifest (portable across machines)
