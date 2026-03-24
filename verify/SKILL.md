@@ -7,6 +7,13 @@ description: "Reality-check code after tests pass. Use when finishing a feature,
 
 Passing tests is necessary, not sufficient. Use the harness to prove the change works.
 
+## Before You Start
+
+Check that the project has verification infrastructure you can use:
+- Can you boot the app? (`make dev`, `npm run dev`, or equivalent)
+- Can you interact with it? (browser automation, curl, CLI invocation)
+- If not, flag the gap. If gaps are systemic, run `harness` to build the missing infra first.
+
 ## Rules
 
 - If you did not run it, you did not verify it.
@@ -17,7 +24,7 @@ Passing tests is necessary, not sufficient. Use the harness to prove the change 
 
 ## Subagents
 
-When the work splits cleanly by concern, use parallel subagents. For named lanes, model guidance, and what each lane should look for, read `references/subagent-lanes.md`.
+When the work splits cleanly by concern, use parallel subagents. For named lanes, model guidance, and what each lane should look for, see `references/subagent-lanes.md`
 
 ## Checks
 
@@ -57,3 +64,4 @@ Report:
 - `Artifacts`: what evidence you inspected
 - `Gaps`: what you could not verify
 - `Confidence`: `ship it` / `needs review` / `blocked`
+- `Harness gaps`: verification infra that was missing or insufficient (feeds back to `harness`)

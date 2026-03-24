@@ -42,7 +42,7 @@ Pick one primary shape. Copy the structure, not the wording.
 
 ## Avoid
 
-- Full architecture tours in `README.md`.
-- Repeating content that already exists in `docs/*`.
+- Full architecture tours in `README.md`
+- Repeating content that already exists in `docs/*`
 - Long setup branches before the reader reaches first value.
 - Decorative sections that do not help install, use, or navigate the project.

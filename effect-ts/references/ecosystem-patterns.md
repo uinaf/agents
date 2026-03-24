@@ -8,9 +8,9 @@ Use this file for Effect packages beyond the core module: HTTP, CLI, platform se
 
 Default pattern:
 
-1. Provide an `HttpClient` implementation such as `FetchHttpClient.layer`.
-2. Build a client with request middleware such as `HttpClient.mapRequest(HttpClientRequest.prependUrl(...))`.
-3. Decode response bodies with `HttpClientResponse.schemaBodyJson(...)`.
+1. Provide an `HttpClient` implementation such as `FetchHttpClient.layer`
+2. Build a client with request middleware such as `HttpClient.mapRequest(HttpClientRequest.prependUrl(...))`
+3. Decode response bodies with `HttpClientResponse.schemaBodyJson(...)`
 4. Match status codes explicitly when non-2xx outcomes are part of the contract.
 
 Use a service when:

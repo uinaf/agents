@@ -17,7 +17,7 @@ Keep the repo legible to humans and agents.
 
 - Turning `AGENTS.md` into a manual.
 - Turning `README.md` into a full project handbook.
-- Putting every detail in `SKILL.md` instead of routing to deeper docs or `references/`.
+- Putting every detail in `SKILL.md` instead of routing to deeper docs or `references/`
 - Leaking chat-only absolute filesystem links into checked-in docs or skill references.
 - Writing long prose when a table, diagram, pseudocode block, or check would work better.
 - Leaving durable guidance in chat, tickets, or external docs.
@@ -30,12 +30,12 @@ Keep the repo legible to humans and agents.
 - `docs/ARCHITECTURE.md`: diagram-first system view and important boundaries.
 - `docs/*.md`: task-specific durable references such as API, deployment, guides, and decisions.
 - `docs/plans/*.md`: one plan per feature with goal, design, tasks, and validation hooks for autonomous execution.
-- For README patterns and examples, read `references/readme-examples.md`.
+- For README patterns and examples, read `references/readme-examples.md`
 
 ## Workflow
 
 1. Inspect the repo and current docs first.
-2. Keep `README.md` and `AGENTS.md` short. Move task-specific detail into `docs/*`. For README work, pick a shape from `references/readme-examples.md`.
+2. Keep `README.md` and `AGENTS.md` short. Move task-specific detail into `docs/*` — for README work, pick a shape from `references/readme-examples.md`
 3. Keep `SKILL.md` to triggers and workflow; move heavier detail to `references/` when it helps repeated use.
 4. Update only the docs touched by the change, and ground claims in the repo or command output.
 5. In checked-in docs, use repo-relative Markdown links for local files. Reserve absolute filesystem paths for chat/UI file references, not versioned docs.

@@ -4,27 +4,27 @@ Use this file when writing or reviewing ordinary Effect application code: sequen
 
 ## Source Notes
 
-- `effect-solutions` topics: `basics`, `services-and-layers`, `data-modeling`, `error-handling`, `config`, `testing`.
+- `effect-solutions` topics: `basics`, `services-and-layers`, `data-modeling`, `error-handling`, `config`, `testing`
 - Official docs: runtime, configuration, schema, testing, and getting-started execution guides.
 
 ## Execution Style
 
 - Use `Effect.gen` for inline effect programs.
 - Use `Effect.fn("Name")` for reusable named effectful functions. This gives call-site tracing and is the default for service methods.
-- Use `.pipe(...)` for cross-cutting behavior such as `Effect.timeout`, `Effect.retry`, `Effect.tap`, and `Effect.withSpan`.
+- Use `.pipe(...)` for cross-cutting behavior such as `Effect.timeout`, `Effect.retry`, `Effect.tap`, and `Effect.withSpan`
 
 Default split:
 
-- One-off workflow in a single module: `Effect.gen`.
-- Reused operation or service method: `Effect.fn`.
+- One-off workflow in a single module: `Effect.gen`
+- Reused operation or service method: `Effect.fn`
 
 ## Services And Layers
 
 Model dependencies explicitly.
 
 - Define services with `Context.Tag` when you want a stable contract plus multiple implementations.
-- Use unique identifiers like `@app/Users` or `@app/EmailService`.
-- Keep service methods `readonly`.
+- Use unique identifiers like `@app/Users` or `@app/EmailService`
+- Keep service methods `readonly`
 - Prefer service methods that do not require extra environment. Push dependencies into the layer graph instead of the method signature.
 
 Implementation defaults:
@@ -78,7 +78,7 @@ Use `Config` at the edge and expose validated config through a service layer.
 
 - Default provider is environment variables.
 - Prefer `Config.redacted` for secrets.
-- Prefer a `Context.Tag` config service with `layer` and, when useful, `testLayer`.
+- Prefer a `Context.Tag` config service with `layer` and, when useful, `testLayer`
 - Use `ConfigProvider.fromMap` or another explicit provider in tests.
 
 ## Testing

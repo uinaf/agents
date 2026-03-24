@@ -1,6 +1,6 @@
 ---
 name: harness
-description: "Evaluate, set up, and improve a project's agent-testable verification infrastructure. Use when a repo lacks bootable dev environment, integration tests, browser automation, observability, or when verification relies on mocks instead of real surfaces. Not for per-change verification (use verify for that)."
+description: "Evaluate, set up, and improve a project's agent-testable verification infrastructure. Use when asked for a harness audit, harness grade, or when a repo lacks bootable dev environment, integration tests, browser automation, or observability. Also use when verification relies on mocks instead of real surfaces. Not for per-change verification (use verify for that)."
 ---
 
 # Harness
