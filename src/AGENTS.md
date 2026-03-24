@@ -40,11 +40,17 @@ If the plan breaks mid-flight, stop and re-plan.
 
 Use repo guardrails first (`make verify`, `just verify`, project scripts). If none exist, run explicit format/lint/typecheck/test.
 
-After tests pass, verify the change works in practice. Run the binary, hit the endpoint, check the output. If a `verify` skill is available, use it.
+After tests pass, verify the change works in practice. Run the binary, hit the endpoint, check the output. If a `verify` skill is available, use it. If verification infra is missing (no bootable env, no integration tests), flag the gap — use the `harness` skill to build it.
 
-For code review, split by concern when the work is parallelizable: security, test gaps, silent failures, types/contracts, maintainability. Each concern gathers evidence independently; merge into one prioritized result.
+For code review, split by concern using parallel subagents: correctness, safety, test quality, contracts/types. Each concern gathers evidence independently; merge into one prioritized result.
 
 If it isn't verified, it isn't done.
+
+### Feedback loops
+
+- **Deterministic steps first**: lint, format, type check — always run before pushing, never left to agent judgment
+- **Cap retries**: max 2 CI rounds per change. Diminishing returns on more. Partial success beats infinite retry
+- **Subagents for parallelism**: independent concerns = independent subagents. Don't serialize what can be parallelized
 
 ### Keep docs alive
 
