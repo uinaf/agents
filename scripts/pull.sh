@@ -8,14 +8,19 @@ echo "Pulling latest in $REPO_DIR..."
 git -C "$REPO_DIR" pull --ff-only
 
 # Symlink for each agent
-mkdir -p "$HOME/.claude" "$HOME/.codex"
+mkdir -p "$HOME/.claude" "$HOME/.codex" "$HOME/.pi/agent"
+
 ln -sf "$REPO_DIR/src/AGENTS.md" "$HOME/.claude/CLAUDE.md"
-ln -sf "$REPO_DIR/src/AGENTS.md" "$HOME/.codex/AGENTS.md"
 echo "Linked: ~/.claude/CLAUDE.md -> src/AGENTS.md"
+
+ln -sf "$REPO_DIR/src/AGENTS.md" "$HOME/.codex/AGENTS.md"
 echo "Linked: ~/.codex/AGENTS.md -> src/AGENTS.md"
 
+ln -sf "$REPO_DIR/src/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"
+echo "Linked: ~/.pi/agent/AGENTS.md -> src/AGENTS.md"
+
 MANIFEST="$REPO_DIR/src/skills.json"
-SKILL_AGENTS=(codex claude-code opencode)
+SKILL_AGENTS=(codex claude-code pi)
 
 # Install skills only from stable manifest (portable across machines)
 if [ -f "$MANIFEST" ]; then
