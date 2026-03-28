@@ -16,7 +16,6 @@ Keep the repo legible to humans and agents. Docs rot silently — every code cha
 - [Scoped Rules](#scoped-rules)
 - [README.md](#readmemd)
 - [Architecture Docs](#architecture-docs)
-- [Style](#style)
 - [Hygiene](#hygiene)
 - [Keep Docs Alive](#keep-docs-alive)
 

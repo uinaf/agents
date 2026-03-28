@@ -192,11 +192,11 @@ Run targeted checks when the agent finishes a task — before commit, not just i
 ```bash
 # .git-hooks/pre-commit or agent stop hook
 set -euo pipefail
-<your-typecheck-command> 2>&1 | tail -20  # truncate passing output
-<your-targeted-test-command> 2>&1 | tail -20
+<your-typecheck-command> >/dev/null 2>&1 || <your-typecheck-command> 2>&1 | tail -20
+<your-targeted-test-command> >/dev/null 2>&1 || <your-targeted-test-command> 2>&1 | tail -20
 ```
 
-Key: run only tests related to changed files, not the full suite. Most test runners support file-pattern filtering. This catches issues immediately without flooding context with 4000 lines of passing tests.
+Pattern: run silently, only show output on failure. Run only tests related to changed files, not the full suite. Most test runners support file-pattern filtering.
 
 ## Retry Caps
 

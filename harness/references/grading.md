@@ -38,6 +38,26 @@ Grade a project's verification infrastructure from F to A. Mechanical criteria �
 - CI runs full integration suite
 - Agent rarely needs human QA
 
+## Example Output
+
+```
+Grade: C → B (after adding e2e tests + CI gate)
+Layers: 1-4 present, 5 partial, 6-7 missing
+
+Bootable:   pass   — `npm run dev` starts app, health check at :3000/health
+Testable:   pass   — 3 Playwright e2e tests hit real UI, 1 API round-trip test
+Observable: partial — structured logs exist but no queryable health endpoint
+Verifiable: pass   — screenshots captured, response logs saved
+
+Gaps (ranked):
+1. No git hooks (layer 5) — lint/smoke not enforced pre-push
+2. No structured health endpoint (layer 6) — logs only
+3. No worktree isolation (layer 7) — parallel agents would collide
+
+Next step: add pre-push hook with lint + smoke
+Confidence: needs review (observable gaps)
+```
+
 ## Grading Rules
 
 - Grade based on what an agent can actually use, not what exists in theory
