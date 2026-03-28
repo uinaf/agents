@@ -18,7 +18,6 @@ Real-world harness patterns from teams running agents at scale.
 
 ## Contents
 
-- [Common Traits](#common-traits)
 - [OpenAI — Codex Frontend](#openai--codex-frontend)
 - [Anthropic — Evaluator Pattern](#anthropic--evaluator-pattern)
 - [Stripe — Minions](#stripe--minions)

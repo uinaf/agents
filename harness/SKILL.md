@@ -1,6 +1,6 @@
 ---
 name: harness
-description: "The verification infrastructure that makes agent work trustworthy. Use when: setting up or auditing a dev environment, verifying changes work end to end, updating AGENTS.md or repo docs, grading agent-readiness, or writing specs/acceptance criteria. Covers the full loop: audit → setup → verify → document → specify."
+description: "Build and use the verification infrastructure coding agents need to prove their work. Use when: a repo has no bootable dev environment, no real-surface tests, or no interaction layer an agent can use; auditing or grading a repo's agent-readiness; verifying changes work end to end on real surfaces; or when harness gaps block reliable agent output."
 ---
 
 # Harness
@@ -115,6 +115,6 @@ After any harness work, report:
 - `references/verification.md` — verify workflow, evaluator pattern, subagent lanes, cost
 - `references/documentation.md` — AGENTS.md rules, scoped rules, README patterns, docs hygiene
 - `references/specifications.md` — SDD triangle, conformance tests, acceptance criteria
-- `references/industry-examples.md` — OpenAI, Anthropic, Stripe, Uber, Datadog, Cursor patterns
+- `references/industry-examples.md` — OpenAI, Anthropic, Stripe, Uber, Datadog, Cursor patterns. Read when designing a harness strategy or justifying investment, not during routine work
 
 Each reference file includes source URLs for the research and articles it draws from.
