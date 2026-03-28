@@ -1,0 +1,1 @@
+Audit this repo's verification infrastructure using the harness skill. Grade it across all four dimensions (bootable, testable, observable, verifiable). Identify which of the 7 layers exist and which are missing. Produce the full grading output format.
