@@ -4,15 +4,16 @@ Reusable agent skills for coding workflows. Progressive disclosure, mechanical v
 
 | Skill | What it does |
 |-------|-------------|
-| **docs** | Keep project docs legible to humans and agents. AGENTS as TOC, deeper guidance in versioned docs, command-backed audits |
+| **harness** | The full agent development loop: audit, setup, verify, document, specify. Grading scale, real-surface verification, scoped rules, spec-driven development |
 | **effect-ts** | Effect TypeScript patterns — setup, Layer/Schema/Service, platform packages, runtime wiring, Promise-to-Effect migration |
-| **harness** | Evaluate, set up, and improve agent-testable verification infrastructure (bootable env, interaction layer, observability) |
-| **verify** | Post-implementation reality check. Run after tests pass, before declaring done — produces evidence, not assertions |
-
-**harness** builds the tools. **verify** uses them.
 
 ## Install
 
 ```bash
 npx skills add uinaf/skills -g -s harness
+npx skills add uinaf/skills -g -s effect-ts
 ```
+
+## Evaluate
+
+Test repos and tasks for evaluating skill quality live in `eval/`.
