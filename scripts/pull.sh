@@ -58,16 +58,41 @@ if [ -f "$MANIFEST" ]; then
       npx skills add "$source" -g -y -a "${SKILL_AGENTS[@]}" -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
     done
 
-    # Remove installed skills no longer in the manifest
+    # Remove installed skills no longer in the manifest. Use the lockfile for
+    # canonical names and also scan the skill directories to catch orphaned
+    # folders that are no longer tracked there.
+    LOCKFILE="$HOME/.agents/.skill-lock.json"
+    INSTALLED_SKILL_NAMES=""
+    if [ -f "$LOCKFILE" ]; then
+      INSTALLED_SKILL_NAMES=$(jq -r '(.skills // {}) | keys[]' "$LOCKFILE")
+      INSTALLED_SKILL_NAMES+=$'\n'
+    fi
+
     SKILLS_DIR="$HOME/.agents/skills"
     if [ -d "$SKILLS_DIR" ]; then
       for skill_dir in "$SKILLS_DIR"/*/; do
-        skill_name=$(basename "$skill_dir")
+        [ -d "$skill_dir" ] || continue
+
+        skill_name=""
+        if [ -f "$skill_dir/SKILL.md" ]; then
+          skill_name=$(awk -F': *' '/^name:/ {print $2; exit}' "$skill_dir/SKILL.md")
+        fi
+        if [ -z "$skill_name" ]; then
+          skill_name=$(basename "$skill_dir")
+        fi
+
+        INSTALLED_SKILL_NAMES+="$skill_name"$'\n'
+      done
+    fi
+
+    if [ -n "$INSTALLED_SKILL_NAMES" ]; then
+      while IFS= read -r skill_name; do
+        [ -n "$skill_name" ] || continue
         if ! echo "$MANIFEST_NAMES" | grep -qx "$skill_name"; then
           echo "Removing stale skill: $skill_name"
-          npx skills remove "$skill_name" -g -y -a "${SKILL_AGENTS[@]}" </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
+          npx skills remove "$skill_name" -g -y </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
         fi
-      done
+      done < <(printf '%s' "$INSTALLED_SKILL_NAMES" | sort -u)
     fi
   fi
 else
