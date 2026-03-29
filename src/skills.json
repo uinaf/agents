@@ -37,18 +37,6 @@
       "source": "trailofbits/skills"
     },
     {
-      "name": "putio-frontend-docs",
-      "source": "putdotio/skills"
-    },
-    {
-      "name": "putio-frontend-packages",
-      "source": "putdotio/skills"
-    },
-    {
-      "name": "putio-frontend-viteplus",
-      "source": "putdotio/skills"
-    },
-    {
       "name": "react-doctor",
       "source": "millionco/react-doctor"
     },
@@ -61,7 +49,7 @@
       "source": "mattpocock/skills"
     }
   ],
-  "version": 22,
-  "manifestHash": "9d1d1174bf7445961b2f5e7a4c4c6d02cd834ca38c8da00eb2006e2e4d41e440",
-  "updatedAt": "2026-03-28T14:10:43Z"
+  "version": 23,
+  "manifestHash": "138e5258cf2282ea30c12bcad92e37f553808f80e01feeb8364173be80c8d445",
+  "updatedAt": "2026-03-29T21:11:55Z"
 }
