@@ -28,6 +28,13 @@ else
   echo "Skipping Codex setup: 'codex' is not installed"
 fi
 
+# Cursor User Rules are not filesystem-synced; copy from src/AGENTS.md in Settings if you want them.
+if command -v cursor >/dev/null 2>&1; then
+  SKILL_AGENTS+=(cursor)
+else
+  echo "Skipping Cursor skills: 'cursor' is not on PATH (install Shell Command from Cursor command palette)"
+fi
+
 if command -v pi >/dev/null 2>&1; then
   mkdir -p "$HOME/.pi/agent"
   ln -sf "$REPO_DIR/src/AGENTS.md" "$HOME/.pi/agent/AGENTS.md"

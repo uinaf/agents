@@ -20,7 +20,9 @@ This will:
 
 1. Symlink `~/.claude/CLAUDE.md` → `src/AGENTS.md`
 2. Symlink `~/.codex/AGENTS.md` → `src/AGENTS.md`
-3. Install global skills from `src/skills.json` (portable manifest)
+3. Install global skills from `src/skills.json` (Claude Code, Codex, Cursor, Pi — whichever CLIs you have)
+
+Cursor **User Rules** are not synced by this repo; paste from `src/AGENTS.md` if you want them there.
 
 ## Update
 
@@ -43,3 +45,4 @@ Syncs your local global skill set into `src/skills.json`, commits, and pushes.
 npx skills add owner/repo -g
 ./scripts/push.sh
 ```
+
