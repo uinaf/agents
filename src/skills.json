@@ -5,6 +5,10 @@
       "source": "jpoehnelt/skills"
     },
     {
+      "name": "docs",
+      "source": "uinaf/skills"
+    },
+    {
       "name": "effect-ts",
       "source": "uinaf/skills"
     },
@@ -47,9 +51,13 @@
     {
       "name": "tdd",
       "source": "mattpocock/skills"
+    },
+    {
+      "name": "verify",
+      "source": "uinaf/skills"
     }
   ],
-  "version": 23,
-  "manifestHash": "138e5258cf2282ea30c12bcad92e37f553808f80e01feeb8364173be80c8d445",
-  "updatedAt": "2026-03-29T21:11:55Z"
+  "version": 24,
+  "manifestHash": "5725e66892fee7ed233f244ac9e35274a530c408127a6154509d8cef8793f7ca",
+  "updatedAt": "2026-04-04T14:19:45Z"
 }
