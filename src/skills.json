@@ -37,16 +37,8 @@
       "source": "mattpocock/skills"
     },
     {
-      "name": "property-based-testing",
-      "source": "trailofbits/skills"
-    },
-    {
       "name": "react-doctor",
       "source": "millionco/react-doctor"
-    },
-    {
-      "name": "request-refactor-plan",
-      "source": "mattpocock/skills"
     },
     {
       "name": "tdd",
@@ -57,7 +49,7 @@
       "source": "uinaf/skills"
     }
   ],
-  "version": 24,
-  "manifestHash": "5725e66892fee7ed233f244ac9e35274a530c408127a6154509d8cef8793f7ca",
-  "updatedAt": "2026-04-04T14:19:45Z"
+  "version": 25,
+  "manifestHash": "9f99aefc0169ae3ecb7b7e10ef4028dcef7e8f37a403f896094cc8044c40b13a",
+  "updatedAt": "2026-04-04T14:21:36Z"
 }
