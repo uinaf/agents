@@ -1,4 +1,4 @@
 interface:
   display_name: "Harness"
-  short_description: "Build, audit, verify, and document a project's verification infrastructure"
-  default_prompt: "Use $harness to audit the repo's agent-readiness, set up missing infrastructure, verify changes work end to end, or update project documentation."
+  short_description: "Build, audit, and improve a repo's verification infrastructure"
+  default_prompt: "Use $harness to audit agent-readiness, build missing verification infrastructure, or improve weak harness layers. Hand off docs work to $docs and review work to $verify."

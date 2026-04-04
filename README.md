@@ -4,13 +4,17 @@ Reusable agent skills for coding workflows. Progressive disclosure, mechanical v
 
 | Skill | What it does |
 |-------|-------------|
-| **harness** | The full agent development loop: audit, setup, verify, document, specify. Grading scale, real-surface verification, scoped rules, spec-driven development |
+| **harness** | Build, audit, and improve verification infrastructure. Grades agent-readiness, adds missing boot/test/observability layers, and unblocks verification |
+| **docs** | Maintain AGENTS.md, README.md, docs/, runbooks, and specs. Keeps repo guidance concise, current, and non-duplicated |
+| **verify** | Review diffs and PRs with real-surface evidence using focused reviewer lanes. Hands off to harness when the repo is not verifiable |
 | **effect-ts** | Effect TypeScript patterns — setup, Layer/Schema/Service, platform packages, runtime wiring, Promise-to-Effect migration |
 
 ## Install
 
 ```bash
 npx skills add uinaf/skills -g -s harness
+npx skills add uinaf/skills -g -s docs
+npx skills add uinaf/skills -g -s verify
 npx skills add uinaf/skills -g -s effect-ts
 ```
 
