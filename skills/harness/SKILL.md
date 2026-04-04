@@ -47,7 +47,7 @@ For each, report:
 - evidence: file or command
 - gap: what is missing
 
-Use `references/grading.md`. Lowest dimension sets the overall grade.
+Use [references/grading.md](references/grading.md). Lowest dimension sets the overall grade.
 
 ### 2. Setup
 
@@ -92,6 +92,6 @@ After harness work, report:
 
 ## References
 
-- `references/grading.md` — harness quality grading scale with mechanical criteria
-- `references/setup-patterns.md` — boot, smoke, e2e, observability, and isolation patterns
-- `references/industry-examples.md` — external patterns and justification for harness investment
+- [references/grading.md](references/grading.md) — harness quality grading scale with mechanical criteria
+- [references/setup-patterns.md](references/setup-patterns.md) — boot, smoke, e2e, observability, and isolation patterns
+- [references/industry-examples.md](references/industry-examples.md) — external patterns and justification for harness investment

@@ -6,20 +6,20 @@ Pick the smallest set of independent lanes that can actually challenge the chang
 
 Use these for most non-trivial changes:
 
-- `reviewers/general.md`
-- `reviewers/tests.md`
-- `reviewers/silent-failures.md`
+- [reviewers/general.md](../reviewers/general.md)
+- [reviewers/tests.md](../reviewers/tests.md)
+- [reviewers/silent-failures.md](../reviewers/silent-failures.md)
 
 ## Add Conditional Lanes
 
-### Add `reviewers/types.md` when:
+### Add [reviewers/types.md](../reviewers/types.md) when:
 
 - new types, schemas, or DTOs are introduced
 - API contracts changed
 - invariants moved into or out of types
 - a refactor changed data boundaries
 
-### Add `reviewers/comments.md` when:
+### Add [reviewers/comments.md](../reviewers/comments.md) when:
 
 - docstrings or code comments changed materially
 - large comment blocks were added

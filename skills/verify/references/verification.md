@@ -97,7 +97,7 @@ Subagents are **context firewalls** — each gets only the context for its conce
 
 ### Review Lanes
 
-These map to the reviewer files under `reviewers/`.
+These map to the reviewer files under [reviewers/](../reviewers/).
 
 **`general`** — broad code review against repo doctrine and obvious risk
 - Project rule violations that matter

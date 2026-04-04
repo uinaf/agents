@@ -73,5 +73,5 @@ After docs work, report:
 
 ## References
 
-- `references/documentation.md` — AGENTS.md shape, scoped rules, README patterns, doc hygiene
-- `references/specifications.md` — feature specs, conformance tests, spec drift, SDD trade-offs
+- [references/documentation.md](references/documentation.md) — AGENTS.md shape, scoped rules, README patterns, doc hygiene
+- [references/specifications.md](references/specifications.md) — feature specs, conformance tests, spec drift, SDD trade-offs

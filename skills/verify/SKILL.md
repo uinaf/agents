@@ -25,18 +25,18 @@ Use the existing harness to judge changes on real surfaces.
 1. Define the scope: diff, branch, commit range, or PR
 2. Confirm you can boot and interact with the real surface
 3. Load the target repo's `AGENTS.md`
-4. Choose reviewer lanes from `references/reviewer-selection.md`
+4. Choose reviewer lanes from [references/reviewer-selection.md](references/reviewer-selection.md)
 
 Default lanes:
 
-- `reviewers/general.md`
-- `reviewers/tests.md`
-- `reviewers/silent-failures.md`
+- [reviewers/general.md](reviewers/general.md)
+- [reviewers/tests.md](reviewers/tests.md)
+- [reviewers/silent-failures.md](reviewers/silent-failures.md)
 
 Add conditional lanes only when they earn their keep:
 
-- `reviewers/types.md`
-- `reviewers/comments.md`
+- [reviewers/types.md](reviewers/types.md)
+- [reviewers/comments.md](reviewers/comments.md)
 
 ## Workflow
 
@@ -55,7 +55,7 @@ Use parallel subagents when available. Keep lanes independent and concern-focuse
 - CLI → run the shipped command
 - state/config → verify round trips and restart behavior
 
-Follow `references/evidence-rules.md` when collecting proof.
+Follow [references/evidence-rules.md](references/evidence-rules.md) when collecting proof.
 
 ### 4. Synthesize the verdict
 
@@ -81,7 +81,7 @@ After verification, report:
 
 ## References
 
-- `references/verification.md` — evaluator pattern, lane design, real-surface checks, cost trade-offs
-- `references/reviewer-selection.md` — which reviewer lanes to run for which change shapes
-- `references/evidence-rules.md` — what counts as proof and how to report it
-- `reviewers/*.md` — specialized review lenses
+- [references/verification.md](references/verification.md) — evaluator pattern, lane design, real-surface checks, cost trade-offs
+- [references/reviewer-selection.md](references/reviewer-selection.md) — which reviewer lanes to run for which change shapes
+- [references/evidence-rules.md](references/evidence-rules.md) — what counts as proof and how to report it
+- [reviewers/](reviewers/) — specialized review lenses
