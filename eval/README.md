@@ -1,47 +1,51 @@
-# Harness Skill Evaluation
+# Skill Evaluation
 
-Test whether coding agents can actually follow the harness skill.
+This repo uses Tessl as the evaluation loop for skill quality, clarity, and self-activation.
 
-## How it works
+## Review
 
-1. Each `tasks/*.md` defines a task prompt + expected outcomes
-2. Each `repos/` subdirectory is a minimal repo at a specific harness grade
-3. Run an agent (Codex, Claude Code) in each repo with the task prompt
-4. Compare output against expected outcomes
-
-## Quick run
+Run a read-only review across every local skill:
 
 ```bash
-# Run a single eval
-cd eval/repos/grade-f-no-boot
-acpx --approve-all codex exec "$(cat ../../tasks/audit.md)"
-
-# Compare output against expected
-# (manual for now, automated grader TODO)
+cd ..
+./eval/review-skills.sh
 ```
 
-## Repos
+By default this enforces `--threshold 90`. Override with `TESSL_THRESHOLD=94` or pass `--threshold` explicitly.
 
-| Repo | Grade | Description |
-|------|-------|-------------|
-| `grade-f-no-boot` | F | Express app, no start script, no tests, manual env setup |
-| `grade-d-mock-only` | D | Express app, boots but all tests are mocked |
-| `grade-c-basic` | C | Express app, boots with one command, one real smoke test |
+Useful direct invocations:
 
-## Tasks
+```bash
+npx tessl skill review skills/review
+npx tessl skill review --json --threshold 90 skills/verify
+```
 
-| Task | File | What it tests |
-|------|------|---------------|
-| Audit | `tasks/audit.md` | Does the agent grade correctly? |
-| Setup | `tasks/setup-smoke.md` | Can the agent add a smoke test? |
-| Verify | `tasks/verify-change.md` | Does the agent verify on real surfaces? |
+Use per-skill `--json` output directly with Tessl rather than `review-skills.sh`, because the batch wrapper emits one review per skill.
 
-## Metrics
+## Optimize
 
-For each run, record:
-- **Skill invoked?** Did the agent read the harness skill?
-- **Grade correct?** Does the audit grade match expected?
-- **Layers identified?** Did it name the right missing layers?
-- **Evidence produced?** Screenshots, logs, response bodies?
-- **Turns taken** — fewer = better skill guidance
-- **Task completed?** Binary pass/fail per expected outcome
+Apply Tessl's optimizer to one skill at a time:
+
+```bash
+cd ..
+./eval/optimize-skills.sh review
+```
+
+Direct form:
+
+```bash
+npx tessl skill review --optimize --yes --max-iterations 1 skills/review
+```
+
+## Suggested workflow
+
+1. Edit the skill
+2. Run `./eval/review-skills.sh`
+3. If the score or suggestions are weak, run Tessl optimize on a single skill or apply the feedback manually
+4. Re-run review and inspect the diff before keeping any optimizer changes
+
+## Notes
+
+- `review-skills.sh` is the batch entrypoint for local skill review
+- `optimize-skills.sh` applies mutations, so run it intentionally and inspect the resulting diff
+- Prefer optimizing one skill at a time rather than churning the whole repo at once

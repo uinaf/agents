@@ -1,6 +1,6 @@
 # Verification
 
-Prove changes work on real surfaces. The agent that wrote the code must not verify it.
+Prove your own changes work on real surfaces. The agent that wrote the code must not verify it in the same context.
 
 ## Sources
 
@@ -16,8 +16,7 @@ Prove changes work on real surfaces. The agent that wrote the code must not veri
 - [Before You Start](#before-you-start)
 - [Checks](#checks)
 - [Evaluator Pattern](#evaluator-pattern)
-- [Subagent Lanes](#subagent-lanes)
-- [Choosing Lanes](#choosing-lanes)
+- [Check Selection](#check-selection)
 - [Model Selection](#model-selection)
 - [Cost Awareness](#cost-awareness)
 
@@ -26,7 +25,8 @@ Prove changes work on real surfaces. The agent that wrote the code must not veri
 1. Check harness grade: C+ = proceed. D/F = invoke harness setup first
 2. Can you boot the app?
 3. Can you interact with it? (Playwright CLI for UI, curl for APIs, CLI invocation)
-4. If not, flag as a harness gap — don't improvise a one-off check
+4. Can you verify your own work from a fresh evaluator context or separate subagent?
+5. If not, flag as a harness gap — don't improvise a one-off check
 
 ## Checks
 
@@ -35,10 +35,10 @@ Prove changes work on real surfaces. The agent that wrote the code must not veri
 - For UI: Playwright CLI or CDP — inspect behavior, structure, legibility, responsiveness
 - For services: hit the real local endpoint, confirm full round trip
 
-### Change Review
-- Screenshots are evidence, not the verdict
-- Check nearby surfaces and follow-on states, not just the named change
-- If the result is weak, fix it and re-run
+### Deterministic Guardrails
+- Run the repo's built-in verify entrypoint first when it exists
+- Prefer targeted checks over full-suite context floods during iteration
+- If a deterministic check fails, fix that failure before claiming runtime success
 
 ### External Contracts
 - Verify field names, enums, response shapes against docs or real responses
@@ -67,11 +67,11 @@ Prove changes work on real surfaces. The agent that wrote the code must not veri
 
 Anthropic's GAN-inspired approach: separate generation from evaluation entirely.
 
-**Three agents**: Planner → Generator → Evaluator
+**Three roles**: Planner → Generator → Evaluator
 - **Evaluator** is always independent from the builder
-- Uses Playwright/CDP to navigate the live app, screenshot it, grade against criteria
+- Uses Playwright/CDP, curl, or the shipped CLI to inspect the live result
 - Can reject work and send it back with specific feedback
-- Sprint contracts define what "done" looks like before each sprint
+- Success criteria are defined before running the check
 
 **Why it works**: LLMs are terrible self-evaluators — they confidently praise mediocre work. Tuning a standalone evaluator to be skeptical is far more tractable than making a generator self-critical.
 
@@ -87,74 +87,23 @@ HumanLayer identified this: running a full test suite floods the context window,
 - Run targeted subsets (< 30 seconds), not the full suite every iteration
 - Use hooks that run silently on success, exit with error only on failure
 
-## Subagent Lanes
+## Check Selection
 
-Subagents are **context firewalls** — each gets only the context for its concern. This prevents context pollution and rot. It's the primary reason to split, not speed.
+Pick the smallest set of checks that can honestly disprove the change:
 
-**When to split**: work divides cleanly by concern, lanes are independent, context is large enough to benefit from isolation.
-
-**When NOT to split**: lanes depend on each other's output, context is small, coordination overhead exceeds benefit.
-
-### Review Lanes
-
-These map to the reviewer files under [reviewers/](../reviewers/).
-
-**`general`** — broad code review against repo doctrine and obvious risk
-- Project rule violations that matter
-- Actual bugs, risky logic, or awkward complexity
-- Security risks: auth bypass, leaked secrets, unsanitized input, access control at the wrong layer
-- Obvious maintainability, accessibility, or performance issues when they materially affect the diff
-
-**`tests`** — behavioral coverage and regression resistance
-- Missing coverage on key paths
-- Weak assertions that would miss real regressions
-- Edge cases, failure paths, async behavior, and boundary conditions
-
-**`silent-failures`** — swallowed errors, vague logging, hidden fallbacks
-- Broad catches that hide real failures
-- Fallbacks that conceal a broken primary path
-- Optional chaining/defaults that erase important signals
-
-**`types`** — type design, contracts, and invariants
-- Invalid states still constructible
-- Schema drift between boundaries
-- Weakly typed interfaces that should be explicit
-
-**`comments`** — comment accuracy and maintenance risk
-- Comments that contradict the code
-- Docstrings that drifted from reality
-- Large explanatory comments that are already stale or likely to rot fast
-
-### Sanity-Check Lanes (run-it-and-prove-it)
-
-Each lane should **execute commands and capture evidence**, not just read code.
-
-**`ui-surface`** — navigate the real UI flow with Playwright/CDP, screenshot at each step, check structure/legibility/responsiveness, verify responsive behavior, check for console errors
-
-**`api-surface`** — hit real local endpoints with representative requests, verify status codes/response shapes/error responses, exercise adjacent/error cases
-
-**`state-and-config`** — write data, restart, read it back; boot with new config and confirm; check both fresh-state and existing-state behavior
-
-**`external-contracts`** — compare actual API responses against expected shapes; watch for optional fields, missing fields, version drift; if you can't hit the real API, surface the gap
-
-## Choosing Lanes
-
-Pick the smallest set of independent lanes that challenge the change from different angles:
-
-- **Default**: `general` + `tests` + `silent-failures`
-- **UI change**: add `ui-surface`; add `types` if data shape changed
-- **API/backend**: add `api-surface`; add `types` or `external-contracts` when contracts moved
-- **State/migration/config**: add `state-and-config`; add `types` for invariant changes
-- **Comment-heavy or docstring-heavy diff**: add `comments`
-- If the risk is broader than the request, verify broadly anyway
+- **UI change** → targeted UI flow, screenshot, responsive spot-check, console scan
+- **API/backend** → representative request, error request, schema or contract check
+- **CLI/tooling** → shipped command invocation, representative args, exit code, stdout/stderr sanity check
+- **State/config** → write/read round trip, restart, boot with changed config, migrate existing state
+- **Pure refactor** → deterministic tests plus one surface check that proves behavior parity
 
 ## Model Selection
 
 Match model capability to lane complexity:
 
-- **Strong reasoning** (e.g. Opus, GPT-5.4): general (security-sensitive changes), types, orchestration/planning
-- **Balanced** (e.g. Sonnet, GPT-5.4-mini): tests, silent-failures, comments
-- **Fast/cheap** (e.g. Haiku, flash): ui-surface, api-surface, state-and-config scans
+- **Strong reasoning** (e.g. Opus, GPT-5.4): evaluator orchestration, complex UI judgment, contract-sensitive checks
+- **Balanced** (e.g. Sonnet, GPT-5.4-mini): targeted runtime checks, API verification, state/config passes
+- **Fast/cheap** (e.g. Haiku, flash): repeated smoke checks, screenshot capture, command re-runs
 
 Use your strongest model for planning/orchestration. Use cheaper models for workers and surface checks.
 

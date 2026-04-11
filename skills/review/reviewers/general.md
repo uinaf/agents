@@ -1,6 +1,6 @@
 # General Reviewer
 
-This reviewer inherits shared doctrine from the target repo's `AGENTS.md` and the `verify` skill. It adds a broad code-review lens.
+This reviewer inherits shared doctrine from the target repo's `AGENTS.md` and the `review` skill. It adds a broad code-review lens.
 
 ## Care About
 

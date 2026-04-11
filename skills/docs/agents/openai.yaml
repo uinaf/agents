@@ -1,4 +1,4 @@
 interface:
   display_name: "Docs"
-  short_description: "Maintain repo docs and agent-facing guidance"
-  default_prompt: "Use $docs to update AGENTS.md, README.md, docs/, specs, or fix doc drift after code and harness changes."
+  short_description: "Update repo docs and agent-facing guidance"
+  default_prompt: "Use $docs to update AGENTS.md, README.md, docs/, specs, plans, or fix doc drift after code, skill, or harness changes."

@@ -1,6 +1,6 @@
 ---
 name: effect-ts
-description: "Implement, refactor, debug, review, or explain Effect TypeScript code. Use when working with `effect` or `@effect/*` packages, especially `Context.Tag`, `Effect.Service`, `Layer`, `Schema`, `Schema.TaggedError`, `Config`, `Stream`, `@effect/platform`, `@effect/cli`, `@effect/vitest`, runtime wiring, or incremental Promise-to-Effect migration."
+description: "Implement, debug, refactor, migrate, review, or explain Effect TypeScript code. Use when a task touches `effect` or `@effect/*` APIs, especially services, layers, schemas, runtime wiring, platform or CLI packages, Effect testing, or Promise-to-Effect migration."
 ---
 
 # Effect TS
@@ -36,6 +36,18 @@ Write idiomatic Effect code instead of promise-shaped TypeScript with Effect wra
 - Parse external data once at the boundary with `Schema`, then pass typed values inward.
 - Model recoverable failures with tagged errors and narrow unions.
 - Prefer test layers and `@effect/vitest` over ad hoc mocks.
+
+```ts
+const loadUser = Effect.fn("loadUser")(function* (id: UserId) {
+  const repo = yield* UserRepo
+  return yield* repo.get(id)
+})
+
+const program = Effect.gen(function* () {
+  const input = yield* Schema.decodeUnknown(UserInput)(payload)
+  return yield* loadUser(input.id)
+})
+```
 
 ## Source Order
 

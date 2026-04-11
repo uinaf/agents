@@ -1,4 +1,4 @@
 interface:
   display_name: "Effect TypeScript"
-  short_description: "Implement idiomatic Effect TypeScript"
-  default_prompt: "Use $effect-ts to implement, review, or debug idiomatic Effect TypeScript code."
+  short_description: "Implement and debug idiomatic Effect TypeScript"
+  default_prompt: "Use $effect-ts when a task touches effect services, layers, schemas, runtime wiring, platform packages, or Promise-to-Effect migration."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review"
+  short_description: "Review existing code with concern-specific personas"
+  default_prompt: "Use $review to inspect existing code, a diff, branch, or PR with focused reviewer personas and evidence. If you need to prove your own completed change works, use $verify instead."

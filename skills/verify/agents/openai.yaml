@@ -1,4 +1,4 @@
 interface:
   display_name: "Verify"
-  short_description: "Review changes with evidence using the existing harness"
-  default_prompt: "Use $verify to review a diff, branch, or PR with reviewer lanes and real-surface evidence. If the repo is not verifiable, hand off to $harness."
+  short_description: "Verify your own changes on real surfaces using the existing harness"
+  default_prompt: "Use $verify after implementation to validate your own change in an independent evaluator context with real-surface evidence. If the repo is not verifiable, hand off to $harness. If the task is reviewing someone else's code, use $review."

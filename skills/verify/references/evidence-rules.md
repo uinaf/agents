@@ -43,9 +43,9 @@ For each meaningful finding:
 - impact
 - suggested fix or handoff
 
-For the overall review:
+For the overall verification:
 
 - verdict: `ship it` / `needs review` / `blocked`
-- scope reviewed
-- reviewer lanes used
+- change verified
+- surfaces exercised
 - evidence summary

@@ -1,62 +1,55 @@
 ---
 name: verify
-description: "Review code changes and pull requests using the repo's existing harness. Use when validating your own changes via an independent evaluator context, reviewing someone else's PR, or producing a ship-it / needs-review / blocked verdict with evidence. If the repo is not verifiable yet, stop and hand off to harness instead of improvising checks."
+description: "Verify your own completed code changes using the repo's existing harness and an independent evaluator context. Use after implementing a change when you need to run unit or integration tests, check build or lint gates, and prove the real surface works with evidence. If the repo is not verifiable yet, hand off to `harness`; if you are reviewing someone else's code, use `review`."
 ---
 
 # Verify
 
-Use the existing harness to judge changes on real surfaces.
+Use the existing harness to prove your own change works before calling it done.
 
 ## Principles
 
-- The builder does not grade their own work; when validating your own changes, use a separate subagent or fresh evaluator context
-- Evidence beats vibes
-- Use the smallest set of reviewer lanes that meaningfully challenge the change
-- Load shared doctrine from the repo's `AGENTS.md` first; reviewer files add a lens, not a new religion
+- The builder does not grade their own work in the same context; switch into a fresh evaluator context or separate subagent first
+- Evidence beats confidence
+- Run repo guardrails first, then hit the real surface
+- Load shared doctrine from the repo's `AGENTS.md` before judging the result
 - If the harness is too weak to verify reliably, stop and hand off to `harness`
 
 ## Handoffs
 
 - No stable boot / smoke / interact path, or harness too weak to trust → use `harness`
+- Need to review existing code, a diff, branch, or PR you are not verifying as the builder → use `review`
 - Main problem is stale AGENTS.md, README, specs, or repo docs → use `docs`
 
 ## Before You Start
 
-1. Define the scope: diff, branch, commit range, or PR
-2. If reviewing your own work, switch into an independent evaluator context before judging it
-3. Confirm you can boot and interact with the real surface
-4. Load the target repo's `AGENTS.md`
-5. Choose reviewer lanes from [references/reviewer-selection.md](references/reviewer-selection.md)
-
-Default lanes:
-
-- [reviewers/general.md](reviewers/general.md)
-- [reviewers/tests.md](reviewers/tests.md)
-- [reviewers/silent-failures.md](reviewers/silent-failures.md)
-
-Add conditional lanes only when they earn their keep:
-
-- [reviewers/types.md](reviewers/types.md)
-- [reviewers/comments.md](reviewers/comments.md)
+1. Define the exact change being verified and the expected user-visible behavior
+2. Switch into an independent evaluator context before judging your own work
+3. Load the target repo's `AGENTS.md`
+4. Confirm you can boot and interact with the real surface
+5. Pick the smallest check set that can disprove the change honestly
 
 ## Workflow
 
-### 1. Scope the review
+### 1. Run deterministic guardrails first
 
-Review the requested diff, but inspect nearby risk as well.
+- Prefer the repo's built-in entrypoint: `make verify`, `just verify`, `pnpm test`, `cargo test`, or the nearest targeted equivalent
+- Swallow boring success output and surface only failures, anomalies, and exact commands
 
-### 2. Run independent lanes
+### 2. Exercise the real surface
 
-Use parallel subagents when available. Keep lanes independent and concern-focused.
-
-### 3. Exercise the real surface
-
-- UI → navigate it
-- API → hit the real endpoint
-- CLI → run the shipped command
-- state/config → verify round trips and restart behavior
+- UI → run the browser harness, navigate the changed flow, and capture screenshots
+- API → hit the local endpoint with a real request such as `curl http://127.0.0.1:3000/health`
+- CLI → run the shipped command such as `node dist/cli.js --help` or the repo's packaged entrypoint
+- state/config → verify round trips, restart behavior, and config boot paths
 
 Follow [references/evidence-rules.md](references/evidence-rules.md) when collecting proof.
+
+### 3. Probe adjacent risk
+
+- Check the main happy path
+- Check at least one failure path or edge case
+- Re-test any config, persistence, or restart-sensitive behavior touched by the change
 
 ### 4. Synthesize the verdict
 
@@ -73,16 +66,25 @@ If blocked because the harness is weak, say so explicitly and hand off to `harne
 After verification, report:
 
 - verdict
-- scope reviewed
-- reviewer lanes used
+- change verified
+- surfaces exercised
 - top findings by severity
 - exact evidence: commands, screenshots, traces, responses, or file references
-- harness gaps or doc drift discovered during review
+- harness gaps or doc drift discovered during verification
 - recommended follow-up: `harness`, `docs`, or implementation
+
+Example:
+
+```text
+verdict: needs review
+change verified: retry banner after transient API failure
+surfaces exercised: pnpm test test/retry.spec.ts, curl http://127.0.0.1:3000/api/retry
+finding: medium — the UI recovers, but the retry count is not persisted across refresh
+evidence: local API returned 200 after retry; browser screenshot after refresh shows count reset to 0
+recommended follow-up: implementation
+```
 
 ## References
 
-- [references/verification.md](references/verification.md) — evaluator pattern, lane design, real-surface checks, cost trade-offs
-- [references/reviewer-selection.md](references/reviewer-selection.md) — which reviewer lanes to run for which change shapes
+- [references/verification.md](references/verification.md) — evaluator pattern, targeted real-surface checks, and cost trade-offs
 - [references/evidence-rules.md](references/evidence-rules.md) — what counts as proof and how to report it
-- [reviewers/](reviewers/) — specialized review lenses

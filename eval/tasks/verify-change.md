@@ -1,1 +1,0 @@
-A change was made to the POST /todos endpoint — it now validates that `title` is non-empty and returns 400 if missing. Verify this change works correctly on real surfaces. Don't just read the code — actually run the app, hit the endpoint, and prove it works. Follow the harness skill's verification checklist.

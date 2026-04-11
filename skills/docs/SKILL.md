@@ -1,6 +1,6 @@
 ---
 name: docs
-description: "Maintain repo documentation and agent-facing guidance. Use when updating or cleaning up AGENTS.md, README.md, docs/, plans, specs, runbooks, or when code and harness changes risk doc drift. Do not use for harness setup or change verification."
+description: "Update repo documentation and agent-facing guidance such as AGENTS.md, README.md, docs/, specs, plans, and runbooks. Use when code, skill, or harness changes risk doc drift or when documentation needs cleanup or restructuring. Do not use for code review, runtime verification, or harness setup."
 ---
 
 # Docs
@@ -18,7 +18,8 @@ Keep the repo legible to humans and agents.
 ## Handoffs
 
 - Missing boot, smoke, e2e, logs, or agent-readiness infrastructure → use `harness`
-- Need to judge a diff, branch, or PR with evidence → use `verify`
+- Need to judge existing code, a diff, branch, or PR with evidence → use `review`
+- Need to validate your own completed change on the real surface → use `verify`
 
 ## Workflow
 
@@ -45,6 +46,7 @@ Keep top-level docs terse and navigational.
 - `SECURITY.md` should hold private-first vulnerability reporting guidance
 - Push detail downward instead of bloating top-level files
 - Use the concrete top-level split and section order in [references/documentation.md](references/documentation.md) instead of inventing a new shape every time
+- Prefer terse routing over narrative sprawl, for example `README.md` should link to deeper docs instead of re-explaining them inline
 
 ### 3. Update deep docs and specs
 
@@ -66,6 +68,11 @@ Refresh the detailed documents that actually carry the knowledge.
 
 Do not trust prose. Check that commands, file paths, and entry points still match the repo.
 
+Concrete checks:
+
+- `rg -n "old/path|stale-command" AGENTS.md README.md docs/` when paths or commands moved
+- `test -e <path-from-docs>` before keeping a file reference
+
 ## Output
 
 After docs work, report:
@@ -74,7 +81,7 @@ After docs work, report:
 - stale or duplicated docs removed or rewritten
 - commands or paths verified
 - remaining doc gaps
-- any handoff needed to `harness` or `verify`
+- any handoff needed to `harness`, `review`, or `verify`
 
 ## References
 
