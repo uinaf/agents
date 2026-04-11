@@ -106,7 +106,8 @@ Stop. Reproduce. Find root cause with evidence. Fix root cause only. No workarou
 ### Safety
 
 - Parse external data at boundaries; operate on typed/validated structures internally
-- No unsafe casts, ignore directives, suppressed checks, skipped tests, or lowered thresholds unless explicitly approved
+- No TypeScript escape hatches: no `as` casts, non-null `!`, `unknown as T`, or double assertions unless explicitly approved
+- Do not disable linters, type checks, tests, or other guardrails. Fix the root cause instead
 - Never log or surface secrets in error output
 
 ### Dependencies
@@ -116,6 +117,7 @@ Stop. Reproduce. Find root cause with evidence. Fix root cause only. No workarou
 
 ### Error handling
 
+- Treat errors as first-class citizens: classify them with specific types, codes, and context instead of generic catch-all failures
 - No silent catches. Add context to errors. Surface useful failures
 
 ### Migrations and state changes
