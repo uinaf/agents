@@ -17,18 +17,6 @@
       "source": "emilkowalski/skill"
     },
     {
-      "name": "error-handling-patterns",
-      "source": "wshobson/agents"
-    },
-    {
-      "name": "git-commit",
-      "source": "github/awesome-copilot"
-    },
-    {
-      "name": "golang-pro",
-      "source": "jeffallan/claude-skills"
-    },
-    {
       "name": "harness",
       "source": "uinaf/skills"
     },
@@ -49,7 +37,7 @@
       "source": "uinaf/skills"
     }
   ],
-  "version": 26,
-  "manifestHash": "b98f7e3489617994e8b96e3c44032e798f53e7147aa1932584e8160fa845eaaa",
-  "updatedAt": "2026-04-11T18:36:18Z"
+  "version": 27,
+  "manifestHash": "78748f75d2905bed59d51d47495704b2e0971b9934f4992c218a3b33a0bc0e49",
+  "updatedAt": "2026-04-11T18:43:01Z"
 }
