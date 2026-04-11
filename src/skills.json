@@ -33,23 +33,23 @@
       "source": "uinaf/skills"
     },
     {
-      "name": "improve-codebase-architecture",
-      "source": "mattpocock/skills"
-    },
-    {
       "name": "react-doctor",
       "source": "millionco/react-doctor"
     },
     {
-      "name": "tdd",
-      "source": "mattpocock/skills"
+      "name": "review",
+      "source": "uinaf/skills"
     },
     {
       "name": "verify",
       "source": "uinaf/skills"
+    },
+    {
+      "name": "viteplus",
+      "source": "uinaf/skills"
     }
   ],
-  "version": 25,
-  "manifestHash": "9f99aefc0169ae3ecb7b7e10ef4028dcef7e8f37a403f896094cc8044c40b13a",
-  "updatedAt": "2026-04-04T14:21:36Z"
+  "version": 26,
+  "manifestHash": "b98f7e3489617994e8b96e3c44032e798f53e7147aa1932584e8160fa845eaaa",
+  "updatedAt": "2026-04-11T18:36:18Z"
 }
