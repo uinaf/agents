@@ -44,7 +44,7 @@ After tests pass, verify the change works in practice. Run the binary, hit the e
 
 For code review, split by concern using parallel subagents: correctness, safety, test quality, contracts/types. Each concern gathers evidence independently; merge into one prioritized result.
 
-**Spawn a separate evaluator subagent to verify runtime behavior. The builder should never grade their own work.**
+**Use an independent evaluator context to verify runtime behavior. The builder should never grade their own work.**
 
 If it isn't verified, it isn't done.
 
@@ -73,7 +73,7 @@ Stop. Reproduce. Find root cause with evidence. Fix root cause only. No workarou
 ## Anti-Patterns
 
 - Big AGENTS.md (> 150 lines) — fails. Keep it a table of contents, load detail on demand
-- Self-evaluation — agent grades own work, always passes. Use an independent evaluator subagent
+- Self-evaluation — agent grades own work, always passes. Use an independent evaluator context
 - Mocked tests as verification — pass by construction, verify nothing real
 - Infinite retry — max 2 CI rounds. Partial success beats token burn
 - All-agentic pipeline — deterministic steps left to LLM judgment waste context and reliability
@@ -136,5 +136,9 @@ Stop. Reproduce. Find root cause with evidence. Fix root cause only. No workarou
 ## Commit Gate
 
 All checks green before commit. If creating a PR, use repo template or: Summary, Changes, Validation, Linked Issues.
+- Use Conventional Commits for commit messages: `<type>: <subject>` or `<type>(<scope>): <subject>`
+- Prefer standard types such as `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `build`, or `ci`
+- Mark breaking changes with `!` in the header or a `BREAKING CHANGE:` footer
+- Commit only the scoped change. Leave unrelated diffs out
 
 **Change Summary** (non-trivial): Changed (files + intent), Risks (what to verify), Complexity (net reduced / neutral / increased — if increased, justify).
