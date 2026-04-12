@@ -5,6 +5,10 @@
       "source": "jpoehnelt/skills"
     },
     {
+      "name": "agent-readiness",
+      "source": "uinaf/skills"
+    },
+    {
       "name": "docs",
       "source": "uinaf/skills"
     },
@@ -15,10 +19,6 @@
     {
       "name": "emil-design-eng",
       "source": "emilkowalski/skill"
-    },
-    {
-      "name": "harness",
-      "source": "uinaf/skills"
     },
     {
       "name": "react-doctor",
@@ -37,7 +37,7 @@
       "source": "uinaf/skills"
     }
   ],
-  "version": 27,
-  "manifestHash": "78748f75d2905bed59d51d47495704b2e0971b9934f4992c218a3b33a0bc0e49",
-  "updatedAt": "2026-04-11T18:43:01Z"
+  "version": 28,
+  "manifestHash": "01352e184012950cf94698969fb6e389b6cd8cc0b9fa65e78c8357063296d19a",
+  "updatedAt": "2026-04-12T11:42:24Z"
 }
