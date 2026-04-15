@@ -40,7 +40,9 @@ If the plan breaks mid-flight, stop and re-plan.
 
 Use repo guardrails first (`make verify`, `just verify`, project scripts). If none exist, run explicit format/lint/typecheck/test.
 
-After tests pass, verify the change works in practice. Run the binary, hit the endpoint, check the output. If a `verify` skill is available, use it. If verification infra is missing (no bootable env, no integration tests), flag the gap — use the `harness` skill to build it.
+After tests pass, verify the change works in practice. Run the binary, hit the endpoint, check the output. If a `verify` skill is available, use it. If verification infra is missing (no bootable env, no integration tests), flag the gap — use the `agent-readiness` skill to build it.
+
+Prefer smoke, integration, contract, and e2e checks over mock-heavy unit tests that mainly self-verify implementation details.
 
 For code review, split by concern using parallel subagents: correctness, safety, test quality, contracts/types. Each concern gathers evidence independently; merge into one prioritized result.
 
@@ -93,6 +95,7 @@ Stop. Reproduce. Find root cause with evidence. Fix root cause only. No workarou
 - **Parse, don't validate** ([original](https://lexi-lambda.github.io/blog/2019/11/05/parse-don-t-validate/), [TS edition](https://bardeworks.com/blog/parse-dont-validate-typescript/)): Push validation to the boundary, produce typed evidence of correctness
 - **[Great software is composed, not written](https://altay.wtf/decade/):** Types are the ultimate contract. Declarative over imperative. Simplicity over cleverness. Pragmatism over perfection
 - Prefer reversible changes when uncertain
+- Delete dead code, stale branches, duplicate helpers, and unused exports instead of preserving them "just in case"
 - For hot paths or perf-sensitive changes, include before/after benchmark numbers in the PR
 
 ### Conventions
@@ -119,6 +122,7 @@ Stop. Reproduce. Find root cause with evidence. Fix root cause only. No workarou
 
 - Treat errors as first-class citizens: classify them with specific types, codes, and context instead of generic catch-all failures
 - No silent catches. Add context to errors. Surface useful failures
+- User-facing errors should help recovery when recovery is possible; preserve richer diagnostics for operators without leaking raw internals
 
 ### Migrations and state changes
 
