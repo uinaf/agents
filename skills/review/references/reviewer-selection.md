@@ -10,6 +10,8 @@ Use these for most non-trivial reviews:
 - [reviewers/tests.md](../reviewers/tests.md)
 - [reviewers/silent-failures.md](../reviewers/silent-failures.md)
 
+The silent-failures lens is especially important when the diff touches error handling, retries, fallbacks, validation, auth, external services, or user-facing failures.
+
 ## Add Conditional Personas
 
 ### Add [reviewers/types.md](../reviewers/types.md) when:

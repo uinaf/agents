@@ -50,6 +50,8 @@ Prove your own changes work on real surfaces. The agent that wrote the code must
 - Delete dead code, stale branches, and unused helpers when they no longer protect a real boundary
 - Treat `any`, unsafe casts, and boundary-leaking `unknown` as verification failures unless explicitly allowed
 - Prefer parsing external data once at the boundary over scattering validation and casts through core logic
+- Classify failures intentionally: validation, not-found, auth, dependency, and programmer errors should not collapse into one vague catch-all
+- Prefer user-facing errors that explain what happened and what to try next, while preserving richer diagnostics for logs or operators
 - Prefer matching existing language/framework patterns over inventing a new local style
 - Delete comments that only compensate for unclear code; keep only durable context the code cannot express
 - Ask whether a fresh agent could extend the changed path without reverse-engineering hidden intent
@@ -62,6 +64,11 @@ Prove your own changes work on real surfaces. The agent that wrote the code must
 - Verify public interfaces end to end
 - Verify persistence/state round trips with real data
 - Verify config changes by starting the program with the new config
+
+### Failure Quality
+- Exercise at least one real failure path when the change touches validation, IO, auth, network, or external dependencies
+- Confirm the surfaced error is actionable: clear cause, stable classification or code where appropriate, and a useful recovery step when the user can do something about it
+- Reject swallowed failures, vague "something went wrong" responses, and raw internals dumped directly to end users
 
 ### CI Integration
 - If the project has CI, push and wait for results before declaring done
@@ -107,6 +114,7 @@ Pick the smallest set of checks that can honestly disprove the change:
 
 - **UI change** → targeted UI flow, screenshot, responsive spot-check, console scan
 - **API/backend** → representative request, error request, schema or contract check; prefer this over handler-level mocks
+- **Error-handling change** → exercise one real failure path, inspect classification, and inspect the user/operator message quality
 - **CLI/tooling** → shipped command invocation, representative args, exit code, stdout/stderr sanity check
 - **State/config** → write/read round trip, restart, boot with changed config, migrate existing state
 - **Pure refactor** → deterministic tests plus one surface check that proves behavior parity, then delete stale paths and duplicates exposed by the refactor

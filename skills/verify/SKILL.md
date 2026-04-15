@@ -10,7 +10,6 @@ Use the existing infrastructure to prove your own change works before calling it
 ## Principles
 
 - The builder does not grade their own work in the same context; switch into a fresh evaluator context or separate subagent first
-- Evidence beats confidence
 - Run repo guardrails first, then hit the real surface
 - Prefer smoke, integration, contract, or e2e proof over unit tests that mock most of the behavior under test
 - Challenge the changed code for shape as well as behavior; passing tests do not excuse bloated, duplicated, or comment-dependent code
@@ -53,7 +52,8 @@ Follow [references/evidence-rules.md](references/evidence-rules.md) when collect
 - Focus on code touched in the current task unless the changes obviously exposed a broader local mess
 - Ask whether the solution matches the repo's language, framework, and design patterns rather than merely working
 - Remove duplication, dead branches, unused helpers, and unnecessary abstractions when they do not protect a real boundary
-- Treat type escape hatches such as `any`, unsafe `as`, boundary-leaking `unknown`, or non-null assertions as safety failures unless the repo explicitly allows them
+- Treat `any`, unsafe `as`, boundary-leaking `unknown`, and non-null assertions as safety failures unless the repo explicitly allows them
+- Check that failures are classified intentionally and surfaced with useful recovery guidance, while preserving codes or diagnostics for operators
 - Prefer code that explains itself; comments should survive only when they carry durable context the code cannot make obvious
 - Read the changed files as if a brand new agent inherited them tomorrow and had to extend the flow without prior context
 
@@ -63,6 +63,7 @@ Use [references/simplification.md](references/simplification.md) for the exact s
 
 - Check the main happy path
 - Check at least one failure path or edge case
+- Check that at least one exercised failure path returns or logs a useful, actionable error instead of a vague or swallowed failure
 - Re-test any config, persistence, or restart-sensitive behavior touched by the change
 
 ### 5. Synthesize the verdict
@@ -82,7 +83,7 @@ After verification, report:
 - verdict
 - change verified
 - surfaces exercised
-- code-shape findings: clarity, duplication, dead code, unsafe type escapes, comments, or maintainability debt in the changed files
+- code-shape findings: clarity, duplication, dead code, unsafe type escapes, error classification, recovery messaging, comments, or maintainability debt in the changed files
 - top findings by severity
 - exact evidence: commands, screenshots, traces, responses, or file references
 - readiness gaps or doc drift discovered during verification

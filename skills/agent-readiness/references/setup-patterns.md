@@ -152,6 +152,13 @@ meta: {
 }
 ```
 
+Prefer mechanical checks for error-handling hygiene when the stack supports them:
+
+- no empty catches
+- no broad catch-and-ignore handlers
+- stable error codes or tagged variants for public interfaces
+- user-facing error text that suggests a recovery step when one exists
+
 ## Observability
 
 Structured JSON logs + machine-readable health endpoints. This is what makes "Grade B" possible — agents can query results, not just read code.

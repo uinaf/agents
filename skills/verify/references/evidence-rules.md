@@ -11,6 +11,7 @@ Prefer reproducible proof:
 - HTTP requests and responses
 - CLI output
 - structured logs, traces, or health checks
+- concrete error messages, codes, and recovery hints from an exercised failure path
 - file references with line numbers for static findings
 
 ## Rules
@@ -27,10 +28,13 @@ Prefer reproducible proof:
 4. **Name the exact surface exercised**
    - page, endpoint, command, state transition, config path
 
-5. **Flag unverified claims honestly**
+5. **For error-handling findings, capture the surfaced failure**
+   - include the actual error text, code/classification, and whether the message helps the user recover
+
+6. **Flag unverified claims honestly**
    - if you could not hit the real surface, say `unverified` and why
 
-6. **Do not flood context with giant logs**
+7. **Do not flood context with giant logs**
    - quote only the relevant lines or summarize with exact pointers
 
 ## Minimum Output Shape
