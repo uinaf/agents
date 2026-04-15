@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Audit"
+  short_description: "Audit skills with Tessl scoring and repo-aware checks"
+  default_prompt: "Use $skill-audit to inspect an existing skill with Tessl, compare it against repo conventions and skill-authoring best practices, then report prioritized findings and the smallest fixes that would improve it."

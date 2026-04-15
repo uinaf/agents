@@ -12,9 +12,9 @@ Use this reference when starting a new repo on VitePlus or converting an existin
 
 1. Audit current scripts, CI, test imports, package manager, and packaging flow before migrating.
 2. Use `vp migrate` as the default starting point instead of a hand-rolled conversion.
-3. If Vite+ is already installed, inspect its packaged `AGENTS.md` first. Common locations are `node_modules/vite-plus/AGENTS.md` or the local CLI package path.
+3. If Vite+ is already installed, inspect its packaged guidance files first. A common location is `node_modules/vite-plus/AGENTS.md`, but use whatever `AGENTS.md`, `CLAUDE.md`, or rules file ships with the installed toolchain.
 4. Reconcile generated files with the repo's real guardrails and release flow instead of assuming stock output is final.
-5. Keep useful generated agent guidance, but merge it into the repo's real `AGENTS.md` instead of accepting generic VitePlus boilerplate unchanged.
+5. Keep useful generated agent guidance, but merge it into the repo's real guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules instead of accepting generic VitePlus boilerplate unchanged.
 
 ## Notes
 

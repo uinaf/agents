@@ -10,7 +10,7 @@ Review existing code with independent lenses, then collapse the result into one 
 
 ## Workflow
 
-1. Load the repo's `AGENTS.md` and local review doctrine first
+1. Load the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, plus local review doctrine, when present
 2. Pick the smallest set of reviewer personas that can challenge the change from distinct angles
 3. Run personas independently when parallelism actually buys separation of concerns
 4. Merge findings into one prioritized verdict

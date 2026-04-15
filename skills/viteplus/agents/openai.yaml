@@ -1,4 +1,4 @@
 interface:
   display_name: "VitePlus"
   short_description: "Align repos with stock VitePlus"
-  default_prompt: "Use $viteplus to migrate or align this frontend repository with the stock VitePlus workflow across scripts, test config, CI, hooks, and packaging. Prefer vp-owned commands, inspect the local VitePlus AGENTS.md when present, and preserve any repo-specific release logic that VitePlus does not replace cleanly."
+  default_prompt: "Use $viteplus to migrate or align this frontend repository with the stock VitePlus workflow across scripts, test config, CI, hooks, and packaging. Prefer vp-owned commands, inspect local guidance files such as AGENTS.md, CLAUDE.md, or repo rules when present, and preserve any repo-specific release logic that VitePlus does not replace cleanly."

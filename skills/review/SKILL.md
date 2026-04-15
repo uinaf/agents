@@ -11,7 +11,7 @@ Review existing code with independent lenses before deciding whether it is safe 
 
 - Prefer parallel reviewer personas when the concerns are independent
 - Evidence beats taste
-- Load shared doctrine from the target repo's `AGENTS.md` first
+- Load shared doctrine from the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules
 - Keep findings risk-focused; do not drown the user in low-value nits
 - If runtime proof for your own completed change is the goal, hand off to `verify`
 
@@ -24,7 +24,7 @@ Review existing code with independent lenses before deciding whether it is safe 
 ## Before You Start
 
 1. Define the scope: file, diff, branch, commit range, or PR
-2. Load the target repo's `AGENTS.md`
+2. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
 3. Choose reviewer personas from [references/reviewer-selection.md](references/reviewer-selection.md)
 4. Decide which personas can run independently in parallel
 

@@ -13,7 +13,7 @@ Use the existing infrastructure to prove your own change works before calling it
 - Evidence beats confidence
 - Run repo guardrails first, then hit the real surface
 - Challenge the changed code for shape as well as behavior; passing tests do not excuse bloated, duplicated, or comment-dependent code
-- Load shared doctrine from the repo's `AGENTS.md` before judging the result
+- Load shared doctrine from the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules before judging the result
 - If the infrastructure is too weak to verify reliably, stop and hand off to `agent-readiness`
 
 ## Handoffs
@@ -26,7 +26,7 @@ Use the existing infrastructure to prove your own change works before calling it
 
 1. Define the exact change being verified and the expected user-visible behavior
 2. Switch into an independent evaluator context before judging your own work
-3. Load the target repo's `AGENTS.md`
+3. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
 4. Confirm you can boot and interact with the real surface
 5. Pick the smallest check set that can disprove the change honestly
 
