@@ -13,6 +13,9 @@ Review existing code with independent lenses before deciding whether it is safe 
 - Evidence beats taste
 - Load shared doctrine from the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules
 - Keep findings risk-focused; do not drown the user in low-value nits
+- Always list the reviewer personas you used, even when there were only one or two
+- Always include an explicit `unverified areas` line, even if the answer is `none`
+- Always choose the verdict from exactly: `ship it`, `needs review`, `blocked`
 - If runtime proof for your own completed change is the goal, hand off to `verify`
 
 ## Handoffs
@@ -40,6 +43,13 @@ Add conditional personas only when they earn their keep:
 - [reviewers/cleanup.md](reviewers/cleanup.md)
 - [reviewers/comments.md](reviewers/comments.md)
 
+Persona shortcuts:
+
+- doc-only or comment-only diffs: use `general` plus `comments`; skip `tests`, `types`, `silent-failures`, and `cleanup` unless the diff actually justifies them
+- type-shape or schema changes: add `types`
+- dead files, deprecated paths, or obviously unused helpers: add `cleanup` and call out deletion explicitly when warranted
+- mock-heavy or shallow tests around risky behavior: make that a finding rather than treating test presence as proof
+
 ## Workflow
 
 ### 1. Scope nearby risk
@@ -61,6 +71,8 @@ Concrete starting points:
 - Cite exact file references for static findings
 - Run the smallest runtime check that changes the verdict when the repo supports it
 - If something is unverified, say so explicitly instead of bluffing
+- If legacy or dead code is still present, say whether it should be deleted or why it must stay
+- If tests mock the main integrations or boundaries, say that the behavior is still unverified on the real surface
 
 ### 4. Synthesize the verdict
 
@@ -84,6 +96,8 @@ After review, report:
 - unverified areas or readiness gaps
 - recommended follow-up: implementation, `verify`, `agent-readiness`, or `docs`
 
+Use those labels explicitly. Do not replace them with softer prose like "safe to merge" or "do not ship today".
+
 Example:
 
 ```text
@@ -92,6 +106,7 @@ scope reviewed: feature/auth-session branch
 reviewer personas: general, tests, silent-failures
 finding: high — src/auth/session.ts:42 fallback returns an anonymous session when token parsing fails
 evidence: targeted test passes only for valid tokens; no failure-path coverage covers malformed headers
+unverified areas: runtime behavior for malformed OAuth callbacks
 recommended follow-up: implementation
 ```
 
