@@ -1,0 +1,28 @@
+name: Review Skills
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  tessl-review:
+    runs-on: ubuntu-latest
+    env:
+      TESSL_AUTO_UPDATE_INTERVAL_MINUTES: "0"
+      TESSL_THRESHOLD: "90"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
+      - name: Review skills with Tessl
+        run: ./eval/review-skills.sh

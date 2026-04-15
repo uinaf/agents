@@ -34,3 +34,5 @@ Use [Tessl](https://tessl.io/), the skill-evaluation CLI used in this repo, to r
 ```
 
 The eval helpers and workflow notes live in `eval/`.
+
+CI also runs `./eval/review-skills.sh` on pull requests and pushes to `main`.

@@ -49,3 +49,4 @@ npx tessl skill review --optimize --yes --max-iterations 1 skills/review
 - `review-skills.sh` is the batch entrypoint for local skill review
 - `optimize-skills.sh` applies mutations, so run it intentionally and inspect the resulting diff
 - Prefer optimizing one skill at a time rather than churning the whole repo at once
+- CI runs `./eval/review-skills.sh` on pull requests and pushes to `main`
