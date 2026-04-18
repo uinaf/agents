@@ -15,6 +15,7 @@ Use this reference when starting a new repo on VitePlus or converting an existin
 3. If Vite+ is already installed, inspect its packaged guidance files first. A common location is `node_modules/vite-plus/AGENTS.md`, but use whatever `AGENTS.md`, `CLAUDE.md`, or rules file ships with the installed toolchain.
 4. Reconcile generated files with the repo's real guardrails and release flow instead of assuming stock output is final.
 5. Keep useful generated agent guidance, but merge it into the repo's real guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules instead of accepting generic VitePlus boilerplate unchanged.
+6. Treat the machine-global `vp` binary and the repo-local `vite-plus` package as separate upgrade surfaces. `vp upgrade` updates the global CLI, while project dependencies should move with `vp update ...` inside the repo.
 
 ## Notes
 
