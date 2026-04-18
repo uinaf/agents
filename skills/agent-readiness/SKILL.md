@@ -76,6 +76,8 @@ Build missing layers in this order:
 
 Each step should be independently useful. Stop once the repo is reliably verifiable; do not build a cathedral because you got excited.
 
+When readiness work includes agent entrypoints, keep `AGENTS.md` as the canonical authored guide and place `CLAUDE.md` beside it as a symlink to `AGENTS.md` rather than maintaining two separate guidance files.
+
 **Boot** — create a single-command entry point:
 
 ```bash

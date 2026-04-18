@@ -28,6 +28,7 @@ Keep the repo legible to humans and agents.
 Check the files humans and agents actually rely on:
 
 - `AGENTS.md`
+- `CLAUDE.md`
 - `README.md`
 - `CONTRIBUTING.md`
 - `SECURITY.md`
@@ -41,6 +42,7 @@ Flag stale commands, dead paths, duplicated guidance, and routing failures.
 Keep top-level docs terse and navigational.
 
 - `AGENTS.md` should be a table of contents, not a wiki
+- If the repo uses `AGENTS.md`, keep `CLAUDE.md` at the same level as a symlink to `AGENTS.md` instead of maintaining a second authored file
 - `README.md` should lead with value and the fastest path to use the project
 - `CONTRIBUTING.md` should hold contributor setup, validation, and workflow
 - `SECURITY.md` should hold private-first vulnerability reporting guidance
@@ -80,8 +82,9 @@ Do not trust prose. Check that commands, file paths, and entry points still matc
 
 Concrete checks:
 
-- `rg -n "old/path|stale-command" AGENTS.md README.md docs/` when paths or commands moved
+- `rg -n "old/path|stale-command" AGENTS.md CLAUDE.md README.md docs/` when paths or commands moved
 - `test -e <path-from-docs>` before keeping a file reference
+- `test ! -e AGENTS.md || { test -L CLAUDE.md && test "$(readlink CLAUDE.md)" = "AGENTS.md"; }` when normalizing agent entrypoints
 
 ## Output
 
