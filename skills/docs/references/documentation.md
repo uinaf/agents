@@ -1,6 +1,7 @@
 # Documentation
 
 Keep the repo legible to humans and agents. Docs rot silently — every code change is a potential doc change.
+Documentation is part of the interface; optimize for scanability, rhythm, and visual clarity, not just correctness.
 
 ## Sources
 
@@ -33,6 +34,7 @@ OpenAI's finding: "We tried the big AGENTS.md. It failed." Context is scarce —
 - Points to `docs/` directory for depth
 - Include: boot command, test command, key conventions, pointers to detailed docs
 - Exclude: architecture tours, full API docs, every lint rule
+- Keep headings and bullets scannable. Prefer task-shaped labels like `Start here`, `Commands`, `Validation`, or `Repo rules` over headings that mirror internal filenames or implementation structure
 
 ### What belongs in AGENTS.md
 
@@ -41,6 +43,7 @@ OpenAI's finding: "We tried the big AGENTS.md. It failed." Context is scarce —
 - Key conventions that deviate from defaults
 - Links to `docs/architecture.md`, `docs/api.md`, etc.
 - Scoped rules pointer (e.g., "see per-directory AGENTS.md files")
+- Section order that follows agent workflow: orient, run, verify, then special rules or hotspots
 
 ### What doesn't belong
 
@@ -48,6 +51,7 @@ OpenAI's finding: "We tried the big AGENTS.md. It failed." Context is scarce —
 - Auto-generated content (actively hurts performance — +20% cost, ETH Zurich)
 - Conditional rules that apply only sometimes
 - Implementation details that change frequently
+- Labels or section names that read like raw filesystem output when a clearer human-facing title would do
 
 ### Enforcement
 
@@ -98,6 +102,13 @@ Use a small default top-level set with one responsibility per file:
 
 Do not cram all four responsibilities into `README.md` unless the repo is tiny enough that the split adds no value.
 
+General doc-surface rules:
+
+- Visible labels should describe purpose, not filenames. Prefer `Contributing`, `Release workflow`, or `Architecture` over `CONTRIBUTING.md` or `docs/RELEASE.md`
+- Use consistent casing for visible prose and navigation. Reserve all-caps names or extension-bearing filenames for literal file references only
+- Order sections and link lists by reader task flow or importance, not by directory layout or implementation order
+- Apply the same rule to agent-facing docs and internal guides, not just user-facing README copy
+
 ## README.md
 
 Use this default order unless the repo gives you a strong reason not to:
@@ -118,6 +129,9 @@ Guidance:
 - Keep contributing and license sections short
 - For package repos, show install plus one short usage example
 - For app repos, keep end-user usage in `README.md` and move contributor setup to `CONTRIBUTING.md`
+- Use human-facing labels in README navigation. Prefer `Contributing`, `Architecture`, `Distribution`, or `Security` over raw filenames or paths like `CONTRIBUTING.md` or `docs/RELEASE.md`
+- Order navigation for readers, not for the filesystem. Put the most useful docs first instead of mirroring path order
+- Apply the same rule to section titles and callouts around the README, not just the bullet links
 
 ### Shape selection
 
@@ -144,6 +158,7 @@ Guidance:
 - Include only contributor-facing commands here: install toolchain, install dependencies, run locally, run checks
 - Keep repo-specific development notes only when they materially help contributors
 - Link deeper docs instead of letting `CONTRIBUTING.md` turn into a handbook
+- Keep visible labels and headings contributor-facing rather than file-oriented here too. For example, prefer `Pull request expectations` over a heading or bullet that just echoes a filename
 
 ## SECURITY.md
 
@@ -169,8 +184,12 @@ When `README.md` has a `Docs` section, keep it compact and canonical.
 
 - Link to deeper docs without dumping their contents into the README
 - Common links: About, Guides, Architecture, Deployment, Security
+- Do not treat it like a directory listing. Use human labels, not raw filenames or paths
+- Keep `Contributing` and `License` in their own sections when the README already has those sections
+- Put agent-only or generated docs last, or move them into a small `Repo Internals` section when that reads better
 - Do not duplicate the same navigation list across multiple top-level files
 - Keep it skimmable
+- Carry the same ordering rule into other visible lists and sections across the doc surface. If a sequence reads like filesystem order instead of reader priority, rewrite it
 
 ## Architecture Docs
 
@@ -184,10 +203,13 @@ Run periodically or after a burst of changes:
 
 1. **Dedup**: same fact in multiple files → pick one canonical location, replace others with pointers
 2. **Consistency**: names, commands, paths in one doc match what referenced docs say
-3. **Conciseness**: section restates what a referenced doc covers → replace with one-line pointer
-4. **Structure**: file growing past ~80 lines of prose → split detail into `references/`, keep parent as routing layer
-5. **Staleness**: delete or archive docs for removed features, finished plans, superseded decisions
-6. **Symlinks over copies**: two files need identical content → symlink, never two copies
+3. **Labeling**: visible labels read like a file tree or internal implementation detail → rewrite them in reader-facing language
+4. **Ordering**: sections or bullet lists mirror path order instead of reader priority → reorder them
+5. **Conciseness**: section restates what a referenced doc covers → replace with one-line pointer
+6. **Scannability**: agent-facing docs are technically correct but visually awkward, over-cased, or hard to skim → rewrite for fast orientation
+7. **Structure**: file growing past ~80 lines of prose → split detail into `references/`, keep parent as routing layer
+8. **Staleness**: delete or archive docs for removed features, finished plans, superseded decisions
+9. **Symlinks over copies**: two files need identical content → symlink, never two copies
 
 ## Keep Docs Alive
 
