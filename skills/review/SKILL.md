@@ -98,6 +98,16 @@ After review, report:
 
 Use those labels explicitly. Do not replace them with softer prose like "safe to merge" or "do not ship today".
 
+Prefer the active harness's best native review representation instead of a prose-heavy wall of text.
+
+Harness-specific presentation rules:
+
+- Tell the harness to use the strongest structured review format it supports
+- Codex / OpenAI review harnesses: prefer the native structured findings UI so issues appear as `P0` / `P1` / `P2` / `P3` findings with tight file and line references
+- Claude / Anthropic harnesses: prefer a compact findings table over paragraphs. Recommended columns: severity, file or lines, issue, why it matters, and evidence
+- Any harness without a richer native review primitive: fall back to a short severity-ordered list, not a long narrative
+- Do not hide actionable findings inside a long prose recap when the harness can represent them more clearly
+
 Example:
 
 ```text
