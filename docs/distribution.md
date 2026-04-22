@@ -15,7 +15,8 @@ jq -r '.name' skills/*/tile.json
 ## How publishing works
 
 - Each skill directory under `skills/*` has its own `tile.json`
-- `.github/workflows/publish-skills.yml` lints and publishes only the tiles that changed on pushes to `main`, or all tiles on manual runs
+- `.github/workflows/publish-skills.yml` lints and publishes only the tiles that changed on pushes to `main`
+- If the workflow file itself changes, or the workflow is run manually, it publishes all tiles so workflow fixes can be validated immediately
 - The publish workflow also runs `tessl skill review --threshold 90` for each changed skill and blocks publishing if the score is below that bar
 - Publishing uses `--bump patch`, so an existing registry version is automatically patch-bumped instead of failing the workflow
 - The workflow expects a repository secret named `TESSL_TOKEN`

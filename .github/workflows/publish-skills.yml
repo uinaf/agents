@@ -20,14 +20,34 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Collect changed tiles
         id: collect
         run: |
+          set -euo pipefail
+
+          all_tiles_json() {
+            find skills -mindepth 1 -maxdepth 1 -type d | sort | jq -Rsc 'split("\n") | map(select(length > 0))'
+          }
+
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            tiles_json="$(printf '%s\n' skills/* | jq -Rsc 'split("\n") | map(select(length > 0))')"
+            tiles_json="$(all_tiles_json)"
           else
-            tiles_json="$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- 'skills/**' | awk -F/ 'NF >= 2 { print $1 \"/\" $2 }' | sort -u | jq -Rsc 'split("\n") | map(select(length > 0))')"
+            changed_files="$(git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- skills .github/workflows/publish-skills.yml)"
+
+            if printf '%s\n' "$changed_files" | grep -qx '.github/workflows/publish-skills.yml'; then
+              tiles_json="$(all_tiles_json)"
+            else
+              tiles_json="$(
+                printf '%s\n' "$changed_files" \
+                  | grep '^skills/' \
+                  | cut -d/ -f1-2 \
+                  | sort -u \
+                  | jq -Rsc 'split("\n") | map(select(length > 0))'
+              )"
+            fi
           fi
 
           echo "tiles=$tiles_json" >> "$GITHUB_OUTPUT"
