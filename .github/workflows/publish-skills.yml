@@ -24,6 +24,6 @@ jobs:
           token: ${{ secrets.TESSL_TOKEN }}
 
       - name: Publish changed tiles
-        uses: uinaf/tessl-publish-action@v1.1.1
+        uses: uinaf/tessl-publish-action@v1.1.2
         with:
           review-threshold: "90"
