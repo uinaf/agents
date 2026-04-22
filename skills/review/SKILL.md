@@ -12,6 +12,7 @@ Review existing code with independent lenses before deciding whether it is safe 
 - Prefer parallel reviewer personas when the concerns are independent
 - Evidence beats taste
 - Load shared doctrine from the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules
+- Keep the final verdict tied to concrete evidence, not reviewer instinct alone
 - Keep findings risk-focused; do not drown the user in low-value nits
 - Always list the reviewer personas you used, even when there were only one or two
 - Always include an explicit `unverified areas` line, even if the answer is `none`
