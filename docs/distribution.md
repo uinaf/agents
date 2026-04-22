@@ -16,7 +16,7 @@ jq -r '.name' skills/*/tile.json
 
 - Each skill directory under `skills/*` has its own `tile.json`
 - `.github/workflows/publish-skills.yml` lints and publishes only the tiles that changed on pushes to `main`
-- If the workflow file itself changes, or the workflow is run manually, it publishes all tiles so workflow fixes can be validated immediately
+- If the workflow is run manually, it publishes all tiles
 - The publish workflow uses [`uinaf/tessl-publish-action`](https://github.com/uinaf/tessl-publish-action) to detect changed tiles, run review and lint, and publish them
 - The action derives semantic version bumps from Conventional Commit messages: breaking changes -> `major`, `feat` -> `minor`, everything else -> `patch`
 - Before publish, the action probes `tessl tile publish --dry-run` and keeps bumping patch versions in the job workspace until Tessl accepts a free version
