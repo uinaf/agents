@@ -4,67 +4,67 @@
   "checklist": [
     {
       "name": "Context.Tag usage",
-      "max_score": "8",
+      "max_score": 8,
       "description": "The service is defined using Context.Tag with a unique string identifier (e.g., @app/NotificationService or similar namespace pattern)"
     },
     {
       "name": "Readonly methods",
-      "max_score": "5",
+      "max_score": 5,
       "description": "All service interface methods are declared as readonly"
     },
     {
       "name": "Effect.fn for service method",
-      "max_score": "8",
+      "max_score": 8,
       "description": "The send method (and any internal helpers) uses Effect.fn('Name') rather than plain arrow functions returning Effect"
     },
     {
       "name": "Tagged error types",
-      "max_score": "8",
+      "max_score": 8,
       "description": "EmailDeliveryError and PushDeliveryError (or equivalent names) are defined as tagged errors using Schema.TaggedError or Data.TaggedError, not as string errors or plain Error subclasses"
     },
     {
       "name": "Domain model variants",
-      "max_score": "7",
+      "max_score": 7,
       "description": "Notification variants (email vs push) are modeled as a discriminated union, preferably using Schema.TaggedClass or Schema.Union"
     },
     {
       "name": "Layer graph for dependencies",
-      "max_score": "10",
+      "max_score": 10,
       "description": "EmailClient and PushClient dependencies are injected via the layer system (Layer.effect, Layer.succeed, or similar) rather than passed as constructor arguments or hidden globals"
     },
     {
       "name": "No runPromise in service",
-      "max_score": "10",
+      "max_score": 10,
       "description": "No call to Effect.runPromise, Effect.runSync, or any Effect.run* variant appears inside the service or error modules"
     },
     {
       "name": "No globals",
-      "max_score": "8",
+      "max_score": 8,
       "description": "No module-level mutable state, singleton instances, or imported globals are used to hold dependencies"
     },
     {
       "name": "Test layer provided",
-      "max_score": "8",
+      "max_score": 8,
       "description": "A testLayer or test double (using Layer.succeed) is provided for NotificationService or its dependencies, making it easy to test without real infrastructure"
     },
     {
       "name": "send method environment",
-      "max_score": "8",
+      "max_score": 8,
       "description": "The send method's Effect return type does not expose extra environment requirements in its R channel beyond what the live layer satisfies"
     },
     {
       "name": "No Promise returns in service",
-      "max_score": "8",
+      "max_score": 8,
       "description": "Service methods do not return Promise values; they return Effect values"
     },
     {
       "name": "Error channel specificity",
-      "max_score": "7",
+      "max_score": 7,
       "description": "The error channel in the send method's return type uses specific tagged error types rather than string, unknown, or Error"
     },
     {
       "name": "Barrel export correctness",
-      "max_score": "5",
+      "max_score": 5,
       "description": "The index.ts barrel file exports the service tag, live layer, error types, and models cleanly without re-exporting implementation internals"
     }
   ]

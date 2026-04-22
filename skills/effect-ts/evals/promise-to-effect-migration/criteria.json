@@ -4,62 +4,62 @@
   "checklist": [
     {
       "name": "use pattern applied",
-      "max_score": "12",
+      "max_score": 12,
       "description": "DocumentStore service exposes a use method that accepts a callback receiving the underlying SDK client (and optionally an AbortSignal), instead of wrapping every individual SDK method"
     },
     {
       "name": "AbortSignal preserved",
-      "max_score": "10",
+      "max_score": 10,
       "description": "The use method or its implementation passes an AbortSignal to the SDK so that Effect cancellation propagates to the underlying Promise operation"
     },
     {
       "name": "Tagged error conversion",
-      "max_score": "10",
+      "max_score": 10,
       "description": "SDK errors are caught and converted to a specific tagged error type (defined in errors.ts) rather than left as unknown or rethrown as plain Error"
     },
     {
       "name": "No runPromise in service",
-      "max_score": "10",
+      "max_score": 10,
       "description": "No Effect.runPromise, Effect.runSync, or other Effect.run* calls appear inside DocumentStore.ts or errors.ts"
     },
     {
       "name": "Effect.tryPromise used",
-      "max_score": "8",
+      "max_score": 8,
       "description": "The Promise-to-Effect conversion uses Effect.tryPromise (not Effect.promise) since the SDK operations can reject"
     },
     {
       "name": "ManagedRuntime in app.ts",
-      "max_score": "12",
+      "max_score": 12,
       "description": "The framework callback in app.ts uses ManagedRuntime.make(layer) to execute Effect code, rather than calling Effect.runPromise with inline layer provision each time"
     },
     {
       "name": "No async/yield mixing",
-      "max_score": "8",
+      "max_score": 8,
       "description": "None of the new Effect files use async functions that return Effect values or mix await with yield*"
     },
     {
       "name": "Service Context.Tag",
-      "max_score": "7",
+      "max_score": 7,
       "description": "DocumentStore is defined as a Context.Tag service with a unique identifier"
     },
     {
       "name": "Layer graph used",
-      "max_score": "8",
+      "max_score": 8,
       "description": "The SDK client instance is injected via a Layer rather than instantiated as a global or passed as a constructor argument"
     },
     {
       "name": "Error types structured",
-      "max_score": "7",
+      "max_score": 7,
       "description": "The tagged error in errors.ts includes a meaningful cause field or encodes the original SDK error message, making it useful for debugging and recovery"
     },
     {
       "name": "Barrel export correctness",
-      "max_score": "4",
+      "max_score": 4,
       "description": "index.ts exports the service tag, live layer, and error types without leaking implementation internals"
     },
     {
       "name": "use pattern appropriate use",
-      "max_score": "4",
+      "max_score": 4,
       "description": "A comment or code note explains why the use pattern was chosen over explicit individual method wrappers (wide surface, noise reduction, or similar reasoning)"
     }
   ]

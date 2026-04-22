@@ -4,67 +4,67 @@
   "checklist": [
     {
       "name": "Removed @effect/schema",
-      "max_score": "10",
+      "max_score": 10,
       "description": "The corrected package.json does not include @effect/schema as a dependency, since Schema is part of the effect package itself"
     },
     {
       "name": "Single platform package",
-      "max_score": "10",
+      "max_score": 10,
       "description": "The corrected package.json includes only one platform runtime package (@effect/platform-node, since the project targets Node.js), and @effect/platform-bun is removed"
     },
     {
       "name": "Test framework added",
-      "max_score": "8",
+      "max_score": 8,
       "description": "vitest and @effect/vitest are added to the dependencies or devDependencies in the corrected package.json"
     },
     {
       "name": "strict: true set",
-      "max_score": "8",
+      "max_score": 8,
       "description": "The corrected tsconfig.json has strict set to true"
     },
     {
       "name": "exactOptionalPropertyTypes",
-      "max_score": "7",
+      "max_score": 7,
       "description": "The corrected tsconfig.json includes exactOptionalPropertyTypes: true"
     },
     {
       "name": "verbatimModuleSyntax",
-      "max_score": "7",
+      "max_score": 7,
       "description": "The corrected tsconfig.json includes verbatimModuleSyntax: true"
     },
     {
       "name": "noUnusedLocals",
-      "max_score": "5",
+      "max_score": 5,
       "description": "The corrected tsconfig.json includes noUnusedLocals: true"
     },
     {
       "name": "noImplicitOverride",
-      "max_score": "5",
+      "max_score": 5,
       "description": "The corrected tsconfig.json includes noImplicitOverride: true"
     },
     {
       "name": "Language service plugin",
-      "max_score": "10",
+      "max_score": 10,
       "description": "The corrected tsconfig.json includes @effect/language-service in the compilerOptions.plugins array"
     },
     {
       "name": "language-service in package.json",
-      "max_score": "7",
+      "max_score": 7,
       "description": "The corrected package.json includes @effect/language-service as a dev dependency"
     },
     {
       "name": "VS Code workspace TypeScript",
-      "max_score": "8",
+      "max_score": 8,
       "description": "The .vscode/settings.json file sets typescript.tsdk to ./node_modules/typescript/lib and enables typescript.enablePromptUseWorkspaceTsdk: true"
     },
     {
       "name": "Audit report completeness",
-      "max_score": "8",
+      "max_score": 8,
       "description": "AUDIT.md explains each category of problem found (wrong schema package, dual platform runtimes, missing test tools, tsconfig strictness gaps, missing language service) with a reason for each fix"
     },
     {
       "name": "Node module settings",
-      "max_score": "7",
+      "max_score": 7,
       "description": "The corrected tsconfig.json uses module: NodeNext (or similar Node-appropriate setting) rather than a bundler-only setting, consistent with the Node.js runtime target"
     }
   ]
