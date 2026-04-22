@@ -48,6 +48,7 @@ Keep top-level docs terse and navigational.
 - `CONTRIBUTING.md` should hold contributor setup, validation, and workflow
 - `SECURITY.md` should hold private-first vulnerability reporting guidance
 - Push detail downward instead of bloating top-level files
+- For coordination or workspace repos, keep one canonical setup doc and let `README.md` point to it instead of repeating the full bootstrap flow inline
 - Use the concrete top-level split and section order in [references/documentation.md](references/documentation.md) instead of inventing a new shape every time
 - Keep visible docs copy human-facing and task-ordered; let the reference file own the detailed labeling and scannability rules
 - Prefer terse routing over narrative sprawl, for example `README.md` should link to deeper docs instead of re-explaining them inline
@@ -69,6 +70,7 @@ For new features, use the directory layout and templates in [references/structur
 - delete or archive stale docs
 - fix cross-links and moved paths
 - keep naming and commands consistent across files
+- keep one canonical home for setup or install commands in workspace-style repos, and replace copied command blocks elsewhere with short pointers
 - normalize visible labels, casing, and section order when the docs read like a file tree instead of a user guide
 
 Example — fixing a stale path after a rename:

@@ -133,6 +133,24 @@ Guidance:
 - Order navigation for readers, not for the filesystem. Put the most useful docs first instead of mirroring path order
 - Apply the same rule to section titles and callouts around the README, not just the bullet links
 
+### Workspace or coordination repos
+
+For workspace, meta, or coordination repos, keep the README even more routing-oriented:
+
+1. **Hero** — what the workspace owns
+2. **Quick start** — shortest path into an already prepared machine or environment
+3. **Workspace model** — layout, naming, source-of-truth registry
+4. **Key docs** — compact links to setup, strategy, and agent guidance
+5. **Skills** — short pointer to the canonical setup doc if shared skill installation exists
+6. **Contributing** — short pointer to `AGENTS.md` or `CONTRIBUTING.md`
+
+Guidance:
+
+- Keep one canonical setup doc for machine bootstrap or shared install commands
+- Let `README.md` point to that setup doc instead of duplicating full bootstrap flows
+- Keep peer-repo or multi-repo layout explanations short and source-of-truth oriented
+- Do not stuff cross-repo reference lists into the top-level README when those links belong in deeper docs or in the peer repos themselves
+
 ### Shape selection
 
 - **Minimal product**: short value prop, one docs link
