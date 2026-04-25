@@ -1,6 +1,6 @@
 {
   "name": "uinaf/uinaf-design-system",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "summary": "Apply the uinaf brand identity to anything that ships under the uinaf name — web interfaces, blog posts, changelogs, documentation, READMEs, slides, OG / social images, email, terminal banners, app or product UI starting points. Covers voice, design tokens, components, motion, and brand assets, with a Tailwind v4 path for web work. Use when producing or restyling any uinaf-branded artefact. Skip for non-uinaf work; this is opinionated brand guidance, not a generic UI kit.",
   "skills": {
