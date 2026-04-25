@@ -12,9 +12,9 @@ The canonical brand spec is [references/brand-spec.md](references/brand-spec.md)
 ## Hard rules — universal (apply to every uinaf output)
 
 - **Berkeley Mono** is the only typeface. No serifs, no sans, no second face. Off-uinaf fallback: JetBrains Mono.
-- **Lowercase voice.** Headings, nav, button labels, post titles, changelog entries, file names that show in UI, the studio name. Always.
+- **Lowercase voice on product surfaces.** Headings, nav, button labels, post titles, changelog entries, file names that show in UI, the studio name. Always — *on uinaf-controlled surfaces*. Repo collaboration docs (`README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, GitHub templates) are carved out and use proper-case headlines; see [references/repo-docs.md](references/repo-docs.md).
 - **No emoji.** Anywhere. Brand artwork is the only flair.
-- **Voice is short, direct, dry.** No SaaS sludge ("empower", "unlock", "synergies"). Sentence fragments end with periods.
+- **Voice is short, direct, dry.** No SaaS sludge ("empower", "unlock", "synergies"). Sentence fragments end with periods. This applies everywhere, including repo docs.
 - **Illustrations live on pure black with no chrome.** The slime palette (lime / green / cyan / blue / purple / magenta / pink) stays *inside* artwork, terminal output, and rare data-viz — never as button fills, gradient washes, or default text.
 
 ## Hard rules — UI surfaces (web, slides, native, email HTML)
@@ -27,20 +27,21 @@ The canonical brand spec is [references/brand-spec.md](references/brand-spec.md)
 
 ## Workflow
 
-1. Confirm what you are producing — web interface, long-form content (blog / changelog / docs / README / terms), slide deck, OG / social asset, email, terminal banner, or app / native UI starting point.
+1. Confirm what you are producing — web interface, product-surface long-form (blog / changelog / product docs page / terms), repo collaboration doc (`README.md` / `CONTRIBUTING.md` / `SECURITY.md` / `AGENTS.md` / `CLAUDE.md`), slide deck, OG / social asset, email, terminal banner, or app / native UI starting point.
 2. Read the matching reference under "Read by task". For mixed outputs (e.g. a blog post on the website), combine the relevant references.
 3. Pull fonts from `https://cdn.uinaf.dev/fonts/berkeley-mono/variable/font.css` and illustrations from `https://cdn.uinaf.dev/images/` (see [references/assets.md](references/assets.md) for filenames and when to use each). Images are hosted on the CDN only — not duplicated in this skill.
-4. Write copy against [references/voice.md](references/voice.md) regardless of surface. Voice is the most-violated rule and the easiest to spot.
-5. Verify against the hard rules above before declaring done. Visual rules apply only where there is a visual surface; voice rules always apply.
+4. Write copy against [references/voice.md](references/voice.md). Voice rules apply to every surface; the lowercase rule is scoped to product surfaces only.
+5. Verify against the hard rules above before declaring done. Visual rules apply only where there is a visual surface; voice rules always apply, with the casing carve-out for repo collaboration docs.
 
 ## Read by task
 
 - **Full brand spec** (voice, visual, iconography canon) → [references/brand-spec.md](references/brand-spec.md)
-- **Voice and copy** (universal, every surface) → [references/voice.md](references/voice.md)
+- **Voice and copy** (every surface, with casing scope) → [references/voice.md](references/voice.md)
 - **Brand assets** (fonts, illustrations, CDN paths, fallbacks) → [references/assets.md](references/assets.md)
 - **Web — Tailwind v4 setup, `@theme` mappings, font wiring** → [references/tailwind.md](references/tailwind.md)
 - **Web — components, layout, motion** (cards, links, buttons, inputs, hr, footer, fade-up-in) → [references/components.md](references/components.md)
-- **Long-form content** (blog post, changelog, docs page, README, terms-of-service) → [references/content.md](references/content.md)
+- **Product-surface long-form** (blog post, changelog, product docs page, terms of service, release notes) → [references/content.md](references/content.md)
+- **Repo collaboration docs** (`README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, GitHub templates) → [references/repo-docs.md](references/repo-docs.md)
 - **Other surfaces** (slides, OG / social, email, terminal banners, native app starting points) → [references/surfaces.md](references/surfaces.md)
 
 ## Bundled files

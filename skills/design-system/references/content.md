@@ -1,8 +1,12 @@
 # Content
 
-Long-form text outputs: blog posts, changelogs, documentation, READMEs, terms-of-service, release notes.
+Long-form text outputs that ship on **product surfaces**: blog posts, changelogs, product documentation pages (e.g. `uinaf.dev/tccutil`), terms of service, release notes.
 
-The voice rules from [voice.md](voice.md) apply universally. This file documents the *structure* and *patterns* on top.
+The voice rules from [voice.md](voice.md) apply: lowercase voice, sentence fragments, no emoji, no exclamation marks.
+
+For `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, and other repo collaboration docs, use [repo-docs.md](repo-docs.md) instead. Those files render in GitHub's chrome, not on uinaf.dev, and follow proper-case headline rules.
+
+This file documents the *structure* and *patterns* on top of the voice rules.
 
 ## Blog post
 
@@ -82,7 +86,9 @@ Patterns:
 - Newest entry on top.
 - Don't link to PRs in the headline. If a bullet needs evidence, append a tiny `(github ↗)` link.
 
-## Documentation page
+## Documentation page (product surface)
+
+Product docs that render on uinaf.dev (e.g. `uinaf.dev/tccutil`). For docs in a GitHub repo (`README.md`, `docs/*.md` consumed in-repo), use [repo-docs.md](repo-docs.md) instead.
 
 Same shell as a blog post but with section headings, code-heavy, scannable.
 
@@ -127,37 +133,7 @@ Patterns:
 
 ## README
 
-A README is a documentation page in disguise. Same shape as above. Add badges sparingly — only ones that signal real status (CI green / red, current version). No marketing badges.
-
-```md
-# tccutil
-
-CLI helpers for managing macOS TCC permissions.
-
-\`\`\`bash
-brew install tccutil
-tccutil reset Camera
-\`\`\`
-
-## why
-
-one paragraph. literal. no hype.
-
-## docs
-
-[uinaf.dev/tccutil ↗](https://uinaf.dev/tccutil)
-
-## license
-
-MIT
-```
-
-Patterns:
-
-- Title = project name, lowercase.
-- Tagline directly under the title, one literal sentence.
-- A *single* fenced block with the install + smallest useful invocation goes near the top.
-- No "Features" section with bullet lists. If the tagline doesn't sell it, nothing will.
+`README.md` is a repo collaboration doc, not a product surface. See [repo-docs.md](repo-docs.md) for structure, headline casing, and the canonical example. The short version: project name as H1 in canonical case, Title Case section headings, sentence-case body, uinaf voice without the lowercase rule.
 
 ## Terms of service / legal
 
