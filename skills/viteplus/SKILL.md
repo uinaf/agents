@@ -22,7 +22,7 @@ When a repo is adopting VitePlus, default to this destination unless a repo-spec
 
 1. Audit the repo's current scripts, workflows, Vite config, test imports, release flow, package manager, and any repo-specific packaging steps.
 2. Read [references/bootstrap.md](references/bootstrap.md) first for migration entrypoints, local guidance-file discovery such as `AGENTS.md`, `CLAUDE.md`, or repo rules, and the standard validation path.
-3. Choose the repo shape: read [references/packages.md](references/packages.md) for standalone packages or [references/monorepos.md](references/monorepos.md) for workspaces.
+3. Choose the repo shape: read [references/packages.md](references/packages.md) for standalone packages or [references/monorepos.md](references/monorepos.md) for workspaces. The monorepo reference covers cross-package script orchestration (`vp run -t`, `vp run -r --parallel`, build-first vs source-alias for in-repo demos) — read it before wiring root-level `dev`, `build`, or deploy commands.
 4. Update the local tool surface together: scripts, `vite.config.ts`, test imports, hook wiring, and packaging commands should move as one migration instead of drifting piecemeal. After this step, run `vp check && vp test` to verify the migrated surface is coherent before moving on. If either command fails, resolve the errors before proceeding — do not carry forward a broken tool surface into CI or release changes.
 5. Update CI and release automation with [references/ci-cd.md](references/ci-cd.md), replacing hand-rolled Node setup with the stock Vite+ flow where it fits.
 6. Update tests and coverage wiring with [references/testing.md](references/testing.md) before changing assertions about test behavior.
