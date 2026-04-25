@@ -110,8 +110,8 @@ uinaf is a low-icon brand. The codebase uses **zero icon fonts and zero SVG icon
 uinaf has two illustrations and they serve two different jobs. Pick by what the surface is *about*:
 
 - **Primary mark** = `assets/uinaf-computer.png` (the melting CRT). The default studio identifier on **product surfaces** — tools, demos, internal dashboards, docs sites, slides, embedded app shells. Iconic enough to identify the studio without competing with the page's actual content. Render at 240×240 inside a 1px `border-neutral-900` square frame, no rounding, no shadow. Smaller framed sizes (60–80px) are common in tool chrome.
-- **About / social mark** = `assets/uinaf-team.png` (the two skeleton figures at desks). Use on the studio homepage (`uinaf.dev`), About pages, team listings, OG / Twitter share images, and any context where the studio itself is the subject. Same 1px framing rules; renders well at 240×240 as a monolithic lockup.
-- **Favicon mark** = `assets/uinaf-computer.png`. Used at 32×32 (favicon) and 180×180 (apple-touch-icon) on every uinaf-owned property.
+- **About / social mark** = `assets/uinaf-team.png` (the two skeleton figures at desks). Use on the studio homepage (`uinaf.dev`), About pages, team listings, and any context where the studio itself is the subject. Same 1px framing rules; renders well at 240×240 as a monolithic lockup. For OG / Twitter, prefer this or a custom 1200×630 render when the *page is about the studio*; for generic product / tool share cards use `assets/uinaf-computer-og-image.png` and match `og:image` dimensions to the file.
+- **Favicon mark** = `assets/uinaf-computer-favicon.png` (256×256 raster). Use the same URL for `<link rel="icon">` and `<link rel="apple-touch-icon">` on every uinaf-owned property.
 
 Neither illustration has a separate text wordmark — the lowercase `uinaf` set in Berkeley Mono can act as one when needed (social handles, command-line prompts).
 - The text `uinaf` set in Berkeley Mono, lowercase, can act as a wordmark when needed (e.g. social handles `@uinafdev`, command-line prompts).

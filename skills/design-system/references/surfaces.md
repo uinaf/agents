@@ -43,10 +43,10 @@ Reveal.js / similar starter:
 
 ## OG / social images
 
-- Aspect: 1200×630 for OpenGraph / Twitter `summary_large_image`. 1200×1200 for Twitter `summary` cards or square IG-style posts.
+- Aspect: 1200×630 for hand-built OpenGraph / Twitter `summary_large_image` assets. The CDN also ships a ready-made product image, `uinaf-computer-og-image.png` (1024×537) — use it as the default `og:image` for tools and demos; set `og:image:width` / `height` to the real dimensions. 1200×1200 for Twitter `summary` cards or square IG-style posts.
 - Background: `--neutral-950`.
 - Composition: centered illustration framed in a 1px `--neutral-900` square, with a single-line headline below in `text-xl` or `text-2xl`. Or, no illustration: just a centered headline with the studio mark bottom-left small.
-- Mark: `uinaf-team.png` framed at ~120×120, or the lowercase `uinaf` wordmark in mono `text-base`.
+- Mark: `uinaf-team.png` or `uinaf-computer.png` framed at ~120×120 depending on whether the card is studio-focused or product-focused, or the lowercase `uinaf` wordmark in mono `text-base`.
 - Domain: bottom-right, `--neutral-600`, `text-2xs` mono.
 - No corner radii. No drop shadows. No coloured backgrounds.
 

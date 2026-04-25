@@ -40,7 +40,7 @@
     {
       "name": "Favicon and OG meta",
       "max_score": 6,
-      "description": "<head> includes <link rel=\"icon\"> and <link rel=\"apple-touch-icon\"> pointing at https://cdn.uinaf.dev/images/uinaf-computer.png. og:image and twitter:image point at https://cdn.uinaf.dev/images/uinaf-team.png."
+      "description": "<head> includes <link rel=\"icon\"> and <link rel=\"apple-touch-icon\"> pointing at https://cdn.uinaf.dev/images/uinaf-computer-favicon.png. og:image and twitter:image point at https://cdn.uinaf.dev/images/uinaf-team.png."
     },
     {
       "name": "Lowercase voice",

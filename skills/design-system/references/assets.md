@@ -45,19 +45,29 @@ Two illustrations exist. Don't generate or commission look-alikes; commission ne
 
 Pick by what the surface is *about*:
 
-### `uinaf-computer.png` — primary mark (product surfaces) + favicon
+### `uinaf-computer.png` — primary mark (product surfaces), full source
 
-- The melting CRT alone
+- The melting CRT alone, 1024×1024
 - Default studio identifier on **product surfaces**: tools, demos, internal dashboards, docs sites, slides, embedded app shells, README hero images
 - Iconic enough to identify the studio without competing with the page's actual content
 - Renders at 240×240 inside a 1px `--neutral-900` square frame for hero placement, or 60–80px in tool chrome
-- Also doubles as favicon at 32×32 and apple-touch-icon at 180×180
+
+### `uinaf-computer-favicon.png` — favicon raster
+
+- 256×256 downscale of the computer mark
+- Use for `rel="icon"` and `rel="apple-touch-icon"` (browsers downscale; smaller bytes than the 1024×1024 full source)
+- **Not** the product hero image — for chrome only
+
+### `uinaf-computer-og-image.png` — generic Open Graph / social share
+
+- Centered mark on a black canvas, 1024×537 — default **product** OG when you don't have a custom render yet
+- Use `og:image` + `og:image:width` / `og:image:height` matching the file
 
 ### `uinaf-team.png` — about / social mark
 
 - Two robed skeletons at a melting CRT
-- Used on the **studio homepage** (`uinaf.dev`), About pages, team listings, and social share images (OG / Twitter)
-- Renders well at 240×240 as a monolithic lockup when the studio itself is the subject
+- Used on the **studio homepage** (`uinaf.dev`), About pages, team listings, and share images where the **studio itself** is the subject
+- Renders well at 240×240 as a monolithic lockup when the studio is the focus
 - Same 1px `--neutral-900` framing rules
 
 ### CDN paths (preferred for production)
@@ -65,6 +75,8 @@ Pick by what the surface is *about*:
 ```
 https://cdn.uinaf.dev/images/uinaf-team.png
 https://cdn.uinaf.dev/images/uinaf-computer.png
+https://cdn.uinaf.dev/images/uinaf-computer-favicon.png
+https://cdn.uinaf.dev/images/uinaf-computer-og-image.png
 ```
 
 ### Bundled paths (offline / standalone)
@@ -80,29 +92,27 @@ The skill ships local copies for offline work, slide-deck mocks, and the case wh
 - Always present on pure black with no surrounding chrome.
 - Logo lockup is the framed 240×240 square. The 1px `--neutral-900` border is part of the mark.
 - Avatar / small-icon usage: 60–80px on the same black canvas.
-- Favicon usage: `uinaf-computer.png` only. Not the team mark.
-- Default to `uinaf-computer.png` for product surfaces. Reach for `uinaf-team.png` only when the studio itself is the subject (homepage, About, OG image).
+- Favicon usage: `uinaf-computer-favicon.png` (256×256) — the computer mark only, not the team illustration
+- Default to `uinaf-computer.png` for in-page hero / logo placement. Use `uinaf-computer-og-image.png` as the generic product OG. Reach for `uinaf-team.png` when the surface is *about* the studio (homepage, About, or a studio-focused share card)
 
 ### Favicon wiring
 
 ```html
-<link rel="icon" type="image/png" sizes="32x32"
-  href="https://cdn.uinaf.dev/images/uinaf-computer.png">
-<link rel="apple-touch-icon" sizes="180x180"
-  href="https://cdn.uinaf.dev/images/uinaf-computer.png">
+<link rel="icon" type="image/png" href="https://cdn.uinaf.dev/images/uinaf-computer-favicon.png">
+<link rel="apple-touch-icon" href="https://cdn.uinaf.dev/images/uinaf-computer-favicon.png">
 ```
 
-The PNG renders sharp at both sizes — no separate `apple-touch-icon-180.png` needed.
-
-### Open Graph
+### Open Graph (generic product surface)
 
 ```html
-<meta property="og:image" content="https://cdn.uinaf.dev/images/uinaf-team.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="1200">
+<meta property="og:image" content="https://cdn.uinaf.dev/images/uinaf-computer-og-image.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="537">
 <meta property="twitter:card" content="summary_large_image">
-<meta property="twitter:image" content="https://cdn.uinaf.dev/images/uinaf-team.png">
+<meta name="twitter:image" content="https://cdn.uinaf.dev/images/uinaf-computer-og-image.png">
 ```
+
+For a studio- or about-focused page, a share image can still use `uinaf-team.png` or a bespoke 1200×630 render — match `og:image:width` / `height` to the actual asset.
 
 ## Wordmark
 

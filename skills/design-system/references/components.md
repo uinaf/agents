@@ -167,7 +167,7 @@ Status colors: `--color-slime-green` (ok), `--color-warn`, `--color-error`, `--c
 
 ## Logo
 
-Default to `uinaf-computer.png` for product surfaces (tools, demos, docs, app shells). Reach for `uinaf-team.png` only when the surface is *about* the studio (homepage, About page, OG image).
+Default to `uinaf-computer.png` for product surfaces (tools, demos, docs, app shells). Reach for `uinaf-team.png` only when the surface is *about* the studio (homepage, About page). For meta tags, use `uinaf-computer-og-image.png` as the default product OG image and `uinaf-team.png` (or a bespoke 1200×630) when the share preview should foreground the studio.
 
 ```html
 <a href="/" class="u-link-plain block w-[240px] h-[240px] border border-neutral-900 transition hover:-translate-y-0.5 active:scale-[0.97]">

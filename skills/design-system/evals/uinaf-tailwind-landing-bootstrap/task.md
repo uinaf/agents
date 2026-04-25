@@ -14,7 +14,7 @@ The project files are at `/workspace/landing/`. The relevant files are:
 ## What to Produce
 
 1. Update `src/styles.css` so it imports Berkeley Mono from `cdn.uinaf.dev` and registers the full uinaf `@theme` token block (neutrals, slime, type scale, motion, radii). Add a `@layer components` block for `.u-link`, `.u-link-plain`, and `.u-card`.
-2. Update `index.html` head: page `<title>uinaf</title>`, favicon and apple-touch-icon pointing at `https://cdn.uinaf.dev/images/uinaf-computer.png`, OG meta pointing at `https://cdn.uinaf.dev/images/uinaf-team.png`.
+2. Update `index.html` head: page `<title>uinaf</title>`, favicon and apple-touch-icon pointing at `https://cdn.uinaf.dev/images/uinaf-computer-favicon.png`, OG meta pointing at `https://cdn.uinaf.dev/images/uinaf-team.png` (studio landing — match `og:image:width` / `height` to the file).
 3. Replace the body content with a uinaf-shaped landing: framed-logo top-left (240×240 inside a 1px `border-neutral-900` square, `https://cdn.uinaf.dev/images/uinaf-team.png` filling it), tagline `we bet you've seen us before` as h1, two short paragraphs, an `<hr>` hairline, then a footer with two link clusters separated by middle dots.
 4. Use only Tailwind utilities sourced from the `@theme` block plus the three `.u-*` component classes. No custom inline `<style>` blocks beyond what's in `src/styles.css`.
 
