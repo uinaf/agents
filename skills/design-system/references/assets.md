@@ -79,13 +79,6 @@ https://cdn.uinaf.dev/images/uinaf-computer-favicon.png
 https://cdn.uinaf.dev/images/uinaf-computer-og-image.png
 ```
 
-### Bundled paths (offline / standalone)
-
-The skill ships local copies for offline work, slide-deck mocks, and the case where the CDN isn't reachable:
-
-- [assets/uinaf-team.png](../assets/uinaf-team.png)
-- [assets/uinaf-computer.png](../assets/uinaf-computer.png)
-
 ### Hard rules
 
 - Never rotate, recolor, gradient-fill, or filter the illustrations.

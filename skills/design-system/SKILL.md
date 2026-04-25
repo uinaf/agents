@@ -29,7 +29,7 @@ The canonical brand spec is [references/brand-spec.md](references/brand-spec.md)
 
 1. Confirm what you are producing — web interface, long-form content (blog / changelog / docs / README / terms), slide deck, OG / social asset, email, terminal banner, or app / native UI starting point.
 2. Read the matching reference under "Read by task". For mixed outputs (e.g. a blog post on the website), combine the relevant references.
-3. Pull fonts from `https://cdn.uinaf.dev/fonts/berkeley-mono/variable/font.css` and illustrations from `https://cdn.uinaf.dev/images/` (see [references/assets.md](references/assets.md) for the full chart — `uinaf-computer.png`, `uinaf-computer-favicon.png`, `uinaf-computer-og-image.png`, `uinaf-team.png`). Bundled copies live under [assets/](assets/) for offline / standalone use.
+3. Pull fonts from `https://cdn.uinaf.dev/fonts/berkeley-mono/variable/font.css` and illustrations from `https://cdn.uinaf.dev/images/` (see [references/assets.md](references/assets.md) for filenames and when to use each). Images are hosted on the CDN only — not duplicated in this skill.
 4. Write copy against [references/voice.md](references/voice.md) regardless of surface. Voice is the most-violated rule and the easiest to spot.
 5. Verify against the hard rules above before declaring done. Visual rules apply only where there is a visual surface; voice rules always apply.
 
@@ -46,15 +46,15 @@ The canonical brand spec is [references/brand-spec.md](references/brand-spec.md)
 ## Bundled files
 
 - [assets/colors_and_type.css](assets/colors_and_type.css) — drop-in stylesheet for web (tokens, semantic vars, base element styles, `.u-link`, `.u-link-plain`, `.u-card`). Imports Berkeley Mono from `cdn.uinaf.dev`. Use as-is for plain HTML, or as the source of truth for Tailwind theme values.
-- [assets/uinaf-computer.png](assets/uinaf-computer.png) — primary mark for in-page / hero use on product surfaces (tools, demos, docs, slides). The default studio mark unless the surface is *about* the studio.
-- [assets/uinaf-computer-favicon.png](assets/uinaf-computer-favicon.png) — favicon + apple touch icon (256×256 raster on the CDN; use the same URL for both `<link rel="icon">` and `<link rel="apple-touch-icon">`).
-- [assets/uinaf-computer-og-image.png](assets/uinaf-computer-og-image.png) — default Open Graph / Twitter image for product and tool pages (1024×537; set `og:image:width` / `height` to match).
-- [assets/uinaf-team.png](assets/uinaf-team.png) — about / social mark (studio homepage, About pages, studio-focused share cards). 240×240 in a 1px frame, square crop on solid black.
 
-For production, prefer the CDN URLs over the bundled copies:
+## Image URLs (production)
 
-- Fonts: `https://cdn.uinaf.dev/fonts/berkeley-mono/variable/font.css`
-- Images: `https://cdn.uinaf.dev/images/uinaf-team.png`, `https://cdn.uinaf.dev/images/uinaf-computer.png`, `https://cdn.uinaf.dev/images/uinaf-computer-favicon.png`, `https://cdn.uinaf.dev/images/uinaf-computer-og-image.png`
+Brand illustrations are **not** vendored in this skill — link hot to `cdn.uinaf.dev` (see [references/assets.md](references/assets.md) for roles and `og` wiring):
+
+- `https://cdn.uinaf.dev/images/uinaf-computer.png` — primary in-page / hero mark
+- `https://cdn.uinaf.dev/images/uinaf-computer-favicon.png` — favicon and apple touch icon
+- `https://cdn.uinaf.dev/images/uinaf-computer-og-image.png` — default product OG / Twitter image
+- `https://cdn.uinaf.dev/images/uinaf-team.png` — studio / about / studio-focused share cards
 
 ## Handoffs
 
