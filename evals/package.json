@@ -1,0 +1,17 @@
+{
+  "name": "uinaf-agents-evals",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Agent-eval harness measuring the impact of rules/agents.md on agent behavior",
+  "scripts": {
+    "eval": "agent-eval",
+    "eval:dry": "agent-eval --dry",
+    "eval:smoke": "agent-eval --smoke",
+    "playground": "agent-eval playground"
+  },
+  "devDependencies": {
+    "@vercel/agent-eval": "latest",
+    "typescript": "^5.6.0"
+  }
+}
