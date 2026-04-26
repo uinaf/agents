@@ -1,0 +1,66 @@
+{
+  "context": "The agent is asked to write a blog post announcing a new CLI tool release and a matching product documentation page. This scenario tests whether the agent follows the uinaf content format rules: specific blog post structure (ISO date, no preamble, no author byline), documentation page heading style (lowercase, no leading verbs), option tables, see-also links, pronoun usage, and voice rules.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Blog ISO date format",
+      "max_score": 8,
+      "description": "The blog post date appears in ISO YYYY-MM-DD format (e.g. 2026-04-25). It does NOT appear as 'Apr 25', 'April 25, 2026', 'April 25th', 'Monday April 25', or any non-ISO variant."
+    },
+    {
+      "name": "Blog title lowercase fragment",
+      "max_score": 8,
+      "description": "The blog post title (H1 or front matter title field) is entirely lowercase with no Title Case, no sentence-case capitalization of the first word, and no trailing exclamation mark."
+    },
+    {
+      "name": "No preamble in blog post",
+      "max_score": 10,
+      "description": "The blog post body does NOT open with any variant of 'in this post', 'today we', 'in this article', 'we are excited to announce', 'we're pleased to', 'we're happy to share'. The opening sentence goes straight into the subject."
+    },
+    {
+      "name": "No author byline",
+      "max_score": 8,
+      "description": "The blog post file contains no author byline, no 'by <name>', no author front matter field, and no 'posted by' attribution. The studio voice is 'we', not a personal handle."
+    },
+    {
+      "name": "Blog word count in range",
+      "max_score": 6,
+      "description": "The blog post body (excluding front matter and code blocks) is between 200 and 800 words. Both a post under 200 words and one over 800 words fail this criterion."
+    },
+    {
+      "name": "Doc headings lowercase, no leading verb",
+      "max_score": 10,
+      "description": "All H2/H3 section headings in the documentation page are entirely lowercase and do NOT start with a verb form ('Installing', 'How to install', 'Getting started', 'Using', 'Running'). Correct examples: 'install', 'usage', 'options', 'see also'."
+    },
+    {
+      "name": "Options as table",
+      "max_score": 10,
+      "description": "The documentation page presents command flags or configuration options in a markdown table (pipe-delimited), NOT as a nested bullet list. At minimum one table with flag/option columns must be present."
+    },
+    {
+      "name": "See also with ↗ arrows",
+      "max_score": 8,
+      "description": "The documentation page includes a 'see also' or equivalent section where external links carry a trailing ↗ glyph inside the link text (e.g. [related-thing ↗](url)). The ↗ is inside the link text, not outside it."
+    },
+    {
+      "name": "Studio pronoun 'we'",
+      "max_score": 8,
+      "description": "When referring to the studio or its actions, the copy uses 'we' (first-person plural). It does NOT use 'the team', 'the uinaf team', 'the studio', 'they', or the studio name as a third-person subject in descriptions of studio actions."
+    },
+    {
+      "name": "No exclamation marks",
+      "max_score": 8,
+      "description": "Neither file contains any exclamation mark (!) anywhere — in headings, body, bullets, or code comments."
+    },
+    {
+      "name": "No SaaS marketing language",
+      "max_score": 8,
+      "description": "Neither file contains any of: 'empower', 'unlock', 'elevate', 'transform', 'revolutionize', 'seamless', 'cutting-edge', 'leverage', 'synergies', 'simply', 'just', 'easily', 'mission', 'reimagine', 'next-level'. Descriptions are literal and functional."
+    },
+    {
+      "name": "Voice: terse fragments with periods",
+      "max_score": 8,
+      "description": "Sentences are short and direct. Sentence fragments end with periods. No paragraph is longer than 3 sentences. No marketing-flattery toward the reader ('you deserve', 'built for people like you', 'we think you'll love')."
+    }
+  ]
+}

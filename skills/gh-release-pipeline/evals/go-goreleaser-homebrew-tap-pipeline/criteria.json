@@ -1,0 +1,71 @@
+{
+  "context": "Tests whether the agent correctly sets up a Go CLI release pipeline using semantic-release (tag-only) combined with GoReleaser for binary distribution and Homebrew tap automation, including proper token scoping, plugin selection, GoReleaser flags, attestation permissions, and Homebrew tap naming conventions.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Tag-only SR plugins",
+      "max_score": 10,
+      "description": "The semantic-release plugins list includes commit-analyzer, release-notes-generator, and github — but does NOT include @semantic-release/git or @semantic-release/npm"
+    },
+    {
+      "name": "GoReleaser conditional",
+      "max_score": 10,
+      "description": "The GoReleaser step is conditional on `steps.release.outputs.new_release_published == 'true'` (or equivalent output check)"
+    },
+    {
+      "name": "GoReleaser --clean flag",
+      "max_score": 10,
+      "description": "The goreleaser-action invocation passes `args: release --clean` (the --clean flag is present)"
+    },
+    {
+      "name": "Tap repo naming",
+      "max_score": 8,
+      "description": "The Homebrew tap repo is referenced with the `homebrew-` prefix in its name (e.g., `homebrew-tap`, `homebrew-<name>`)"
+    },
+    {
+      "name": "TAP_GITHUB_TOKEN scope",
+      "max_score": 8,
+      "description": "The workflow or documentation specifies that TAP_GITHUB_TOKEN is a fine-grained PAT (or equivalent) scoped only to the tap repo, NOT a broad classic PAT"
+    },
+    {
+      "name": "Attestation permissions",
+      "max_score": 8,
+      "description": "The release job's permissions include `id-token: write` and `attestations: write` (required for the attest-build-provenance step)"
+    },
+    {
+      "name": "Attest step conditional",
+      "max_score": 8,
+      "description": "The actions/attest-build-provenance step is also conditional on `new_release_published == 'true'`"
+    },
+    {
+      "name": "GoReleaser brews block",
+      "max_score": 8,
+      "description": "A `.goreleaser.yaml` (or equivalent) file is produced containing a `brews:` block that references the Homebrew tap repo"
+    },
+    {
+      "name": "fetch-depth: 0",
+      "max_score": 6,
+      "description": "Both verify and release job checkout steps use `fetch-depth: 0`"
+    },
+    {
+      "name": "skip ci guards",
+      "max_score": 6,
+      "description": "Both verify and release jobs have `if:` guards checking for `[skip ci]` in the commit message"
+    },
+    {
+      "name": "Release concurrency",
+      "max_score": 6,
+      "description": "The release job has a job-level concurrency group with `cancel-in-progress: false`"
+    },
+    {
+      "name": "Secrets on step",
+      "max_score": 6,
+      "description": "GITHUB_TOKEN and TAP_GITHUB_TOKEN are declared in the GoReleaser step's `env:`, not at the job level"
+    },
+    {
+      "name": "SR action version",
+      "max_score": 6,
+      "description": "Uses `cycjimmy/semantic-release-action@v4`"
+    }
+  ]
+}

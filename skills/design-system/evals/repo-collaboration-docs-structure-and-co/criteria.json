@@ -1,0 +1,61 @@
+{
+  "context": "The agent is asked to prepare the repository collaboration docs for a new uinaf open-source project: AGENTS.md, CLAUDE.md, and SECURITY.md. This scenario tests whether the agent knows that repo docs use proper-case (Title Case) headlines rather than the lowercase product voice, that CLAUDE.md should be a symlink (not a second authored file), that AGENTS.md stays compact, and that SECURITY.md follows the private-first pattern without SLA promises.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "AGENTS.md Title Case headings",
+      "max_score": 12,
+      "description": "All H2 and H3 section headings in AGENTS.md use Title Case (e.g. 'Daily Workflow', 'Local Setup', 'Commit Rules'). They do NOT use sentence-case or all-lowercase headings such as 'daily workflow' or 'local setup'."
+    },
+    {
+      "name": "AGENTS.md sentence-case body",
+      "max_score": 10,
+      "description": "Body text in AGENTS.md uses sentence-case (first word of each sentence capitalized, proper nouns capitalized). It does NOT apply all-lowercase product voice to body sentences."
+    },
+    {
+      "name": "AGENTS.md compact length",
+      "max_score": 8,
+      "description": "AGENTS.md is at most 150 lines total (including headings, blank lines, and code blocks). Files over 150 lines fail this criterion."
+    },
+    {
+      "name": "AGENTS.md no brand spec duplication",
+      "max_score": 8,
+      "description": "AGENTS.md does NOT paste or restate the brand spec, design tokens, color palette, or motion values. At most, it links to the relevant skill or doc. Brand guidance is not authored inline in AGENTS.md."
+    },
+    {
+      "name": "CLAUDE.md is not a second authored file",
+      "max_score": 12,
+      "description": "CLAUDE.md content is byte-for-byte identical to AGENTS.md, OR a setup script / Makefile / README instruction shows `ln -s AGENTS.md CLAUDE.md`. CLAUDE.md must NOT contain different or additional content from AGENTS.md."
+    },
+    {
+      "name": "SECURITY.md contact: dev@uinaf.dev",
+      "max_score": 10,
+      "description": "SECURITY.md contains the contact address dev@uinaf.dev for reporting vulnerabilities. No other contact address is the primary point of contact."
+    },
+    {
+      "name": "SECURITY.md private-first",
+      "max_score": 10,
+      "description": "SECURITY.md explicitly instructs reporters NOT to open public GitHub issues for security vulnerabilities. The instruction appears in the reporting section."
+    },
+    {
+      "name": "SECURITY.md no SLA promise",
+      "max_score": 8,
+      "description": "SECURITY.md does NOT promise a specific response time (no 'within 24 hours', 'within 48 hours', 'within N business days', 'we will respond in N days'). Responses are characterized as prompt or best-effort without a committed SLA."
+    },
+    {
+      "name": "Conventional Commits documented",
+      "max_score": 8,
+      "description": "AGENTS.md or a referenced CONTRIBUTING.md mentions Conventional Commits format and lists at minimum: feat, fix, docs. Breaking changes notation (! or BREAKING CHANGE footer) is also present."
+    },
+    {
+      "name": "Voice: no SaaS sludge, no emoji, no exclamation",
+      "max_score": 8,
+      "description": "None of the three files contain emoji, exclamation marks, or any of: 'empower', 'unlock', 'synergies', 'simply', 'just', 'mission', 'revolutionize'. All files are terse and factual."
+    },
+    {
+      "name": "AGENTS.md covers repo orientation",
+      "max_score": 6,
+      "description": "AGENTS.md covers at least: what the repo is / what it does, the toolchain or language, and the key commands a contributor or agent will run. These can be brief but must be present."
+    }
+  ]
+}

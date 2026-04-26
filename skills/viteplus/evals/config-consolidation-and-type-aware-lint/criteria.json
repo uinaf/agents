@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent correctly consolidates a project's fragmented configuration files into a single vite.config.ts following VitePlus conventions, enables type-aware lint options, and handles the baseUrl incompatibility with VitePlus type-aware checks that causes silent failures.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "No parallel vitest.config.ts",
+      "max_score": 12,
+      "description": "The output does NOT include a `vitest.config.ts` file — test configuration has been moved into the `test` block inside `vite.config.ts`"
+    },
+    {
+      "name": "No .oxlintrc* files",
+      "max_score": 10,
+      "description": "The output does NOT include any `.oxlintrc`, `.oxlintrc.json`, `.oxlintrc.yml`, or similar oxlint standalone config files — lint config has been consolidated into `vite.config.ts`"
+    },
+    {
+      "name": "No parallel tsdown.config.ts",
+      "max_score": 8,
+      "description": "The output does NOT include a `tsdown.config.ts` file — packaging config has been moved into `vite.config.ts`"
+    },
+    {
+      "name": "typeAware enabled",
+      "max_score": 15,
+      "description": "The `vite.config.ts` includes `lint: { options: { typeAware: true } }` (or equivalent nested structure with `typeAware: true` inside the lint options)"
+    },
+    {
+      "name": "typeCheck enabled",
+      "max_score": 15,
+      "description": "The `vite.config.ts` includes `lint: { options: { typeCheck: true } }` (or equivalent with `typeCheck: true` inside the lint options)"
+    },
+    {
+      "name": "baseUrl incompatibility addressed",
+      "max_score": 15,
+      "description": "The `compilerOptions.baseUrl` is either removed from `tsconfig.json` OR the output explicitly documents that `baseUrl` causes VitePlus to silently skip type-aware checks and recommends removing it"
+    },
+    {
+      "name": "Staged config in vite.config.ts",
+      "max_score": 10,
+      "description": "Pre-commit / staged hook configuration is placed inside the `staged` property of the root `defineConfig` in `vite.config.ts`, rather than in a separate Husky or lint-staged config"
+    },
+    {
+      "name": "No Husky or lint-staged config",
+      "max_score": 5,
+      "description": "The output does NOT create or preserve `.husky/pre-commit`, `.husky/` directory, or any `lint-staged` configuration block in `package.json`"
+    },
+    {
+      "name": "defineConfig from vite-plus",
+      "max_score": 5,
+      "description": "The `vite.config.ts` imports `defineConfig` from `'vite-plus'` (not from `'vite'`)"
+    },
+    {
+      "name": "vp migrate referenced",
+      "max_score": 5,
+      "description": "The migration notes, README, or a migration script references `vp migrate` as the recommended migration entry point (rather than purely describing manual file edits)"
+    }
+  ]
+}

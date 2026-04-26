@@ -1,0 +1,66 @@
+{
+  "context": "Tests whether the agent correctly sets up a release pipeline for a TypeScript GitHub Actions marketplace action, covering the action.yml entrypoint requirement (bundled dist/index.js), moving major tag automation, correct plugin selection for a marketplace action (no npm publish), and the standard workflow structure including [skip ci] guards and concurrency.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "action.yml uses dist/index.js",
+      "max_score": 12,
+      "description": "The action.yml `runs:` block references `dist/index.js` (or a path under `dist/`) as the main entrypoint — NOT a TypeScript source file like `src/index.ts`"
+    },
+    {
+      "name": "dist built in verify",
+      "max_score": 8,
+      "description": "The verify job includes a build step that compiles/bundles the TypeScript source into `dist/`, OR the workflow commits `dist/` in the release job"
+    },
+    {
+      "name": "Moving major tag step",
+      "max_score": 12,
+      "description": "A post-release step force-updates the moving major tag (e.g., `git tag -f v1` and `git push -f origin v1`) so consumers pinning to `@v1` see updates"
+    },
+    {
+      "name": "Major tag step is conditional",
+      "max_score": 8,
+      "description": "The moving major tag step is conditional on a new release having been published (e.g., `steps.release.outputs.new_release_published == 'true'`)"
+    },
+    {
+      "name": "No npm publish plugin",
+      "max_score": 10,
+      "description": "The .releaserc.json does NOT include @semantic-release/npm (GitHub Actions are published by tagging, not registry push)"
+    },
+    {
+      "name": "SR plugins for action",
+      "max_score": 8,
+      "description": "The .releaserc.json includes @semantic-release/git and @semantic-release/github as plugins"
+    },
+    {
+      "name": "git before github",
+      "max_score": 8,
+      "description": "@semantic-release/git appears before @semantic-release/github in the plugins list"
+    },
+    {
+      "name": "skip ci on both jobs",
+      "max_score": 8,
+      "description": "Both verify and release jobs have `if:` conditions that skip execution when the commit message contains `[skip ci]`"
+    },
+    {
+      "name": "Release concurrency non-cancellable",
+      "max_score": 6,
+      "description": "The release job has a concurrency group with `cancel-in-progress: false`"
+    },
+    {
+      "name": "fetch-depth: 0",
+      "max_score": 6,
+      "description": "Both verify and release job checkout steps specify `fetch-depth: 0`"
+    },
+    {
+      "name": "Bot identity in step env",
+      "max_score": 7,
+      "description": "GIT_AUTHOR_NAME/EMAIL and GIT_COMMITTER_NAME/EMAIL are set inside the semantic-release step's env, not at the job level"
+    },
+    {
+      "name": "SR action v4",
+      "max_score": 7,
+      "description": "Uses `cycjimmy/semantic-release-action@v4`"
+    }
+  ]
+}

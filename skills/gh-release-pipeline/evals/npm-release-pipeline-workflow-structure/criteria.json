@@ -1,0 +1,86 @@
+{
+  "context": "Tests whether the agent correctly sets up a GitHub Actions CI/CD pipeline for an npm TypeScript library using semantic-release, covering the verify/release job structure, concurrency configuration, [skip ci] guards, checkout depth, bot identity, permissions, and semantic-release plugin ordering and configuration.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "fetch-depth verify",
+      "max_score": 5,
+      "description": "The verify job's checkout step uses `fetch-depth: 0` (not the default shallow clone)"
+    },
+    {
+      "name": "fetch-depth release",
+      "max_score": 5,
+      "description": "The release job's checkout step uses `fetch-depth: 0`"
+    },
+    {
+      "name": "Verify concurrency group",
+      "max_score": 6,
+      "description": "The verify job (or workflow-level) has a cancellable concurrency group with `cancel-in-progress: true`"
+    },
+    {
+      "name": "Release concurrency group",
+      "max_score": 6,
+      "description": "The release job has a job-level non-cancellable concurrency group with `cancel-in-progress: false`"
+    },
+    {
+      "name": "skip ci on verify",
+      "max_score": 6,
+      "description": "The verify job has an `if:` condition that skips execution when the commit message contains `[skip ci]`"
+    },
+    {
+      "name": "skip ci on release",
+      "max_score": 6,
+      "description": "The release job has an `if:` condition that skips execution when the commit message contains `[skip ci]`"
+    },
+    {
+      "name": "Bot identity in step env",
+      "max_score": 7,
+      "description": "GIT_AUTHOR_NAME, GIT_AUTHOR_EMAIL, GIT_COMMITTER_NAME, GIT_COMMITTER_EMAIL are set inside the semantic-release step's `env:`, NOT at job level"
+    },
+    {
+      "name": "Bot uses noreply address",
+      "max_score": 4,
+      "description": "The bot email addresses use a `noreply.github.com` domain (not a real human email)"
+    },
+    {
+      "name": "Release permissions",
+      "max_score": 6,
+      "description": "The release job explicitly declares `permissions: { contents: write, issues: write, pull-requests: write }`"
+    },
+    {
+      "name": "semantic-release action version",
+      "max_score": 5,
+      "description": "Uses `cycjimmy/semantic-release-action@v4` (not v3, v5, v6, or a different action)"
+    },
+    {
+      "name": "Plugin order",
+      "max_score": 8,
+      "description": "Plugins are ordered: commit-analyzer before release-notes-generator, both before publish plugins, @semantic-release/git before @semantic-release/github"
+    },
+    {
+      "name": "Matching preset",
+      "max_score": 8,
+      "description": "Both @semantic-release/commit-analyzer and @semantic-release/release-notes-generator are configured with `\"preset\": \"conventionalcommits\"`"
+    },
+    {
+      "name": "git plugin message",
+      "max_score": 8,
+      "description": "The @semantic-release/git plugin's message contains `[skip ci]` and uses the `chore(release): ${nextRelease.version}` format"
+    },
+    {
+      "name": "registry-url in setup-node",
+      "max_score": 8,
+      "description": "The `actions/setup-node` step in the release job includes `registry-url: \"https://registry.npmjs.org\"`"
+    },
+    {
+      "name": "release needs verify",
+      "max_score": 6,
+      "description": "The release job declares `needs: [verify]` (or equivalent), making verify the gate to publish"
+    },
+    {
+      "name": "Secrets on step",
+      "max_score": 6,
+      "description": "NPM_TOKEN and GITHUB_TOKEN are declared in the semantic-release step's `env:`, not at the job level"
+    }
+  ]
+}

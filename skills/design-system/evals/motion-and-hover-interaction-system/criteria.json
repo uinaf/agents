@@ -1,0 +1,66 @@
+{
+  "context": "The agent is asked to build an interactive uinaf-branded page with entry animations and hover/press interactions. This scenario tests whether the agent uses the exact motion specification: specific easing function, duration values, stagger mechanics, sessionStorage replay gating, reduced-motion fallback, and the correct card/logo/link hover patterns.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "fade-up-in animation",
+      "max_score": 8,
+      "description": "The entry animation moves elements from opacity 0 to 1 AND from translateY(10px) to translateY(0). Both opacity and Y-translation are part of the animation — opacity-only is insufficient."
+    },
+    {
+      "name": "ease-snappy easing function",
+      "max_score": 10,
+      "description": "The value cubic-bezier(0.22, 1, 0.36, 1) appears in CSS transitions or animation definitions — not ease, ease-in-out, or any other preset."
+    },
+    {
+      "name": "160ms fast duration",
+      "max_score": 8,
+      "description": "Hover and press transitions use a 160ms duration (either as a variable --duration-fast or inline). Not 150ms, 200ms, or a different value."
+    },
+    {
+      "name": "220ms base duration",
+      "max_score": 8,
+      "description": "Entry animations use a 220ms duration (either as --duration-base or inline). Not 200ms, 250ms, or a different value."
+    },
+    {
+      "name": "45ms stagger via --stagger-index",
+      "max_score": 10,
+      "description": "Animation delay is calculated using a --stagger-index custom property on each animated element (e.g. animation-delay: calc(var(--stagger-index, 0) * 45ms)). The 45ms step value is present."
+    },
+    {
+      "name": "sessionStorage replay gate",
+      "max_score": 12,
+      "description": "JavaScript reads and sets the sessionStorage key 'uinaf-entry-motion-seen'. When the key is already set, animations are skipped (elements set to final visible state immediately). The exact key name 'uinaf-entry-motion-seen' must be used."
+    },
+    {
+      "name": "Reduced motion fallback",
+      "max_score": 10,
+      "description": "A @media (prefers-reduced-motion: reduce) block removes all transform animations, leaving only an opacity fade. The translateY transform does NOT appear inside this block."
+    },
+    {
+      "name": "Card hover lift and border shift",
+      "max_score": 8,
+      "description": "Card hover state applies translateY(-2px) AND shifts border color from neutral-800 to neutral-500. Both effects must be present — lift alone or border-change alone is insufficient."
+    },
+    {
+      "name": "Card ↗ arrow color shift",
+      "max_score": 8,
+      "description": "The ↗ glyph inside a card element changes color on card hover (from a muted/dim color such as neutral-600 to a lighter value such as neutral-300). The transition is triggered by the parent card hover, not by hovering the arrow directly."
+    },
+    {
+      "name": "Logo hover: lift + image scale",
+      "max_score": 8,
+      "description": "The logo container lifts with translateY(-2px) on hover AND the inner <img> element scales to 1.015. Both effects must be present on the logo — lift alone is insufficient."
+    },
+    {
+      "name": "Press scale(0.97) on :active",
+      "max_score": 6,
+      "description": "Cards, links, and/or the logo apply transform: scale(0.97) on :active. At least cards and the logo must have this press state."
+    },
+    {
+      "name": "No backdrop-filter or backdrop-blur",
+      "max_score": 4,
+      "description": "The CSS does NOT contain backdrop-filter, -webkit-backdrop-filter, or backdrop-blur anywhere — not on cards, modals, nav, or any other element."
+    }
+  ]
+}
