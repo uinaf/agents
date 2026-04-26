@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for contributors in this repo.
+Instructions for contributors in this repo. For the *global behavioral rules* synced to every machine, see [`rules/AGENTS.md`](rules/AGENTS.md) — different file, different scope.
 
 - Treat `AGENTS.md` as a table of contents, not a manual. Put details in `references/`.
 - Use progressive disclosure. Keep core workflow in `SKILL.md`; move deeper detail to `references/` when it earns its keep.

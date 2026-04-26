@@ -1,6 +1,17 @@
 # skills
 
-Reusable agent skills for coding workflows. Progressive disclosure, mechanical verification, repo-first truth.
+Reusable agent skills, global behavioral rules, and cross-machine sync for AI coding agents (Claude Code, Codex, Cursor, Pi, openclaw). Progressive disclosure, mechanical verification, repo-first truth.
+
+> Repo will be renamed to `uinaf/agents` once the merged layout settles. The previous `uinaf/agents` repo is preserved as `uinaf/agents-old` for history.
+
+## Layout
+
+- `skills/` — reusable skill packages (the table below)
+- `rules/AGENTS.md` — global behavioral rules synced into every agent on every machine via `sync/pull.sh`
+- `sync/` — cross-machine helpers: `pull.sh` (symlink rules + install skills), `push.sh` (publish local skill set into `sync/skills.json`)
+- `scripts/` — repo-local Tessl helpers (`review-skills.sh`, `optimize-skills.sh`)
+- `docs/` — deeper notes
+- `AGENTS.md` (root) — contributor guide for working on this repo (separate from `rules/AGENTS.md`)
 
 | Skill | What it does |
 |-------|-------------|
@@ -15,7 +26,17 @@ Reusable agent skills for coding workflows. Progressive disclosure, mechanical v
 | **gh-deploy-pipeline** | Standardize a repo's GitHub Actions deploy flow — push to main → detect lanes → verify + e2e against built artifacts → deploy each lane (Cloudflare Pages, AWS Amplify, GHCR + VPS) → smoke check |
 | **uinaf-design-system** | Apply the uinaf brand identity to any uinaf output — web (Tailwind v4), blog / changelog / docs / READMEs, slides, OG / social, email, terminal banners, native app starting points |
 
-## Install
+## Sync (rules + skills together)
+
+```bash
+git clone git@github.com:uinaf/skills.git
+cd skills
+./sync/pull.sh
+```
+
+This symlinks `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.pi/agent/AGENTS.md` to `rules/AGENTS.md`, then installs the skills listed in `sync/skills.json` into whichever supported agents you have on the box. Re-run any time. To publish your local skill set into `sync/skills.json` and push, use `./sync/push.sh`.
+
+## Install individual skills
 
 ```bash
 npx skills add uinaf/skills -g -s agent-readiness

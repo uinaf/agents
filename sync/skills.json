@@ -1,0 +1,63 @@
+{
+  "skills": [
+    {
+      "name": "agent-readiness",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "docs",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "effect-ts",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "emil-design-eng",
+      "source": "emilkowalski/skill"
+    },
+    {
+      "name": "gh-release-pipeline",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "uinaf-frontend-docs",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "uinaf-frontend-repos",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "uinaf-sdk-dev",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "react-doctor",
+      "source": "millionco/react-doctor"
+    },
+    {
+      "name": "review",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "skill-audit",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "uinaf-design-system",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "verify",
+      "source": "uinaf/skills"
+    },
+    {
+      "name": "viteplus",
+      "source": "uinaf/skills"
+    }
+  ],
+  "version": 30,
+  "manifestHash": "78b7d3c0a6ed8f27000b1324baf3fbee262af193c33c926d6e4c1f0a6ac18457",
+  "updatedAt": "2026-04-26T15:02:12Z"
+}
