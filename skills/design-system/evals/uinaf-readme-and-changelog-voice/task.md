@@ -4,12 +4,25 @@ The studio is open-sourcing a new internal CLI called `tccutil` — a small util
 
 Your job is to write both files in uinaf voice and shape, ready to ship at the repo root.
 
-## Project Location
+## Output Specification
 
-The project files are at `/workspace/tccutil/`. Write outputs to:
+Produce the following files at the workspace root, ready to commit as-is (no placeholders left unfilled):
 
-- `/workspace/tccutil/README.md`
-- `/workspace/tccutil/CHANGELOG.md`
+- `README.md`
+- `CHANGELOG.md`
+
+## Input Files
+
+The following file represents the current state of the repository. Extract it before beginning.
+
+=============== FILE: package.json ===============
+{
+  "name": "tccutil",
+  "version": "0.1.0",
+  "description": "manage macOS TCC permissions from the command line",
+  "license": "MIT",
+  "repository": "github.com/uinaf/tccutil"
+}
 
 ## What `tccutil` does (factual context only — don't quote this verbatim)
 
