@@ -4,19 +4,19 @@ set -euo pipefail
 PRUNE_MANAGED=0
 for arg in "$@"; do
   case "$arg" in
-    --prune-managed)
+    --prune|--prune-managed)
       PRUNE_MANAGED=1
       ;;
     -h|--help)
-      echo "Usage: $0 [--prune-managed]"
+      echo "Usage: $0 [--prune]"
       echo
-      echo "  --prune-managed  Remove globally installed uinaf/agents skills that are no longer in scripts/sync/skills.json."
-      echo "                   Skills from other sources are left alone."
+      echo "  --prune  Remove globally installed uinaf/agents skills that are no longer in scripts/sync/skills.json."
+      echo "           Skills from other sources are left alone."
       exit 0
       ;;
     *)
       echo "Unknown argument: $arg" >&2
-      echo "Usage: $0 [--prune-managed]" >&2
+      echo "Usage: $0 [--prune]" >&2
       exit 2
       ;;
   esac
@@ -108,7 +108,7 @@ if [ -f "$MANIFEST" ]; then
         echo "No global skill lockfile found; skipping managed prune"
       fi
     else
-      echo "Skipping prune. Use --prune-managed to remove stale uinaf/agents skills."
+      echo "Skipping prune. Use --prune to remove stale uinaf/agents skills."
     fi
   fi
 else

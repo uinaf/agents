@@ -32,7 +32,7 @@ cd agents
 ./scripts/sync/sync.sh
 ```
 
-This symlinks `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.pi/agent/AGENTS.md` to `rules/agents.md`, then installs or updates the skills listed in `scripts/sync/skills.json` into whichever supported agents you have on the box. Sync is additive by default: it does not remove skills that are not in this manifest. To remove stale globally installed skills whose source is `uinaf/agents`, run `./scripts/sync/sync.sh --prune-managed`. Re-run any time. To publish your local skill set into `scripts/sync/skills.json` and push, use `./scripts/sync/push.ts`.
+This symlinks `~/.claude/CLAUDE.md`, `~/.codex/AGENTS.md`, and `~/.pi/agent/AGENTS.md` to `rules/agents.md`, then installs or updates the skills listed in `scripts/sync/skills.json` into whichever supported agents you have on the box. Sync is additive by default: it does not remove skills that are not in this manifest. To remove stale globally installed skills whose source is `uinaf/agents`, run `./scripts/sync/sync.sh --prune`. Re-run any time. To publish your local skill set into `scripts/sync/skills.json` and push, use `./scripts/sync/push.ts`.
 
 ## Install individual skills
 
