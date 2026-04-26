@@ -76,9 +76,7 @@ MANIFEST="$REPO_DIR/scripts/sync/skills.json"
 
 # Install skills only from stable manifest (portable across machines)
 if [ -f "$MANIFEST" ]; then
-  VERSION=$(jq -r '.version // "?"' "$MANIFEST")
-  HASH=$(jq -r '.manifestHash // ""' "$MANIFEST")
-  echo "Using skills manifest version=$VERSION hash=$HASH"
+  echo "Using skills manifest: $MANIFEST"
 
   if [ ${#SKILL_AGENTS[@]} -eq 0 ]; then
     echo "No supported agent installations found; skipping skill sync"

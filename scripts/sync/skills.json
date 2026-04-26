@@ -48,8 +48,5 @@
       "name": "viteplus",
       "source": "uinaf/agents"
     }
-  ],
-  "version": 32,
-  "manifestHash": "d1098151e66444ab4bdb9fe2cf60cff4fae12a3563c599cd48da44f58572bb67",
-  "updatedAt": "2026-04-26T22:45:00Z"
+  ]
 }
