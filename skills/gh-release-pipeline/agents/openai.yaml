@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Pipeline"
+  short_description: "Standardize GitHub Actions release flow"
+  default_prompt: "Use $gh-release-pipeline to set up or align this repo's GitHub Actions release flow around the verify-then-release shape: push to main → guardrails → semantic-release tags and publishes → version-bump commit back to main with [skip ci]. Pick the publish target that matches this repo (npm, CocoaPods/SwiftPM, Go/GoReleaser, Rust/release-plz+cargo-dist, GitHub Action) and preserve any repo-specific verify command or release plumbing already in place."
