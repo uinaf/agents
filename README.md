@@ -10,19 +10,6 @@ Reusable agent skills, global behavioral rules, and a small sync script for AI c
 - `scripts/skills/` — Tessl review helpers.
 - `docs/` — distribution notes.
 
-## Local Skills
-
-- `agent-readiness`
-- `docs`
-- `effect-ts`
-- `gh-deploy-pipeline`
-- `gh-release-pipeline`
-- `review`
-- `skill-audit`
-- `uinaf-design-system`
-- `verify`
-- `viteplus`
-
 ## Sync (rules + skills together)
 
 ```bash
