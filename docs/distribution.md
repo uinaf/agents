@@ -30,12 +30,12 @@ Create a Tessl API key for the `uinaf` workspace, then add it to this repository
 You can create the key either from the Tessl web UI or with the CLI:
 
 ```bash
-tessl api-key create --workspace uinaf --name github-actions-publish --role publisher
+npx tessl api-key create --workspace uinaf --name github-actions-publish --role publisher
 ```
 
 ## Local checks
 
 ```bash
-tessl tile lint skills/review
-tessl tile publish --dry-run skills/review
+npx tessl tile lint skills/review
+npx tessl tile publish --dry-run skills/review
 ```

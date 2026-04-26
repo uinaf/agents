@@ -48,7 +48,7 @@ Patterns:
 - Use human-facing labels in section names (`Contributing`, `Security`, `License`), not raw filenames. The link target is the file.
 - Don't dump every top-level file under a `Docs` section. Keep `Contributing`, `Security`, and `License` as their own sections.
 - Don't include a "Features" bullet list. If the one-line description doesn't sell it, a bullet list won't.
-- Repo-relative links for in-repo files (`[CONTRIBUTING.md](CONTRIBUTING.md)`). External links get the `↗` arrow as part of the link text.
+- Repo-relative links for in-repo files, for example `CONTRIBUTING.md` linked to `CONTRIBUTING.md`. External links get the `↗` arrow as part of the link text.
 
 ## CONTRIBUTING.md
 

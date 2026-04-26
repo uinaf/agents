@@ -7,7 +7,6 @@ This repo uses Tessl as the evaluation loop for skill quality, clarity, and self
 Run a read-only review across every local skill:
 
 ```bash
-cd ..
 ./scripts/skills/review.sh
 ```
 
@@ -27,7 +26,6 @@ Use per-skill `--json` output directly with Tessl rather than `skills/review.sh`
 Apply Tessl's optimizer to one skill at a time:
 
 ```bash
-cd ..
 ./scripts/skills/optimize.sh review
 ```
 

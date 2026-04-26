@@ -2,7 +2,7 @@
 
 Instructions for contributors in this repo. For the *global behavioral rules* synced to every machine, see [`rules/agents.md`](rules/agents.md) — different file, different scope.
 
-- Treat `AGENTS.md` as a table of contents, not a manual. Put details in `references/`.
+- Treat `AGENTS.md` as a table of contents, not a manual. Put skill-specific depth in each skill's `references/`.
 - Use progressive disclosure. Keep core workflow in `SKILL.md`; move deeper detail to `references/` when it earns its keep.
 - Keep `README.md` and `AGENTS.md` concise. Put task-specific detail in `docs/*`.
 - Do not duplicate guidance across skills.
