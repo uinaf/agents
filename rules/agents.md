@@ -32,7 +32,7 @@ For non-trivial tasks, before writing code:
 - Use repo guardrails (`make verify`, `just verify`) when present; otherwise run format, lint, typecheck, test explicitly
 - Prefer integration / contract / e2e checks over mock-heavy unit tests
 - If verification infra is missing, flag it (use `agent-readiness`) — do not declare done
-- The builder never grades their own work; hand verification to an independent evaluator. If it is not verified, it is not done
+- If it is not verified, it is not done
 
 ### Feedback loops
 
