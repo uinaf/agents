@@ -10,14 +10,14 @@ The team uses pytest and a Makefile for their standard verification workflow. Yo
 
 Produce a file named `verification-report.md` containing a complete report with all of the following sections:
 
-- **Verdict**: one of `ship it`, `needs review`, or `blocked`
+- **Verdict**: one of `ready for review`, `needs more work`, or `blocked` (verify is the builder's gate before review; the ship decision belongs to `review`)
 - **Change Verified**: what was tested and confirmed
 - **Surfaces Exercised**: the exact commands or calls used
-- **Code-Shape Findings**: observations on code clarity, duplication, dead code, or error handling quality
-- **Top Findings**: any issues found, with severity
+- **Self-Corrections Applied**: any cheap, obvious issues you fixed during verification (or "none")
+- **Top Findings**: substantive issues left for review, with severity
 - **Exact Evidence**: commands run and output received
 - **Readiness Gaps**: any gaps in test coverage or infrastructure
-- **Recommended Follow-up**: suggested next steps
+- **Recommended Follow-up**: suggested next steps (typically `review` when the verdict is `ready for review`)
 
 ## Input Files
 

@@ -49,7 +49,7 @@ For each meaningful finding:
 
 For the overall verification:
 
-- verdict: `ship it` / `needs review` / `blocked`
+- verdict: `ready for review` / `needs more work` / `blocked` (verify never issues `ship it` — that's `review`'s call)
 - change verified
 - surfaces exercised
 - evidence summary

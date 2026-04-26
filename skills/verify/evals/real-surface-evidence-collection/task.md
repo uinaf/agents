@@ -10,7 +10,7 @@ The team lead wants concrete evidence â€” not just a read-through of the code â€
 
 Produce a file named `verification-report.md` containing:
 
-- The verdict on whether the API is ready to promote (`ship it`, `needs review`, or `blocked`)
+- The verdict on whether the API is ready to hand off for review (`ready for review`, `needs more work`, or `blocked`). The actual ship-or-not call belongs to `review`, not verify.
 - A "Surfaces Exercised" section naming each endpoint tested
 - A section with the exact commands you ran and the actual responses received
 - A section covering any findings, each with severity, what the issue is, and the impact

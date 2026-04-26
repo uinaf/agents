@@ -30,4 +30,4 @@ The project files are at `/workspace/landing/`. The relevant files are:
 
 ## Reference
 
-The full brand spec lives at `skills/design-system/references/brand-spec.md`. The Tailwind setup is at `skills/design-system/references/tailwind.md`. The component patterns are at `skills/design-system/references/components.md`.
+The full brand spec lives at `skills/uinaf-design-system/references/brand-spec.md`. The Tailwind setup is at `skills/uinaf-design-system/references/tailwind.md`. The component patterns are at `skills/uinaf-design-system/references/components.md`.

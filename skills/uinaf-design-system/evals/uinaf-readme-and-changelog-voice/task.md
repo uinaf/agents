@@ -64,4 +64,4 @@ uinaf-shaped changelog. Date-headed (`## YYYY-MM-DD` or `## v0.1.0 — 2026-04-2
 
 ## Reference
 
-Voice rules: `skills/design-system/references/voice.md`. Long-form patterns (README, changelog): `skills/design-system/references/content.md`. Canonical brand: `skills/design-system/references/brand-spec.md`.
+Voice rules: `skills/uinaf-design-system/references/voice.md`. Long-form patterns (README, changelog): `skills/uinaf-design-system/references/content.md`. Canonical brand: `skills/uinaf-design-system/references/brand-spec.md`.

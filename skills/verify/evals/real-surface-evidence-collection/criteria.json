@@ -45,7 +45,7 @@
     {
       "name": "Valid verdict",
       "max_score": 15,
-      "description": "Report contains a verdict using exactly one of: 'ship it', 'needs review', or 'blocked'"
+      "description": "Report contains a verdict using exactly one of: 'ready for review', 'needs more work', or 'blocked'. Does NOT use 'ship it' (that verdict belongs to review)."
     }
   ]
 }

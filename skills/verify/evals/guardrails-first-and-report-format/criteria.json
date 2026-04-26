@@ -20,7 +20,7 @@
     {
       "name": "Verdict field present",
       "max_score": 10,
-      "description": "Report contains a 'Verdict' section using exactly one of: 'ship it', 'needs review', or 'blocked'"
+      "description": "Report contains a 'Verdict' section using exactly one of: 'ready for review', 'needs more work', or 'blocked'. Does NOT use 'ship it' (that verdict belongs to review, not verify)."
     },
     {
       "name": "Change Verified section",
@@ -33,9 +33,9 @@
       "description": "Report includes a 'Surfaces Exercised' section (or equivalent) naming the specific commands or functions that were invoked"
     },
     {
-      "name": "Code-Shape Findings section",
+      "name": "Self-Corrections section",
       "max_score": 8,
-      "description": "Report includes a 'Code-Shape Findings' section (or equivalent) containing observations about code quality, clarity, error handling, or duplication in the changed files"
+      "description": "Report includes a 'Self-Corrections Applied' section (or equivalent) listing any cheap, obvious fixes made during verification, or explicitly stating 'none'. Substantive code-shape concerns are deferred to review, not pre-fixed here."
     },
     {
       "name": "Exact Evidence section",

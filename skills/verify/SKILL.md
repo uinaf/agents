@@ -1,25 +1,27 @@
 ---
 name: verify
-description: "Verify your own completed code changes using the repo's existing infrastructure and an independent evaluator context. Use after implementing a change when you need to run unit or integration tests, check build or lint gates, prove the real surface works with evidence, and challenge the changed code for clarity, deduplication, and maintainability. If the repo is not verifiable yet, hand off to `agent-readiness`; if you are reviewing someone else's code, use `review`."
+description: "Self-check your own completed change before handing off to `review` — the pre-review sanity pass. Use when you want to verify your change, test it end-to-end, run the repo's guardrails (lint, typecheck, tests, build), exercise the real surface with evidence, and catch obvious self-correctable issues you can fix in seconds. Produces a `ready for review` / `needs more work` / `blocked` verdict — never a ship decision (that's `review`'s job). If the repo cannot be booted or exercised reliably, hand off to `agent-readiness`. If you are auditing someone else's diff, branch, or PR, use `review` instead."
 ---
 
 # Verify
 
-Use the existing infrastructure to prove your own change works before calling it done.
+Self-check your own completed change before handing it off to `review`. Verify proves the change boots, passes guardrails, and survives the real surface — it is not a substitute for independent review.
 
 ## Principles
 
-- The builder does not grade their own work in the same context; switch into a fresh evaluator context or separate subagent first
+- Verify is the builder's gate before review; it does not replace review
+- The builder does not grade their own work in the same context — switch into a fresh evaluator context or separate subagent first
 - Run repo guardrails first, then hit the real surface
 - Prefer smoke, integration, contract, or e2e proof over unit tests that mock most of the behavior under test
-- Challenge the changed code for shape as well as behavior; passing tests do not excuse bloated, duplicated, or comment-dependent code
+- Self-correct obvious issues you spot while exercising the change; leave the rigorous code-shape pass to `review`
 - Load shared doctrine from the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules before judging the result
 - If the infrastructure is too weak to verify reliably, stop and hand off to `agent-readiness`
 
 ## Handoffs
 
+- Verification passed → hand off to `review` for the independent ship decision
 - No stable boot / smoke / interact path, or infrastructure too weak to trust → use `agent-readiness`
-- Need to review existing code, a diff, branch, or PR you are not verifying as the builder → use `review`
+- Auditing existing code, a diff, branch, or PR you did not author → use `review`
 - Main problem is stale AGENTS.md, README, specs, or repo docs → use `docs`
 
 ## Before You Start
@@ -47,17 +49,15 @@ Use the existing infrastructure to prove your own change works before calling it
 
 Follow [references/evidence-rules.md](references/evidence-rules.md) when collecting proof.
 
-### 3. Run a code-shape pass on the changed files
+### 3. Self-correct obvious issues
 
-- Focus on code touched in the current task unless the changes obviously exposed a broader local mess
-- Ask whether the solution matches the repo's language, framework, and design patterns rather than merely working
-- Remove duplication, dead branches, unused helpers, and unnecessary abstractions when they do not protect a real boundary
-- Treat `any`, unsafe `as`, boundary-leaking `unknown`, and non-null assertions as safety failures unless the repo explicitly allows them
-- Check that failures are classified intentionally and surfaced with useful recovery guidance, while preserving codes or diagnostics for operators
-- Prefer code that explains itself; comments should survive only when they carry durable context the code cannot make obvious
-- Read the changed files as if a brand new agent inherited them tomorrow and had to extend the flow without prior context
+While exercising the change, fix anything cheap and obvious that you spot:
 
-Use [references/simplification.md](references/simplification.md) for the exact simplification questions.
+- A typo in a log line, a stale comment, an unused import, a duplicated helper inside the diff
+- An `any`, unsafe `as`, or non-null assertion you can replace with a real type in seconds
+- A failure path that swallows errors silently when a one-line `throw` makes the diagnostic useful
+
+Do not turn this into a full review pass. Substantive code-shape concerns (architecture mismatches, broader duplication, error-classification redesigns) belong to `review`. Use [references/simplification.md](references/simplification.md) only as a short self-check, not as a refactoring backlog.
 
 ### 4. Probe adjacent risk
 
@@ -70,11 +70,11 @@ Use [references/simplification.md](references/simplification.md) for the exact s
 
 Produce one clear outcome:
 
-- `ship it`
-- `needs review`
-- `blocked`
+- `ready for review` — guardrails green, real surface confirmed, no obvious self-correctable issues left
+- `needs more work` — the change is not ready to be reviewed; specific issues to address are listed
+- `blocked` — verification cannot proceed, usually because infrastructure is too weak (hand off to `agent-readiness`)
 
-If blocked because the infrastructure is weak, say so explicitly and hand off to `agent-readiness`.
+Verify never issues `ship it`. The independent ship decision is `review`'s job.
 
 ## Output
 
@@ -83,22 +83,22 @@ After verification, report:
 - verdict
 - change verified
 - surfaces exercised
-- code-shape findings: clarity, duplication, dead code, unsafe type escapes, error classification, recovery messaging, comments, or maintainability debt in the changed files
-- top findings by severity
+- self-corrections applied during verification (if any)
+- top findings by severity (issues you could not self-correct)
 - exact evidence: commands, screenshots, traces, responses, or file references
 - readiness gaps or doc drift discovered during verification
-- recommended follow-up: `agent-readiness`, `docs`, or implementation
+- recommended follow-up: `review`, `agent-readiness`, `docs`, or more implementation
 
 Example:
 
 ```text
-verdict: needs review
+verdict: ready for review
 change verified: retry banner after transient API failure
 surfaces exercised: pnpm test test/retry.spec.ts, curl http://127.0.0.1:3000/api/retry
-code-shape finding: low — retry counter update is split across two helpers with identical branching; merge into one explicit path
-finding: medium — the UI recovers, but the retry count is not persisted across refresh
+self-corrections: dropped unused import in src/retry/banner.ts; tightened error log to include status code
+top finding: medium — the UI recovers, but the retry count is not persisted across refresh (left for review to weigh)
 evidence: local API returned 200 after retry; browser screenshot after refresh shows count reset to 0
-recommended follow-up: implementation
+recommended follow-up: review
 ```
 
 ## References

@@ -1,11 +1,11 @@
 ---
 name: review
-description: "Review existing code, diffs, branches, or pull requests using concern-specific reviewer personas and evidence. Use when auditing someone else's work, triaging risk in a PR, or producing a ship-it / needs-review / blocked verdict. Do not use to verify your own completed change; use `verify` for that."
+description: "Independently audit existing code, diffs, branches, or pull requests using concern-specific reviewer personas and evidence. Use when triaging risk in a PR, deciding whether a change is safe to ship, or following up on a `verify` pass to make the call the builder cannot make on their own work. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored; use `verify` for that."
 ---
 
 # Review
 
-Review existing code with independent lenses before deciding whether it is safe to ship.
+Independently audit existing code with concern-specific lenses and decide whether it is safe to ship. Review is the gate after `verify` — the builder proves the change works on the real surface, then review decides whether the change is *good*.
 
 ## Principles
 
@@ -21,7 +21,7 @@ Review existing code with independent lenses before deciding whether it is safe 
 
 ## Handoffs
 
-- Need to prove your own completed change works on real surfaces → use `verify`
+- Self-checking a change you just authored, before handing it off for review → use `verify`
 - Review is blocked because the repo cannot be booted or exercised reliably → use `agent-readiness`
 - Main problem is stale AGENTS.md, README, specs, or repo docs → use `docs`
 
