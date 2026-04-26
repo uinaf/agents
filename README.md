@@ -18,7 +18,7 @@ cd agents
 ./scripts/sync/sync.sh
 ```
 
-Sync is additive by default. To remove stale globally installed skills whose source is `uinaf/agents`, run:
+Sync is additive by default. To remove globally installed skills that are not listed in `scripts/sync/skills.json`, run:
 
 ```bash
 ./scripts/sync/sync.sh --prune

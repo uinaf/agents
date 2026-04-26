@@ -1,17 +1,16 @@
 #!/bin/bash
 set -euo pipefail
 
-PRUNE_MANAGED=0
+PRUNE=0
 for arg in "$@"; do
   case "$arg" in
     --prune)
-      PRUNE_MANAGED=1
+      PRUNE=1
       ;;
     -h|--help)
       echo "Usage: $0 [--prune]"
       echo
-      echo "  --prune  Remove globally installed uinaf/agents skills that are no longer in scripts/sync/skills.json."
-      echo "           Skills from other sources are left alone."
+      echo "  --prune  Remove globally installed skills that are not listed in scripts/sync/skills.json."
       exit 0
       ;;
     *)
@@ -89,24 +88,24 @@ if [ -f "$MANIFEST" ]; then
       npx skills add "$source" -g -y -a "${SKILL_AGENTS[@]}" -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
     done
 
-    if [ "$PRUNE_MANAGED" -eq 1 ]; then
+    if [ "$PRUNE" -eq 1 ]; then
       LOCKFILE="$HOME/.agents/.skill-lock.json"
       if [ -f "$LOCKFILE" ]; then
-        echo "Pruning managed uinaf/agents skills missing from manifest"
+        echo "Pruning skills missing from manifest"
         jq -r \
           --argjson manifest "$(jq -c '[.skills[].name]' "$MANIFEST")" \
-          '(.skills // {}) | to_entries[] | select(.value.source == "uinaf/agents") | select(.key as $name | $manifest | index($name) | not) | .key' \
+          '(.skills // {}) | keys[] | select(. as $name | $manifest | index($name) | not)' \
           "$LOCKFILE" |
         while read -r skill_name; do
           [ -n "$skill_name" ] || continue
-          echo "Removing managed stale skill: $skill_name"
+          echo "Removing stale skill: $skill_name"
           npx skills remove "$skill_name" -g -y </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
         done
       else
-        echo "No global skill lockfile found; skipping managed prune"
+        echo "No global skill lockfile found; skipping prune"
       fi
     else
-      echo "Skipping prune. Use --prune to remove stale uinaf/agents skills."
+      echo "Skipping prune. Use --prune to remove skills missing from manifest."
     fi
   fi
 else
