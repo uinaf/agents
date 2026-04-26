@@ -27,15 +27,12 @@ For non-trivial tasks, before writing code:
 
 ### Verification
 
-- Bug fix → write a reproducing test first, then fix
-- Refactor → confirm before/after behavior parity
-- Feature → contract-level tests plus a runtime check (run the binary, hit the endpoint, read the output)
-- Fresh worktree → bootstrap (install deps, codegen) before running checks
+- Match the check to the change: bug fixes need a repro test; refactors prove behavior parity; features need contract tests plus a runtime check
+- Bootstrap fresh worktrees before checks: install deps, run codegen, and make the repo runnable
 - Use repo guardrails (`make verify`, `just verify`) when present; otherwise run format, lint, typecheck, test explicitly
 - Prefer integration / contract / e2e checks over mock-heavy unit tests
 - If verification infra is missing, flag it (use `agent-readiness`) — do not declare done
-- The builder never grades their own work. Hand verification to an independent evaluator (e.g. `verify` skill or a fresh subagent)
-- If it is not verified, it is not done
+- The builder never grades their own work; hand verification to an independent evaluator. If it is not verified, it is not done
 
 ### Feedback loops
 
@@ -71,22 +68,17 @@ Reproduce the failure, find the root cause with evidence, fix the root cause. No
 
 ## Code Principles
 
-- Build from small composable pieces with narrow surfaces; deep modules over layered complexity
-- Make illegal states unrepresentable; parse external input at the boundary, operate on typed values internally
-- Prefer reversible changes when uncertain
-- Delete dead code, unused exports, stale branches — do not preserve "just in case"
-- For hot paths or performance-sensitive changes, include before/after benchmark numbers
-- Follow existing repo conventions before inventing new ones; if you must invent, explain why
-- Never hardcode volatile metrics (test counts, coverage %) in docs — let commands be the source of truth
-- Use repo-relative links in checked-in Markdown; never commit absolute filesystem paths
+- Build small, composable pieces with narrow surfaces; prefer deep modules over layered complexity
+- Parse external input at the boundary and make illegal states unrepresentable internally
+- Prefer reversible changes when uncertain; delete dead code instead of preserving it "just in case"
+- Follow repo conventions and existing dependencies before inventing new patterns or adding packages
+- Benchmark hot paths and performance-sensitive changes with before/after numbers
+- Keep docs command-derived: no volatile metrics, absolute filesystem paths, `file://`, or editor URIs
 - Avoid TypeScript escape hatches (`as`, non-null `!`, `unknown as T`, double assertions) unless explicitly approved
-- Do not disable linters, type checks, or tests — fix the root cause
-- Treat errors as first-class: typed, contextful, no silent catches. User-facing errors should help recovery while preserving operator diagnostics
-- Never log or surface secrets in error output
+- Do not disable linters, type checks, tests, or hooks — fix the root cause
+- Treat errors as typed, contextful, and recoverable where possible; never log or surface secrets
 - Schema/state changes must be forward-compatible with a documented rollback path; flag irreversible migrations before running them
-- Don't add dependencies unless necessary; prefer what's already in the stack
-- No real timers in tests. Mock time, mute loggers, and avoid assertions on logger calls
-- Prefer in-process tests; use subprocess tests only for true process-boundary behavior
+- Tests should avoid real timers and logger assertions; prefer in-process tests unless the process boundary matters
 
 ---
 
