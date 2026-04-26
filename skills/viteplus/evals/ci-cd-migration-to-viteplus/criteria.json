@@ -8,14 +8,14 @@
       "description": "The migrated workflow uses `voidzero-dev/setup-vp@v1` instead of a hand-rolled `actions/setup-node` or Corepack bootstrapping step"
     },
     {
-      "name": "Includes vp env step",
+      "name": "No redundant vp env step",
       "max_score": 10,
-      "description": "The CI workflow includes a `vp env` step as part of the setup sequence"
+      "description": "The CI workflow does NOT add a separate `vp env` setup step. `setup-vp@v1` already handles Node and package-manager bootstrap; the skill explicitly tells agents not to duplicate it unless the repo has a specific environment need the action does not cover."
     },
     {
       "name": "Uses vp install",
       "max_score": 10,
-      "description": "The workflow uses `vp install` to install dependencies instead of `pnpm install`, `npm install`, or `yarn install`"
+      "description": "The workflow uses `vp install` to install dependencies instead of `pnpm install`, `npm install`, or `yarn install` (or relies on the action's `run-install` input)"
     },
     {
       "name": "Uses vp check and vp test",
@@ -25,7 +25,7 @@
     {
       "name": "vp run for custom scripts",
       "max_score": 10,
-      "description": "Any repo-specific scripts not replaced by VitePlus built-ins are invoked via `vp run <script>` rather than `pnpm run` or `npm run`"
+      "description": "Any repo-specific scripts not replaced by VitePlus built-ins are invoked via `vp run <script>` (or the `vpr <script>` shorthand) rather than `pnpm run` or `npm run`"
     },
     {
       "name": "No direct package manager commands",

@@ -18,14 +18,14 @@
       "description": "The output does NOT contain invented commands such as `vp vitest`, `vp exec vitest`, or `vp run vitest`"
     },
     {
-      "name": "Watch script uses vp test",
+      "name": "Watch script uses vp test watch",
       "max_score": 10,
-      "description": "The watch-mode test script (if present) uses `vp test --watch` and not a direct vitest invocation"
+      "description": "The watch-mode test script (if present) uses `vp test watch` (the documented subcommand) and not `vp test --watch`, raw `vitest`, or any direct vitest invocation"
     },
     {
-      "name": "Coverage script uses vp test",
+      "name": "Coverage script uses vp test run --coverage",
       "max_score": 10,
-      "description": "The coverage script (if present) uses `vp test --coverage` rather than a direct vitest coverage invocation"
+      "description": "The coverage script (if present) uses `vp test run --coverage` (the documented subcommand form for one-shot coverage runs) rather than `vp test --coverage` or a direct vitest coverage invocation"
     },
     {
       "name": "Coverage migrated together",

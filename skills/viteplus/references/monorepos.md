@@ -81,9 +81,15 @@ For OSS or published libraries, prefer build-first. For a purely internal demo w
 
 The split is intentional: anything that walks the workspace graph goes through `vp run`; anything that just iterates leaves stays on the package manager's recursive runner.
 
+## Caching and nested `vp run`
+
+- `vp run` of a `package.json` script is uncached by default. Opt in with `vp run --cache <script>` for one invocation, set `run.cache.scripts: true` in `vite.config.ts` to flip the default workspace-wide, or move the task into `vite.config.ts` (cached by default).
+- Compound commands joined with `&&` are split into independent sub-tasks, each cached separately. When a script contains `vp run`, Vite Task inlines those nested calls as sibling tasks instead of spawning a nested process — recursion (root `build` → `vp run -r build` → root `build` …) is detected and the self-reference is pruned automatically.
+- Caveat: `vp check` invoked inside a `run.tasks` `command` (e.g. `"command": "vp check && vp test"`) currently bypasses the normal cache configuration and runs uncached. If cache-hit-rate matters, expose `vp check` as its own task and reference it via `dependsOn` instead of inlining. Tracking: voidzero-dev/vite-plus#994.
+
 ## Graduating to `vite.config.ts` task definitions
 
-`vp run` of a `package.json` script is uncached by default. Tasks defined in the root `vite.config.ts` `run.tasks` block are cached by default and can declare `dependsOn: ['<otherpkg>#<task>']` to express ordering inline. When CI build chains start to dominate wall-clock time, move the orchestrating task into `vite.config.ts` to pick up caching for free:
+Tasks defined in the root `vite.config.ts` `run.tasks` block are cached by default and can declare `dependsOn: ['<otherpkg>#<task>']` to express ordering inline. When CI build chains start to dominate wall-clock time, move the orchestrating task into `vite.config.ts` to pick up caching for free:
 
 ```ts
 import { defineConfig } from 'vite-plus';

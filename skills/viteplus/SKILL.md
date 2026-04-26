@@ -5,31 +5,32 @@ description: "Migrate or align frontend repositories to the stock VitePlus workf
 
 # VitePlus
 
-Use this skill to move a frontend repo closer to the stock VitePlus toolchain without blindly deleting repo-specific release or runtime logic.
+Move a frontend repo closer to the stock VitePlus toolchain without blindly deleting repo-specific release or runtime logic. VitePlus is in alpha — verify behavior against installed `vp --version` and the latest [release notes](https://github.com/voidzero-dev/vite-plus/releases) rather than memorized command shapes.
 
 ## Migration Targets
 
-When a repo is adopting VitePlus, default to this destination unless a repo-specific boundary clearly blocks it:
+Default to this destination unless a repo-specific boundary clearly blocks it. If you keep an old command shape, document the reason.
 
-- CI uses `voidzero-dev/setup-vp@v1`, lets the action own Node and package-manager bootstrap, then runs `vp install`, `vp check`, `vp test`, and `vp build` as needed
-- test files use `vite-plus/test` when VitePlus owns the test surface
-- scripts prefer `vp test`, `vp test --watch`, `vp test --coverage`, `vp pack`, `vp build`, `vp update`, and `vp run <script>` over direct package-manager, raw Vitest, or tsdown wiring
-- hooks prefer `vp config`, `.vite-hooks`, and `vp staged` instead of custom Husky or `lint-staged` setup
-- contributor docs use the new `vp` commands in the same change
-- if you keep the old command shape, explain the repo-specific reason explicitly
+- CI uses `voidzero-dev/setup-vp@v1`; the action owns Node and package-manager bootstrap, then runs `vp install`, `vp check`, `vp test`, `vp build`
+- test files use `vite-plus/test` (and `vite-plus/test/browser/context` for browser mode)
+- scripts prefer `vp test`, `vp test watch`, `vp test run --coverage`, `vp pack`, `vp build`, `vp update`, and `vp run <script>` (or `vpr <script>`) over direct package-manager, raw Vitest, or tsdown wiring
+- hooks use `vp config`, `.vite-hooks`, and `vp staged` instead of custom Husky or `lint-staged`
+- single-source config in `vite.config.ts`: no parallel `vitest.config.ts`, `.oxlintrc*`, `.oxfmtrc*`, or `tsdown.config.ts`
+- contributor docs move to the new `vp` commands in the same change
 
 ## Workflow
 
-1. Audit the repo's current scripts, workflows, Vite config, test imports, release flow, package manager, and any repo-specific packaging steps.
-2. Read [references/bootstrap.md](references/bootstrap.md) first for migration entrypoints, local guidance-file discovery such as `AGENTS.md`, `CLAUDE.md`, or repo rules, and the standard validation path.
-3. Choose the repo shape: read [references/packages.md](references/packages.md) for standalone packages or [references/monorepos.md](references/monorepos.md) for workspaces. The monorepo reference covers cross-package script orchestration (`vp run -t`, `vp run -r --parallel`, build-first vs source-alias for in-repo demos) — read it before wiring root-level `dev`, `build`, or deploy commands.
-4. Update the local tool surface together: scripts, `vite.config.ts`, test imports, hook wiring, and packaging commands should move as one migration instead of drifting piecemeal. After this step, run `vp check && vp test` to verify the migrated surface is coherent before moving on. If either command fails, resolve the errors before proceeding — do not carry forward a broken tool surface into CI or release changes.
-5. Update CI and release automation with [references/ci-cd.md](references/ci-cd.md), replacing hand-rolled Node setup with the stock Vite+ flow where it fits.
-6. Update tests and coverage wiring with [references/testing.md](references/testing.md) before changing assertions about test behavior.
-7. Check [references/commands.md](references/commands.md) before changing command invocations, script wiring, or package-manager usage.
-8. Keep repo-specific binary, release, or packaging steps only where Vite+ does not replace them cleanly.
-9. If the repo is standardizing on a newer Vite+ release, update the global `vp` binary with `vp upgrade`, then update the project packages with `vp update vite-plus @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` or the nearest repo-appropriate subset. Verify with `vp outdated` when version drift is a concern.
-10. Validate the migrated repo end-to-end by running `vp env && vp install && vp check && vp test`. Then re-check the key runtime surfaces: build output (verify `vp build` produces the expected artifacts), test coverage (confirm `vp test --coverage` reports pass), and hook triggers (confirm `vp staged` fires correctly on a staged change). If any surface fails, fix it before declaring the migration complete.
+1. Confirm the project is on Vite 8+ and Vitest 4.1+ — VitePlus refuses older versions.
+2. Audit current scripts, workflows, Vite config, test imports, release flow, package manager, and packaging.
+3. Read [references/bootstrap.md](references/bootstrap.md) for entrypoints (`vp create`, `vp migrate`), local guidance-file discovery, and validation path.
+4. Pick the shape: [references/packages.md](references/packages.md) for standalone, [references/monorepos.md](references/monorepos.md) for workspaces (covers `vp run -t`, `vp run -r --parallel`, build-first vs source-alias).
+5. Migrate scripts, `vite.config.ts`, test imports, hooks, and packaging together. Verify with `vp check && vp test` before moving on.
+6. Update CI per [references/ci-cd.md](references/ci-cd.md).
+7. Update tests and coverage per [references/testing.md](references/testing.md).
+8. Check [references/commands.md](references/commands.md) before changing command invocations. Cross-check [references/known-issues.md](references/known-issues.md) on unexpected behavior before assuming the repo is at fault.
+9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace.
+10. To adopt a newer Vite+ release: `vp upgrade` (global), then `vp update vite-plus @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` (project). Confirm with `vp outdated`.
+11. End-to-end validation: `vp env current && vp install && vp check && vp test`, then verify `vp build` artifacts, `vp test run --coverage`, and `vp staged` on a staged change.
 
 Concrete examples:
 
@@ -45,28 +46,32 @@ Concrete examples:
 ```
 
 ```ts
+import { defineConfig } from 'vite-plus'
+
 export default defineConfig({
+  lint: {
+    options: { typeAware: true, typeCheck: true },
+  },
   staged: {
     "*.{js,ts,tsx,vue,svelte}": "vp check --fix",
   },
 })
 ```
 
-Before/after for a common migration — replacing hand-rolled test scripts:
-
 ```diff
  # package.json scripts
--- "test": "vitest run --coverage",
--- "test:watch": "vitest",
-+- "test": "vp test",
-+- "test:watch": "vp test --watch",
+-"test": "vitest run --coverage",
+-"test:watch": "vitest",
++"test": "vp test run --coverage",
++"test:watch": "vp test watch",
 ```
 
 ## Guardrails
 
-- Start from `vp create` or `vp migrate` when the repo shape allows it instead of rebuilding the migration by hand.
-- Do not invent custom Husky, lint-staged, or shell-hook wiring when `vp config`, `.vite-hooks`, and `vp staged` already fit the repo.
-- Keep `pack` config in `vite.config.ts` when feasible; do not maintain parallel tsdown config unless the repo has a deliberate reason.
-- Do not delete repo-specific release workflows, binary packaging, or publish steps just to look more "stock."
-- When coverage requires `@vitest/coverage-v8`, treat mixed-version warnings as a known Vite+ caveat and verify whether the same warning reproduces in a fresh stock scaffold before calling it a repo bug.
-- Update contributor docs when install, test, or verify commands change.
+- Prefer `vp create` / `vp migrate --agent <name> --editor <name>` over hand-rolling agent or editor config.
+- Do not delete release workflows, binary packaging, or publish steps just to look more "stock."
+- If `vp check` is not running type-aware lint or type checks, confirm `lint.options.typeAware` and `lint.options.typeCheck` in `vite.config.ts`, and check for `compilerOptions.baseUrl` in `tsconfig.json` — `tsgolint` does not support `baseUrl` and VitePlus silently skips type-aware checks when it is present.
+
+## Known Caveats
+
+See [references/known-issues.md](references/known-issues.md) for current upstream caveats (hook runners, single-file `vp check --fix`, SSR `instanceof` failures, Cloudflare Workers tests, `@vitest/coverage-v8` mixed-version warnings).
