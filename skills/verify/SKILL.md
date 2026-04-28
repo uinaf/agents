@@ -93,6 +93,7 @@ Keep the final answer short:
 - Keep the footer to 5 labeled lines or fewer
 - Omit `fixed during verify` when nothing was corrected
 - Use comma-separated command names and surfaces instead of paragraphs
+- For failures or blocked checks, include the relevant error/status line or response snippet; do not hide the only evidence in terminal output
 
 Example:
 
