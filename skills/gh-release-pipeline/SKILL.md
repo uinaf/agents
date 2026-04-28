@@ -1,6 +1,6 @@
 ---
 name: gh-release-pipeline
-description: "Set up or align a GitHub Actions release pipeline for a versioned package, library, CLI, or marketplace action. Use when standardizing repos around the verify-then-release shape: push to main → guardrails → semantic-release tags + publishes → version-bump commit back to main with `[skip ci]`. Pairs with `gh-deploy-pipeline` for running apps — this skill is for publishing versioned artifacts to a registry, not deploying a running service."
+description: "Set up or align a GitHub Actions release pipeline for a versioned package, library, CLI, or marketplace action. Use when standardizing repos around the verify-then-release shape: push to main → guardrails → semantic-release tags + publishes → version-bump commit back to main with `[skip ci]`. Pairs with `gh-deploy-pipeline` for running apps; use for publishing versioned artifacts to a registry, not deploying a running service."
 ---
 
 # Release Pipeline
@@ -33,71 +33,25 @@ Both jobs check out at `fetch-depth: 0`. The verify job is gated by a cancellabl
 9. Validate end-to-end: PR (verify only) → merge a `feat:` / `fix:` → watch verify→release run → confirm tag, GitHub Release, published artifact, and the `chore(release): … [skip ci]` commit on `main`.
 10. Cross-check [references/troubleshooting.md](references/troubleshooting.md) when verify or release misbehaves before assuming the repo is at fault.
 
-## Concrete Examples
+## Examples
 
-Workflow skeleton (verify gated by PR + push, release gated by main + `[skip ci]`):
+Load workflow snippets from [references/workflows.md](references/workflows.md), target-specific release shape from [references/targets.md](references/targets.md), and semantic-release config from [references/semantic-release.md](references/semantic-release.md) only after the package type is known.
+
+Minimal release anchors:
 
 ```yaml
-name: ci
-on:
-  pull_request:
-  push:
-    branches: [main]
-
-concurrency:
-  group: verify-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
-  verify:
-    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-        with: { fetch-depth: 0 }
-      # bootstrap toolchain, then:
-      - run: <repo verify command>   # e.g. vp run verify, make verify, mise run verify
-
-  release:
-    needs: [verify]
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[skip ci]') }}
-    runs-on: ubuntu-latest
-    concurrency:
-      group: release-${{ github.repository }}-main
-      cancel-in-progress: false
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v6
-        with: { fetch-depth: 0, persist-credentials: true }
-      # bootstrap toolchain + install publish creds, then:
-      - uses: cycjimmy/semantic-release-action@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GIT_AUTHOR_NAME: release-bot
-          GIT_AUTHOR_EMAIL: release-bot@users.noreply.github.com
-          GIT_COMMITTER_NAME: release-bot
-          GIT_COMMITTER_EMAIL: release-bot@users.noreply.github.com
+release:
+  needs: [verify]
+  if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && !contains(github.event.head_commit.message, '[skip ci]') }}
+  concurrency: { group: release-${{ github.repository }}-main, cancel-in-progress: false }
 ```
-
-Canonical `.releaserc.json`:
 
 ```json
 {
   "branches": ["main"],
   "plugins": [
     ["@semantic-release/commit-analyzer", { "preset": "conventionalcommits" }],
-    ["@semantic-release/release-notes-generator", { "preset": "conventionalcommits" }],
-    "@semantic-release/changelog",
-    "@semantic-release/npm",
-    ["@semantic-release/git", {
-      "assets": ["package.json", "package-lock.json", "CHANGELOG.md"],
-      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-    }],
-    "@semantic-release/github"
+    ["@semantic-release/git", { "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}" }]
   ]
 }
 ```

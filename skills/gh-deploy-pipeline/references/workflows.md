@@ -1,6 +1,6 @@
 # Workflows
 
-Conventions for the workflow files this skill produces. Two files cover the common cases; only add a third for preview deploys (PR-driven).
+Conventions for deploy workflow files. Two files cover the common cases; only add a third for preview deploys (PR-driven).
 
 Start by reading the repo's existing workflow/action files and any same-org repo that deploys to the same host. Preserve proven composite actions, token names, and deploy scripts when the target matches. Marketplace examples are fallback material, not the first source of truth.
 

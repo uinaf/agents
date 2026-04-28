@@ -1,6 +1,6 @@
 # Brand Spec
 
-The canonical voice, visual, and iconography rulebook for uinaf. This file is the upstream source — every other reference in this skill defers to it.
+The canonical voice, visual, and iconography rulebook for uinaf. Task-specific references defer to it.
 
 ## Studio context
 
@@ -14,9 +14,9 @@ uinaf looks like a terminal you'd actually want to live in. Near-black canvas, a
 
 **Voice.** Short, direct, a little dry. Sounds like a sharp engineer who has nothing to prove. No SaaS-marketing sludge ("empower", "unlock", "synergies"). No exclamation marks. No em-dash drama. Sentence fragments are fine. Periods at the end. Wit lives in the *content*, not in punctuation or formatting.
 
-**Casing.** **Everything lowercase on product surfaces.** Headings, nav, button labels, product names, the company name itself ("uinaf"). The only capitalised thing in body copy is the legal entity name when it has to appear ("undefined is not a function LLC"), and proper nouns inside quotes / code identifiers. URLs and code are mono-cased as written.
+**Casing.** **Everything lowercase on product and marketing surfaces.** Headings, nav, button labels, product names, the company name itself ("uinaf"). The only capitalised thing in body copy is the legal entity name when it has to appear ("undefined is not a function LLC"), and proper nouns inside quotes / code identifiers. URLs and code are mono-cased as written.
 
-The lowercase rule is scoped to surfaces uinaf controls visually — `uinaf.dev`, blog, changelog, terms, OG/social, slides, email, terminal banners, in-product UI strings. It does **not** apply to repo collaboration docs (`README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, GitHub templates), which render in GitHub's chrome and use proper-case headlines with sentence-case body. See [repo-docs.md](repo-docs.md). Voice (short, direct, dry, no SaaS sludge, no emoji) still applies everywhere.
+The lowercase rule is scoped to product and marketing surfaces uinaf controls visually — `uinaf.dev` marketing pages, blog posts, terms, OG/social, slides, email, terminal banners, in-product UI strings. It does **not** apply to documentation surfaces (`README.md`, `CHANGELOG.md`, product docs pages, `docs/*.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, GitHub templates), which use proper-case headlines with sentence-case body. See [repo-docs.md](repo-docs.md) for repo collaboration docs. Voice (short, direct, dry, no SaaS sludge, no emoji) still applies everywhere.
 
 **Pronouns.** First-person plural — **"we"** — for the studio. Second-person — **"you"** — for the reader, used sparingly and in actual instructions, never in marketing-flattery ("you deserve…").
 

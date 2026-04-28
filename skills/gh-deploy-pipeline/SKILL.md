@@ -1,6 +1,6 @@
 ---
 name: gh-deploy-pipeline
-description: "Set up or align a GitHub Actions deploy pipeline for an app or service. Use when standardizing repos around the verify-then-deploy shape: push to main → detect affected lanes → verify and build artifacts → e2e → deploy each lane to its host (Cloudflare Pages, AWS Amplify, GHCR + VPS, etc.) with a non-cancellable per-lane concurrency group. Pairs with `gh-release-pipeline` for versioned packages — this skill is for deploying running apps, not publishing artifacts to a registry."
+description: "Set up or align a GitHub Actions deploy pipeline for an app or service. Use when standardizing repos around the verify-then-deploy shape: push to main → detect affected lanes → verify and build artifacts → e2e → deploy each lane to its host (Cloudflare Pages, AWS Amplify, GHCR + VPS, etc.) with a non-cancellable per-lane concurrency group. Pairs with `gh-release-pipeline` for versioned packages; use for deploying running apps, not publishing artifacts to a registry."
 ---
 
 # Deploy Pipeline
@@ -35,102 +35,21 @@ A separate `deploy.yml` (`workflow_dispatch`) lets a human re-deploy a specific 
 9. Validate end-to-end: PR (verify only, no deploy) → merge a change touching one lane → watch detect → verify → e2e → deploy → smoke → publish summary. Confirm only the touched lane ran.
 10. Cross-check [references/troubleshooting.md](references/troubleshooting.md) when a deploy is stuck, racing, or shipping the wrong artifact.
 
-## Concrete Examples
+## Examples
 
-Top-level workflow (one lane shown; copy per app):
+Load detailed workflow snippets from [references/workflows.md](references/workflows.md) only after the target lanes and host are known; load [references/targets.md](references/targets.md) only for the selected host.
 
-```yaml
-name: main
-on:
-  push:
-    branches: [main]
-
-permissions:
-  contents: read
-
-jobs:
-  changes:
-    runs-on: ubuntu-latest
-    outputs:
-      web: ${{ steps.filter.outputs.web }}
-    steps:
-      - uses: actions/checkout@v6
-        with: { fetch-depth: 0 }
-      - id: filter
-        uses: dorny/paths-filter@v4
-        with:
-          filters: |
-            web:
-              - 'apps/web/**'
-              - 'packages/**'
-              - 'package.json'
-              - 'pnpm-lock.yaml'
-
-  verify-web:
-    needs: changes
-    if: ${{ needs.changes.outputs.web == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/setup-workspace
-      - run: pnpm run check && pnpm run test && pnpm run build
-      - uses: actions/upload-artifact@v7
-        with:
-          name: web-dist
-          path: apps/web/dist
-          if-no-files-found: error
-
-  e2e-web:
-    needs: verify-web
-    if: ${{ needs.verify-web.result == 'success' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
-        with: { name: web-dist, path: apps/web/dist }
-      - uses: ./.github/actions/setup-workspace
-      - run: pnpm run e2e
-
-  deploy-web:
-    needs: [verify-web, e2e-web]
-    if: ${{ needs.verify-web.result == 'success' && needs.e2e-web.result == 'success' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    concurrency:
-      group: deploy-production-web
-      cancel-in-progress: false
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/download-artifact@v8
-        with: { name: web-dist, path: apps/web/dist }
-      - uses: ./.github/actions/cloudflare-pages-deploy
-        with:
-          api-token:   ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          account-id:  ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          project-name: web-prod
-          dist-dir:    apps/web/dist
-          branch:      main
-      - run: curl -fsS https://web.example.com/healthz
-```
-
-Manual re-deploy (`.github/workflows/deploy.yml`) with the same concurrency group:
+Minimal deploy anchor:
 
 ```yaml
-on:
-  workflow_dispatch:
-    inputs:
-      ref:  { type: string, default: main }
-      lane: { type: choice, options: [web], default: web }
-
-jobs:
-  deploy-web:
-    if: ${{ inputs.lane == 'web' }}
-    concurrency:
-      group: deploy-production-web   # same group as main.yml — manual + push serialize
-      cancel-in-progress: false
-    # ...build and deploy steps identical to main.yml
+deploy-web:
+  needs: [verify-web, e2e-web]
+  if: ${{ needs.verify-web.result == 'success' && needs.e2e-web.result == 'success' }}
+  concurrency: { group: deploy-production-web, cancel-in-progress: false }
+  steps:
+    - uses: actions/download-artifact@v8
+      with: { name: web-dist, path: apps/web/dist }
+    - run: curl -fsS https://web.example.com/healthz
 ```
 
 ## Guardrails

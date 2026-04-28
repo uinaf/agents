@@ -188,4 +188,4 @@ Use the web track verbatim: import [colors_and_type.css](../assets/colors_and_ty
 Native shells inevitably need patterns the web spec doesn't define (tab bars, navigation drawers, system dialogs, sheets, swipe gestures). When you invent one:
 
 1. Build it on top of the foundations — mono, near-black canvas, hairline borders, no shadows, square or 2pt corners.
-2. Document the addition in *that product's* local README under a `## design` section. Don't fold it back into this skill until at least two products use the same pattern.
+2. Document the addition in *that product's* local README under a `## design` section. Don't promote it to shared brand guidance until at least two products use the same pattern.

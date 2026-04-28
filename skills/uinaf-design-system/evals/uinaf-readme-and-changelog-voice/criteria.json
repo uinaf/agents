@@ -5,7 +5,7 @@
     {
       "name": "README title and tagline",
       "max_score": 8,
-      "description": "README.md opens with `# tccutil` (lowercase title, no quotes, no decoration) followed by a single literal one-line tagline directly below describing what the tool does. Tagline is lowercase, ends with a period, and contains no benefit / marketing language."
+      "description": "README.md opens with the project name in canonical case (for this package, `# tccutil`) followed by a single literal one-line tagline directly below describing what the tool does. Tagline uses sentence case, ends with a period, and contains no benefit / marketing language."
     },
     {
       "name": "README install block at top",
@@ -15,7 +15,7 @@
     {
       "name": "README sections match the pattern",
       "max_score": 6,
-      "description": "Section headings present include `## why`, `## docs`, `## license`. Headings are lowercase. No `## features`, `## highlights`, `## benefits`, or `## getting started` sections appear."
+      "description": "Section headings present include `## Why`, `## Docs`, `## License`. Headings use documentation casing. No `## Features`, `## Highlights`, `## Benefits`, or `## Getting Started` sections appear."
     },
     {
       "name": "README docs link uses ↗",
@@ -25,7 +25,7 @@
     {
       "name": "README license one-liner",
       "max_score": 4,
-      "description": "The `## license` section is one line containing `MIT`. The token `MIT` is the only uppercase string allowed in body content. No copyright boilerplate is duplicated."
+      "description": "The `## License` section is one line containing `MIT`. No copyright boilerplate is duplicated."
     },
     {
       "name": "README length",
@@ -35,12 +35,12 @@
     {
       "name": "CHANGELOG newest-first, dated",
       "max_score": 8,
-      "description": "CHANGELOG.md is headed `# changelog` (lowercase) and lists at least two entries newest-first. Each entry header is `## YYYY-MM-DD` or `## v0.1.0 — 2026-04-25` (em-dash, lowercase v). The 2026-04-25 entry appears above the 2026-04-22 entry."
+      "description": "CHANGELOG.md is headed `# Changelog` and lists at least two entries newest-first. Each entry header is `## YYYY-MM-DD` or `## v0.1.0 — 2026-04-25` (em-dash, lowercase v). The 2026-04-25 entry appears above the 2026-04-22 entry."
     },
     {
       "name": "CHANGELOG bullet shape",
       "max_score": 8,
-      "description": "Each entry body is a `-` bullet list. Each bullet is lowercase, ends with a period, and is one short clause. No nested bullets, no multi-line bullets, no inline links to PRs unless minimal."
+      "description": "Each entry body is a `-` bullet list. Each bullet uses sentence case, ends with a period, and is one short clause. No nested bullets, no multi-line bullets, no inline links to PRs unless minimal."
     },
     {
       "name": "CHANGELOG no categories or emoji",
@@ -48,9 +48,9 @@
       "description": "No `### Added`, `### Changed`, `### Fixed`, `### Deprecated`, or similar category subheadings. No emoji prefixes (no 🐛 ✨ 🎉 ⚡). No bracketed tags like `[BREAKING]`."
     },
     {
-      "name": "Lowercase voice across both files",
+      "name": "Documentation casing across both files",
       "max_score": 12,
-      "description": "Every visible string in both files is lowercase. Exceptions allowed: code identifiers (`tccutil`, `Camera`, `bundle-id`), URLs, file paths, the literal token `MIT` in the license section, and shell command tokens inside fenced code blocks. No Title Case, no sentence-case capitalization of headings, no all-caps."
+      "description": "README.md and CHANGELOG.md use documentation casing: proper-case headings and sentence-case body. They are NOT forced into all-lowercase product-marketing casing. Code identifiers, URLs, file paths, and shell command tokens keep canonical case."
     },
     {
       "name": "No emoji, no exclamation marks",

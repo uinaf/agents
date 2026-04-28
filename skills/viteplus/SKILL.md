@@ -23,11 +23,11 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 1. Confirm the project is on Vite 8+ and Vitest 4.1+ — VitePlus refuses older versions.
 2. Audit current scripts, workflows, Vite config, test imports, release flow, package manager, and packaging.
 3. Read [references/bootstrap.md](references/bootstrap.md) for entrypoints (`vp create`, `vp migrate`), local guidance-file discovery, and validation path.
-4. Pick the shape: [references/packages.md](references/packages.md) for standalone, [references/monorepos.md](references/monorepos.md) for workspaces (covers `vp run -t`, `vp run -r --parallel`, build-first vs source-alias).
+4. Pick the shape and load only that reference: [references/packages.md](references/packages.md) for standalone packages, or [references/monorepos.md](references/monorepos.md) for workspaces.
 5. Migrate scripts, `vite.config.ts`, test imports, hooks, and packaging together. Verify with `vp check && vp test` before moving on.
 6. Update CI per [references/ci-cd.md](references/ci-cd.md).
 7. Update tests and coverage per [references/testing.md](references/testing.md).
-8. Check [references/commands.md](references/commands.md) before changing command invocations. Cross-check [references/known-issues.md](references/known-issues.md) on unexpected behavior before assuming the repo is at fault.
+8. Check [references/commands.md](references/commands.md) before changing command invocations. Load [references/known-issues.md](references/known-issues.md) only on unexpected behavior or when upgrading VitePlus.
 9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace.
 10. To adopt a newer Vite+ release: `vp upgrade` (global), then `vp update vite-plus @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` (project). Confirm with `vp outdated`.
 11. End-to-end validation: `vp env current && vp install && vp check && vp test`, then verify `vp build` artifacts, `vp test run --coverage`, and `vp staged` on a staged change.

@@ -273,4 +273,4 @@ Workflow:
 ```
 
 - Tag prefix prevents collisions when multiple packages release independently.
-- For coordinated releases across packages, prefer changesets or release-please; this skill's pattern targets independent per-package releases.
+- For coordinated releases across packages, prefer changesets or release-please; this pipeline pattern targets independent per-package releases.

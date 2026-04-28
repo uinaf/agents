@@ -1,6 +1,6 @@
 # Workflows
 
-Use this reference when authoring or aligning the GitHub Actions workflow files.
+Use when aligning GitHub Actions release workflow files.
 
 ## File Layout
 

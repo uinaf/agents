@@ -4,13 +4,13 @@ The voice tests harder than any visual rule. If a sentence could appear on a gen
 
 ## Scope
 
-These rules apply to **product surfaces**: anything rendered in Berkeley Mono on a uinaf-controlled canvas — `uinaf.dev` and its sub-pages, blog posts, changelogs, terms, OG/social images, slides, email, terminal banners, in-product UI strings.
+These rules apply to **product and marketing surfaces**: anything rendered in Berkeley Mono on a uinaf-controlled canvas — `uinaf.dev` marketing pages, blog posts, terms, OG/social images, slides, email, terminal banners, in-product UI strings.
 
-They do **not** govern repo collaboration docs (`README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, GitHub issue and PR templates). Those render in GitHub's default chrome, target collaborators and tooling, and use proper-case headlines with sentence-case body. See [repo-docs.md](repo-docs.md) for that surface. Voice rules 2–5 below still apply there; only the lowercase rule is carved out.
+They do **not** govern documentation surfaces: product docs pages, `README.md`, `CHANGELOG.md`, `docs/*.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, GitHub issue and PR templates. Those target people looking for commands, contracts, or contributor guidance, and use proper-case headlines with sentence-case body. See [repo-docs.md](repo-docs.md) for repo collaboration docs. Voice rules 2–5 below still apply there; only the lowercase rule is carved out.
 
 ## The five rules
 
-1. **Lowercase.** Always, on product surfaces. Headings, nav, buttons, product names, the company name. The legal entity ("undefined is not a function LLC") is the only exception, and only when it must appear verbatim. Repo collaboration docs are out of scope — they use proper-case headlines and sentence-case body.
+1. **Lowercase.** Always on product and marketing surfaces. Headings, nav, buttons, product names, the company name. The legal entity ("undefined is not a function LLC") is the only exception, and only when it must appear verbatim. Documentation surfaces are out of scope — they use proper-case headlines and sentence-case body.
 2. **Short.** Single sentences. Paragraphs are 1–3 sentences. Lists run short.
 3. **Direct.** No filler ("simply", "just", "easily"), no qualifiers ("essentially", "basically"), no SaaS verbs ("empower", "unlock", "elevate", "transform").
 4. **Dry.** Wit lives in the *content*, not in punctuation. No exclamation marks. No em-dash drama. No emoji.
@@ -52,7 +52,7 @@ If a draft trips the SaaS detector, scrap it and write what the thing literally 
 
 - Code identifiers, file paths, URLs: keep their canonical case (`AGENTS.md`, `tile.json`, `https://uinaf.dev`).
 - Quoted proper nouns: keep their canonical case (`"Berkeley Mono"`, `"undefined is not a function LLC"`).
-- Everything else in body and chrome: lowercase.
+- Everything else in product-surface body and chrome: lowercase.
 
 ## Punctuation
 
@@ -88,13 +88,13 @@ Pattern: `name — literal one-line description.` Em dash. Period at end. Lowerc
 
 ## Long-form prose
 
-For terms, docs, acknowledgements: same voice, just more of it. Cordon long-form into its own scroll container so the rest of the page stays sparse. Don't adopt a separate "legal" or "documentation" register — uinaf reads the same everywhere.
+For terms and acknowledgements: same voice, just more of it. Cordon long-form into its own scroll container so the rest of the page stays sparse. Documentation keeps the same direct, dry voice, but uses documentation casing.
 
 ## Quick checklist
 
 Before shipping copy, scan for:
 
-- Any uppercase letters in body or chrome on **product surfaces** → lowercase them. Skip this check for `README.md` / `CONTRIBUTING.md` / `SECURITY.md` / `AGENTS.md` / `CLAUDE.md` and other repo collaboration docs.
+- Any uppercase letters in body or chrome on **product and marketing surfaces** → lowercase them. Skip this check for documentation surfaces: product docs pages, `README.md`, `CHANGELOG.md`, `docs/*.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, and GitHub templates.
 - Exclamation marks → delete
 - Emoji → delete
 - "empower", "unlock", "elevate", "transform", "synergies", "simply", "just", "essentially" → rewrite

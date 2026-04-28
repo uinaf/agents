@@ -1,10 +1,10 @@
 # Content
 
-Long-form text outputs that ship on **product surfaces**: blog posts, changelogs, product documentation pages (e.g. `uinaf.dev/tccutil`), terms of service, release notes.
+Long-form text outputs that ship on **product and marketing surfaces**: blog posts, terms of service, and release announcements.
 
-The voice rules from [voice.md](voice.md) apply: lowercase voice, sentence fragments, no emoji, no exclamation marks.
+The voice rules from [voice.md](voice.md) apply: lowercase voice for product and marketing copy, sentence fragments, no emoji, no exclamation marks.
 
-For `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, and other repo collaboration docs, use [repo-docs.md](repo-docs.md) instead. Those files render in GitHub's chrome, not on uinaf.dev, and follow proper-case headline rules.
+For documentation surfaces (`README.md`, `CHANGELOG.md`, product docs pages, `docs/*.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`), use documentation casing: proper-case headlines and sentence-case body. Use [repo-docs.md](repo-docs.md) for repo collaboration docs.
 
 This file documents the *structure* and *patterns* on top of the voice rules.
 
@@ -56,24 +56,24 @@ Patterns:
 
 ## Changelog
 
-Plain `CHANGELOG.md` at the repo root. Date-headed, bullet body, lowercase, terse.
+Plain `CHANGELOG.md` at the repo root is documentation, not product copy. Date-headed, bullet body, sentence-case, terse.
 
 ```md
-# changelog
+# Changelog
 
 ## 2026-04-25
 
-- new design system skill, opinionated to uinaf brand.
-- cdn now serves brand illustrations under `/images/`.
-- berkeley mono moved to variable woff2.
+- New design system skill, opinionated to uinaf brand.
+- CDN now serves brand illustrations under `/images/`.
+- Berkeley Mono moved to variable woff2.
 
 ## 2026-04-22
 
-- gt america added to cdn (six families, all weights).
+- GT America added to CDN (six families, all weights).
 
 ## 2026-04-15
 
-- repo init.
+- Repo init.
 ```
 
 If you version: `## v0.1.0 — 2026-04-25`. Em dash. Lowercase `v`. ISO date.
@@ -82,43 +82,43 @@ Patterns:
 
 - No "Added / Changed / Fixed / Deprecated" categories. The bullets are short enough that grouping is overhead.
 - No emoji prefixes (no 🐛 ✨ 🎉).
-- Each bullet: lowercase, period at end, one short clause.
+- Each bullet: sentence case, period at end, one short clause.
 - Newest entry on top.
 - Don't link to PRs in the headline. If a bullet needs evidence, append a tiny `(github ↗)` link.
 
-## Documentation page (product surface)
+## Documentation page
 
-Product docs that render on uinaf.dev (e.g. `uinaf.dev/tccutil`). For docs in a GitHub repo (`README.md`, `docs/*.md` consumed in-repo), use [repo-docs.md](repo-docs.md) instead.
+Product docs that render on uinaf.dev (e.g. `uinaf.dev/tccutil`) are documentation surfaces, even when they live on the website. They keep the uinaf voice, but use documentation casing.
 
-Same shell as a blog post but with section headings, code-heavy, scannable.
+Code-heavy and scannable.
 
 ```md
-# tool name
+# Tool Name
 
-one literal sentence about what it does.
+One literal sentence about what it does.
 
-## install
+## Installation
 
 \`\`\`bash
 brew install tool-name
 \`\`\`
 
-## usage
+## Usage
 
 \`\`\`bash
 tool-name --flag value
 \`\`\`
 
-paragraph that explains the gotcha.
+Paragraph that explains the gotcha.
 
-## options
+## Options
 
-| flag | does |
+| Flag | Does |
 | --- | --- |
-| `--flag` | one literal description. |
-| `--other` | another. |
+| `--flag` | One literal description. |
+| `--other` | Another. |
 
-## see also
+## See Also
 
 - [related-thing ↗](https://example.com)
 - [another-thing ↗](https://example.com)
@@ -126,10 +126,10 @@ paragraph that explains the gotcha.
 
 Patterns:
 
-- Section headings: lowercase, no leading verbs ("install", not "How to install").
+- Section headings: Title Case or standard documentation nouns (`Installation`, `Usage`, `Options`, `See Also`).
 - Tables for option matrices, not nested lists.
 - Code-block density is fine; uinaf docs are read by people who came for the code.
-- "See also" footer with `↗` external arrows for outbound links.
+- `See Also` footer with `↗` external arrows for outbound links.
 
 ## README
 
@@ -149,18 +149,18 @@ If a sentence reads like it came from a template lawyer-bot, rewrite it. The bra
 
 ## Release notes
 
-Release notes are a changelog entry plus 1–3 paragraphs of context for the user. Put them in the same `CHANGELOG.md` (or a `RELEASES.md` if the project distinguishes), keyed by version.
+Release notes are documentation: a changelog entry plus 1–3 paragraphs of context for the user. Put them in the same `CHANGELOG.md` (or a `RELEASES.md` if the project distinguishes), keyed by version.
 
 ```md
 ## v0.2.0 — 2026-04-25
 
-major: cli flag `--strict` is now the default. pass `--no-strict` to opt out.
+Major: CLI flag `--strict` is now the default. Pass `--no-strict` to opt out.
 
-- `--strict` now defaults on. previous behavior available via `--no-strict`.
-- new `report` subcommand emits a one-line summary on exit.
-- bumped node engine to 22.
+- `--strict` now defaults on. Previous behavior available via `--no-strict`.
+- New `report` subcommand emits a one-line summary on exit.
+- Bumped Node engine to 22.
 
-upgrade path:
+Upgrade path:
 
 \`\`\`bash
 brew upgrade tool-name
@@ -177,7 +177,7 @@ tool-name --no-strict          # to keep prior behavior
 | External link in prose | `[name ↗](url)` (the `↗` is part of the link text) |
 | Card title | product name, lowercase, no prefix |
 | Card description | one literal sentence, period at end |
-| Section subhead | lowercase: `open-source tools we actively build and maintain.` |
+| Product section subhead | lowercase: `open-source tools we actively build and maintain.` |
 | Hero h1 | sentence fragment, period optional, lowercase |
 | 404 / error | matter-of-fact: `not here. probably never was.` not `Oops!` |
 | Loading | `loading.` not `Loading…` |

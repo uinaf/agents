@@ -44,15 +44,15 @@ The following file represents the current state of the repository. Extract it be
 
 ### `README.md`
 
-A uinaf-shaped README. Title is the project name lowercase. Tagline is one literal sentence below. A single fenced bash block near the top showing install + the smallest useful invocation. Sections for `## why`, `## docs`, `## license`. No "features" section, no marketing badges, no benefit-statement copy.
+A uinaf-shaped README. Title is the project name in canonical case. Tagline is one literal sentence below, using sentence case. A single fenced bash block near the top showing install + the smallest useful invocation. Sections for `## Why`, `## Docs`, `## License`. No "Features" section, no marketing badges, no benefit-statement copy.
 
 ### `CHANGELOG.md`
 
-uinaf-shaped changelog. Date-headed (`## YYYY-MM-DD` or `## v0.1.0 — 2026-04-25`), newest entry on top. Bullet body, lowercase, period at end of each bullet. No emoji prefixes, no "Added / Changed / Fixed" categories.
+uinaf-shaped changelog. Date-headed (`## YYYY-MM-DD` or `## v0.1.0 — 2026-04-25`), newest entry on top. Bullet body, sentence case, period at end of each bullet. No emoji prefixes, no "Added / Changed / Fixed" categories.
 
 ## Hard rules to enforce
 
-- Both files are 100% lowercase, except code identifiers, file paths, URLs, and the literal token `MIT` in the license section
+- README and CHANGELOG are documentation surfaces: use proper-case headings and sentence-case body, while keeping the dry uinaf voice
 - Zero emoji
 - Zero SaaS marketing language ("empower", "unlock", "synergies", "simply", "just", "essentially", "transform", "elevate", "mission")
 - No exclamation marks
@@ -64,4 +64,4 @@ uinaf-shaped changelog. Date-headed (`## YYYY-MM-DD` or `## v0.1.0 — 2026-04-2
 
 ## Reference
 
-Voice rules: `skills/uinaf-design-system/references/voice.md`. Long-form patterns (README, changelog): `skills/uinaf-design-system/references/content.md`. Canonical brand: `skills/uinaf-design-system/references/brand-spec.md`.
+Voice rules: `skills/uinaf-design-system/references/voice.md`. Repo docs and documentation casing: `skills/uinaf-design-system/references/repo-docs.md`. Long-form patterns: `skills/uinaf-design-system/references/content.md`.

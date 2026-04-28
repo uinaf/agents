@@ -1,5 +1,5 @@
 {
-  "context": "The agent is asked to write a blog post announcing a new CLI tool release and a matching product documentation page. This scenario tests whether the agent follows the uinaf content format rules: specific blog post structure (ISO date, no preamble, no author byline), documentation page heading style (lowercase, no leading verbs), option tables, see-also links, pronoun usage, and voice rules.",
+  "context": "The agent is asked to write a blog post announcing a new CLI tool release and a matching product documentation page. This scenario tests whether the agent follows the uinaf content format rules: lowercase product-marketing copy for the blog, proper documentation casing for docs, option tables, see-also links, pronoun usage, and voice rules.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -28,9 +28,9 @@
       "description": "The blog post body (excluding front matter and code blocks) is between 200 and 800 words. Both a post under 200 words and one over 800 words fail this criterion."
     },
     {
-      "name": "Doc headings lowercase, no leading verb",
+      "name": "Doc headings use documentation casing",
       "max_score": 10,
-      "description": "All H2/H3 section headings in the documentation page are entirely lowercase and do NOT start with a verb form ('Installing', 'How to install', 'Getting started', 'Using', 'Running'). Correct examples: 'install', 'usage', 'options', 'see also'."
+      "description": "All H2/H3 section headings in the documentation page use proper documentation casing, such as 'Installation', 'Usage', 'Options', and 'See Also'. They are NOT forced into all-lowercase product-marketing casing."
     },
     {
       "name": "Options as table",

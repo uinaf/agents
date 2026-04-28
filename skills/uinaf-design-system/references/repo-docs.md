@@ -90,7 +90,7 @@ Link from `README.md` when it materially helps navigation.
   ln -s AGENTS.md CLAUDE.md
   ```
 - Use proper-case headlines here too. Agents read these files in editor and terminal contexts where lowercase headings break scanning.
-- Don't paste the brand spec into `AGENTS.md`. If brand work is a real concern in the repo, link to this skill or the relevant docs.
+- Don't paste the brand spec into `AGENTS.md`. If brand work is a real concern in the repo, link to the relevant brand guidance.
 
 ## LICENSE
 
