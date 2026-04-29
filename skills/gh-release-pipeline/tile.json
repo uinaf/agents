@@ -1,6 +1,6 @@
 {
   "name": "uinaf/gh-release-pipeline",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "summary": "Set up or align a GitHub Actions release pipeline for a versioned package, library, CLI, or marketplace action. Use when standardizing repos around the verify-then-release shape: push to main → guardrails → semantic-release tags + publishes → version-bump commit back to main with [skip ci].",
   "skills": {

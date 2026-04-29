@@ -1,6 +1,6 @@
 {
   "name": "uinaf/docs",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "private": false,
   "summary": "Update repo documentation and agent-facing guidance such as AGENTS.md, README.md, docs/, specs, plans, and runbooks. Use when code, skill, or infrastructure changes risk doc drift or when documentation needs cleanup or restructuring. Do not use for code review, runtime verification, or `agent-readiness` setup.",
   "skills": {

@@ -1,6 +1,6 @@
 {
   "name": "uinaf/skill-audit",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "private": false,
   "summary": "Audit existing skills with Tessl scoring, metadata and trigger-coverage checks, repo conventions, and skill-authoring best practices. Use when creating or revising a skill, triaging weak self-activation, or comparing a skill against source-repo guidance such as `AGENTS.md`, `CLAUDE.md`, or repo rules, plus external skill guidance. Do not use to verify general application code or to rewrite unrelated docs.",
   "skills": {

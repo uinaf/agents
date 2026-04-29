@@ -1,6 +1,6 @@
 {
   "name": "uinaf/verify",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "private": false,
   "summary": "Verify your own completed code changes using the repo's existing infrastructure and an independent evaluator context. Use after implementing a change when you need to run unit or integration tests, check build or lint gates, prove the real surface works with evidence, and challenge the changed code for clarity, deduplication, and maintainability. If the repo is not verifiable yet, hand off to `agent-readiness`; if you are reviewing someone else's code, use `review`.",
   "skills": {
