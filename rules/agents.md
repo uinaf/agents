@@ -50,6 +50,7 @@ Doc drift degrades every future agent's performance. Update docs as part of the 
 - After implementing a feature, check whether `AGENTS.md`, `README`, or architecture docs need updates
 - After renaming, moving, or deleting code, grep docs for stale references
 - After a design decision, record it before moving on
+- Write docs in current-state form. Prefer "the system does X" over "we changed X from Y"; keep before/after history only when migration context is needed
 - If it is not in the repo, it does not exist to the next agent
 - If a `docs` skill is available, use it for audits and structural updates
 

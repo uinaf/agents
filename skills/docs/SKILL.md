@@ -11,6 +11,7 @@ Keep the repo legible to humans and agents.
 
 - Docs rot silently — every code change is a possible doc change
 - Documentation is part of the interface; optimize for scanability, rhythm, and visual clarity, not just correctness
+- Describe the current state, not the edit history; use before/after wording only when migration context helps the reader
 - Routing docs stay short; depth lives in `docs/`
 - No duplication when a pointer will do
 - Use repo-relative links for in-repo docs; external links are fine in sources and references
@@ -61,6 +62,8 @@ Refresh the detailed documents that actually carry the knowledge.
 - task guides and runbooks
 - feature specs, plans, and decision records
 - readiness infrastructure docs after agent-readiness changes
+
+Write each updated section as the reader's current source of truth. Avoid "previously/now" or "before/after" framing unless the doc is a migration note, changelog, or decision record.
 
 For new features, use the directory layout and templates in [references/structuring.md](references/structuring.md) — specs, plans, and decisions each have their own shape.
 
