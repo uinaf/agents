@@ -29,6 +29,10 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "cross-harness-review",
+      "source": "uinaf/agents"
+    },
+    {
       "name": "skill-audit",
       "source": "uinaf/agents"
     },
