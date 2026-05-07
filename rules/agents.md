@@ -37,6 +37,10 @@ For non-trivial tasks, before writing code:
 - If verification infra is missing, flag it (use `agent-readiness`) — do not declare done
 - If it is not verified, it is not done
 
+### Worktree isolation
+
+- Prefer linked worktrees for non-trivial repo work: Codex under `~/.codex/worktrees/`, Claude under `~/.claude/worktrees/`
+
 ### Feedback loops
 
 - Lint, format, typecheck, push hooks are deterministic gates — never substitute agent judgment for them
