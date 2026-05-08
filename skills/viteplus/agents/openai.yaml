@@ -2,7 +2,7 @@ interface:
   display_name: "Vite+"
   short_description: "Align repos with stock Vite+"
   default_prompt: |
-    Use $vite-plus.
+    Use $viteplus.
 
     Goal: migrate or align a frontend repo with the stock Vite+ workflow.
 
