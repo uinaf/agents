@@ -95,4 +95,24 @@ Reproduce the failure, find the root cause with evidence, fix the root cause. No
 - All checks green before commit
 - Conventional Commits: `<type>(<scope>): <subject>`. Mark breaking changes with `!` or a `BREAKING CHANGE:` footer
 - Commit only the scoped change; leave unrelated diffs out
-- For non-trivial changes, the PR body lists Changed (files + intent), Risks (what to verify), and Complexity (reduced / neutral / increased — justify if increased)
+
+### Pull requests
+
+- Follow the repo's PR template when it has one. If there is no template, use this shape for non-trivial changes:
+
+```md
+## Summary
+
+## Changed
+
+## Risks
+
+## Verification
+
+## Complexity
+```
+
+- Changed lists files or surfaces with intent, not a noisy commit log
+- Risks names what could regress and what reviewers should verify
+- Verification is compact: list only the meaningful local, CI, preview, or live proof; avoid long command dumps, repeated green checks, and raw logs unless they explain a risk or failure
+- Complexity is reduced, neutral, or increased; justify increased complexity
