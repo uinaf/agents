@@ -52,6 +52,7 @@ Keep top-level docs terse and navigational.
 - For coordination or workspace repos, keep one canonical setup doc and let `README.md` point to it instead of repeating the full bootstrap flow inline
 - Use the concrete top-level split and section order in [references/documentation.md](references/documentation.md) instead of inventing a new shape every time
 - Keep visible docs copy human-facing and task-ordered; let the reference file own the detailed labeling and scannability rules
+- Use document titles or purpose labels in routing/index lists. Prefer `Contributing`, `Release workflow`, `Architecture`, or `Agent guide` over visible labels like `CONTRIBUTING.md`, `docs/RELEASE.md`, or `AGENTS.md`
 - Prefer terse routing over narrative sprawl, for example `README.md` should link to deeper docs instead of re-explaining them inline
 
 ### 3. Update deep docs and specs
@@ -74,7 +75,7 @@ For new features, use the directory layout and templates in [references/structur
 - fix cross-links and moved paths
 - keep naming and commands consistent across files
 - keep one canonical home for setup or install commands in workspace-style repos, and replace copied command blocks elsewhere with short pointers
-- normalize visible labels, casing, and section order when the docs read like a file tree instead of a user guide
+- normalize visible labels, casing, and section order when the docs read like a file tree instead of a user guide. Link targets may be paths; visible link text should usually be the document title or reader-facing purpose
 
 Example — fixing a stale path after a rename:
 
