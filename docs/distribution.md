@@ -15,7 +15,7 @@ jq -r '.name' skills/*/tile.json
 ## How publishing works
 
 - Each skill directory under `skills/*` has its own `tile.json`
-- `.github/workflows/publish-skills.yml` runs a secretless review job first, then publishes only after the `release` Environment approves the publish job
+- `.github/workflows/publish-skills.yml` runs a secretless review job first, then continuously publishes through the `release` Environment for secret scoping
 - Pushes to `main` publish only the tiles that changed
 - Manual workflow runs publish all tiles only when the run ref is `main`; non-`main` manual runs can review, but the publish job is skipped
 - The publish job uses [`uinaf/tessl-publish-action`](https://github.com/uinaf/tessl-publish-action) to detect changed tiles, run review and lint, and publish them
@@ -28,8 +28,7 @@ jq -r '.name' skills/*/tile.json
 
 Create a GitHub Environment named `release` for the publish job:
 
-- Add a required reviewer who is not the release author
-- Enable prevent self-review
+- Do not add required reviewers; releases should stay continuously publishable after the review job passes on `main`
 - Limit Environment deployment branches to `main`
 - Store the Tessl publish token as the Environment secret `TESSL_TOKEN`; do not store it as a plain repository Actions secret
 - Protect `main` so only trusted uinaf admins can update it, with force-push and branch deletion blocked where GitHub supports those controls
@@ -43,7 +42,7 @@ You can create the key either from the Tessl web UI or with the CLI:
 npx tessl api-key create --workspace uinaf --name github-actions-publish --role publisher
 ```
 
-The workflow still references the token as `${{ secrets.TESSL_TOKEN }}`; GitHub resolves that value from the `release` Environment after reviewer approval.
+The workflow still references the token as `${{ secrets.TESSL_TOKEN }}`; GitHub resolves that value from the `release` Environment when the publish job starts.
 
 ## Local checks
 
