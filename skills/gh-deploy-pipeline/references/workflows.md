@@ -10,7 +10,7 @@ Start by reading the repo's existing workflow/action files and any same-org repo
 .github/
 ├── workflows/
 │   ├── main.yml      # push to main → detect → verify → e2e → deploy → smoke
-│   ├── deploy.yml    # workflow_dispatch → re-deploy a ref + lane (no verify)
+│   ├── deploy.yml    # workflow_dispatch → re-deploy a verified artifact/image
 │   └── verify.yml    # pull_request + merge_group → verify only (no deploy)
 └── actions/
     ├── setup-workspace/        # one place to bootstrap (Node, pnpm/vite+, cache)
@@ -46,6 +46,10 @@ on:
 - `merge_group:` covers the GitHub merge queue. Without it the queue blocks PRs that depend on green checks from this workflow.
 - `pull_request: { types: [...ready_for_review] }` keeps draft PRs out of CI but picks them up the moment they're marked ready.
 - Do **not** add `push:` to `verify.yml` — the verify gate runs inside `main.yml` for push events.
+- Secret-bearing manual deploys validate `inputs.ref` in a secretless step before checkout or secret loading. Prefer `main`, protected release tags, or exact SHAs with a matching successful artifact/image.
+- Environment branch/tag rules constrain the workflow run ref; they do not prove a separately checked-out `inputs.ref` is trusted.
+- Manual redeploys download an existing artifact or pull an image by immutable digest/SHA; they do not rebuild arbitrary refs in the secret-bearing job.
+- Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or artifact/image lookup. Do not interpolate `${{ inputs.* }}` inside `run:`.
 
 ## Concurrency
 
@@ -162,6 +166,12 @@ The same artifact must flow `verify → e2e → deploy`. Upload once, download t
 - `if-no-files-found: error` catches a build that silently emits zero files into the wrong directory.
 - `include-hidden-files: true` is required for any framework that emits a leading-dot directory (`.next/`, `.output/`, `.amplify-artifacts/`).
 - Artifact names must be unique per lane (`web-dist`, `tv-dist`, `api-image-meta`); GitHub will not overwrite same-name artifacts within a run.
+
+## Caches
+
+- Caches speed dependency downloads and tool setup; they are not deployment artifacts.
+- Do not restore generated app output, package/vendor trees, container layers, or built bundles from a lower-trust workflow into a secret-bearing deploy job.
+- If deploy-time setup needs a cache, namespace by workflow, event/trust level, platform, and lockfile. The deployed artifact still comes from the current verified artifact or immutable image digest.
 
 ## Job dependencies
 

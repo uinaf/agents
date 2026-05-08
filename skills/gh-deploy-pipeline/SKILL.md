@@ -20,14 +20,14 @@ push to main
 
 Each lane is independent: a web-only change builds and deploys only web, leaving api untouched. Verify, e2e, and deploy run cancellable concurrency groups; the deploy job uses a **non-cancellable** group per `(env, lane)` so two pushes never race the same target.
 
-A separate `deploy.yml` (`workflow_dispatch`) lets a human re-deploy a specific ref + lane without re-running verify — same composite actions, same concurrency group, no path detection.
+A separate `deploy.yml` (`workflow_dispatch`) lets a human re-deploy an existing artifact or image for a validated ref + lane — same composite actions, same concurrency group, no path detection.
 
 ## Workflow
 
 1. Inspect the current repo first: existing `.github/workflows/*`, `.github/actions/*`, hosting scripts, infra files, and recent failing runs. If the org has a known-good sibling repo for the same host, read that workflow before choosing actions or inventing shell.
 2. Confirm prerequisites: `main` is the deploy branch, the host (Cloudflare/Amplify/VPS) is reachable, and the secret store (1Password Connect, AWS OIDC, or repo secrets) is wired.
 3. Pick the deploy target — [references/targets.md](references/targets.md) covers Cloudflare Pages, AWS Amplify, and GHCR + VPS (blue/green with Traefik). Each gets its own composite action under `.github/actions/<name>` so the workflow stays declarative. Prefer a working repo-local or sibling composite action over a fresh marketplace guess.
-4. Author `.github/workflows/main.yml` and (optionally) `.github/workflows/deploy.yml` per [references/workflows.md](references/workflows.md). Keep the `changes → verify → e2e → deploy` topology; do not collapse stages.
+4. Author `.github/workflows/main.yml` and (optionally) `.github/workflows/deploy.yml` per [references/workflows.md](references/workflows.md). Keep the `changes → verify → e2e → deploy` topology; manual dispatch reuses verified artifacts/images.
 5. Stand up change detection: `dorny/paths-filter@v4` for simple per-app rules, or a Turbo `--affected` walker for monorepos that need package-graph awareness. Output one boolean per deploy lane.
 6. Wire env loading via [references/secrets.md](references/secrets.md) — 1Password Connect for application env, AWS OIDC for cloud creds, GHCR auto-token for image push. Never paste secrets directly into workflow YAML.
 7. Set deploy concurrency: cancellable for verify/e2e, **non-cancellable** for deploy. Group by `(env, lane)` so a web deploy does not block an api deploy, but two web deploys serialize.
@@ -58,3 +58,4 @@ deploy-web:
 - Repo precedent beats generic advice. If a sibling repo already deploys to the same host successfully, preserve that workflow/action shape unless you can point to a concrete mismatch.
 - Deploy concurrency is non-cancellable per `(env, lane)` and shared between `main.yml` and `deploy.yml`.
 - A deploy job is not green until its smoke step has hit the deployed URL.
+- Secret-bearing deploy jobs must validate any manual input before checkout or secret loading, and must deploy a previously built artifact or image with known provenance rather than rebuilding an arbitrary input ref.

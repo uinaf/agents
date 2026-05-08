@@ -50,12 +50,12 @@
     {
       "name": "Manual deploy workflow",
       "max_score": 8,
-      "description": "A separate workflow_dispatch workflow exists (deploy.yml or equivalent) for manually re-deploying a specific ref without re-running verify"
+      "description": "A separate workflow_dispatch workflow exists (deploy.yml or equivalent) for manually re-deploying a verified artifact or image for a validated ref without re-running verify"
     },
     {
-      "name": "ref input to checkout",
+      "name": "validated redeploy ref",
       "max_score": 8,
-      "description": "The manual deploy workflow's checkout step passes `ref: ${{ inputs.ref }}` (or equivalent) to ensure the requested ref is checked out"
+      "description": "The manual deploy workflow validates the requested ref, passes it through env or outputs, and uses the validated value for checkout or artifact/image lookup rather than interpolating `inputs.ref` directly in shell"
     },
     {
       "name": "Independent lane verification",

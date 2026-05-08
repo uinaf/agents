@@ -76,7 +76,7 @@ Common failure modes when standing up or operating a deploy pipeline. Check here
 ## Preview deploy comment posts but the URL 404s
 
 - Cause: the comment was upserted before the deploy completed, or the deploy_url output was empty (the deploy step crashed after writing the comment but before publishing the artifact).
-- Fix: order is `deploy → smoke → comment`. The comment job must `needs:` the smoke job, not just the deploy job. A comment without a successful smoke is misinformation.
+- Fix: order is `deploy → smoke → comment`. The comment job must `needs:` the smoke job, not just the deploy job.
 
 ## Workflow re-runs after a deploy because the bot pushed a generated file
 
@@ -90,8 +90,8 @@ Common failure modes when standing up or operating a deploy pipeline. Check here
 
 ## Manual `workflow_dispatch` deploy ignores my `ref:` input
 
-- Cause: the deploy workflow's `actions/checkout` step is missing `with: { ref: ${{ inputs.ref }} }`. Without it, checkout falls back to the workflow's commit, not the requested ref.
-- Fix: pass `ref:` to checkout in `deploy.yml`. Sanity-check by running `git rev-parse HEAD` early in the job and confirming it matches `inputs.ref`.
+- Cause: the workflow ignores the requested ref, or passes an unvalidated input into a secret-bearing job.
+- Fix: validate `inputs.ref` in a secretless step, emit a sanitized output, then use that output for `actions/checkout` `with.ref` or artifact/image lookup. Sanity-check `git rev-parse HEAD` against the validated ref.
 
 ## Concurrency group serializes when it shouldn't
 

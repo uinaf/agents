@@ -29,6 +29,7 @@ Workflow step:
 - `registry-url` is required for `setup-node` to write the `_authToken` line. Without it, `@semantic-release/npm` cannot publish.
 - For scoped public packages set `"publishConfig": { "access": "public" }` in `package.json`.
 - For a CLI, set `"bin"` in `package.json` and verify the published tarball includes the entry. `npm pack --dry-run` locally before the first release.
+- If the release builds standalone binaries, verify every downloaded runtime or toolchain archive by digest before extracting or embedding it. Functional smoke tests prove the binary starts; they do not prove archive provenance.
 
 ## CocoaPods + SwiftPM
 
@@ -50,6 +51,7 @@ Semantic-release tags via `@semantic-release/git`; CocoaPods publish runs via `@
 - `publish-cocoapods.sh` runs `pod trunk push <podname>.podspec --allow-warnings`.
 - Secrets: `COCOAPODS_TRUNK_TOKEN` exported as env on the publish step. Trunk token is generated with `pod trunk register` once and then stored as a repo secret.
 - SwiftPM consumers pull from the git tag — no separate publish step needed.
+- Do not restore generated dependency trees such as full `Pods/` into signed or publishing jobs across trust boundaries. Cache download artifacts only, or namespace caches by workflow/trust level and regenerate/verify generated trees before signing or publishing.
 
 ## Go (GoReleaser)
 
@@ -89,6 +91,7 @@ Two-step release job:
 - `TAP_GITHUB_TOKEN` is needed only if GoReleaser publishes to a Homebrew tap in another repo (see Homebrew Tap below).
 - Add `id-token: write` and `attestations: write` to the job's `permissions:` for the attestation step.
 - `--clean` wipes `dist/` before building so a previous run cannot poison the new release.
+- Build and upload release artifacts from the release tag or verified release commit. If a workflow intentionally promotes an existing artifact, require recorded provenance: source commit, tag, build number/version, artifact digest, and producing workflow run.
 
 ## Rust
 
