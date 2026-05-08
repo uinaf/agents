@@ -1,5 +1,5 @@
 ---
-name: viteplus
+name: vite-plus
 description: "Migrate or align frontend repositories to the stock Vite+ workflow. Use when standardizing package or monorepo repos around `vp`, `voidzero-dev/setup-vp`, `vite-plus/test`, and Vite+ native CI, test, packaging, and hook flows. Default to replacing direct package-manager and Vitest wiring with the Vite+ equivalents unless the repo has a proven exception."
 ---
 
