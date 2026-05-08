@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether the agent correctly configures a TypeScript library for packaging using Vite+ conventions: using vp pack, placing pack config in vite.config.ts, using vp staged for hooks, adding pnpm overrides, and updating contributor docs.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "vp pack for library",
+      "max_score": 15,
+      "description": "The `build` or `pack` script in package.json uses `vp pack` and NOT `vp build` (since this is a library, not a web application)"
+    },
+    {
+      "name": "Pack config in vite.config.ts",
+      "max_score": 15,
+      "description": "Library packaging configuration (entry points, formats, output options) is placed inside `vite.config.ts` rather than in a separate config file"
+    },
+    {
+      "name": "No parallel tsdown config",
+      "max_score": 10,
+      "description": "The output does NOT include a `tsdown.config.ts` or `tsdown.config.js` file as a parallel packaging config"
+    },
+    {
+      "name": "vp staged for hooks",
+      "max_score": 15,
+      "description": "Pre-commit hook configuration uses `staged` inside `vite.config.ts` (the `defineConfig` `staged` property) rather than a separate `.husky/` directory, `lint-staged` config, or shell-hook wiring"
+    },
+    {
+      "name": "No Husky or lint-staged",
+      "max_score": 10,
+      "description": "The output does NOT add `husky`, `lint-staged`, or `.husky/` configuration for pre-commit hooks"
+    },
+    {
+      "name": "pnpm overrides for vite and vitest",
+      "max_score": 15,
+      "description": "The `package.json` includes a `pnpm.overrides` block (or equivalent) that adds overrides for the Vite+ wrapped `vite` and `vitest` packages"
+    },
+    {
+      "name": "No direct pnpm/npm/yarn commands",
+      "max_score": 10,
+      "description": "Scripts in package.json do NOT use `pnpm run`, `npm run`, or `yarn run` for any command that Vite+ replaces (install, test, build)"
+    },
+    {
+      "name": "Docs updated with new commands",
+      "max_score": 10,
+      "description": "The README or CONTRIBUTING file is updated to reflect the new install and build commands (references `vp install` or `vp pack` instead of `pnpm install` / old build command)"
+    }
+  ]
+}

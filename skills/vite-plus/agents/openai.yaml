@@ -1,0 +1,21 @@
+interface:
+  display_name: "Vite+"
+  short_description: "Align repos with stock Vite+"
+  default_prompt: |
+    Use $vite-plus.
+
+    Goal: migrate or align a frontend repo with the stock Vite+ workflow.
+
+    Success criteria:
+    - Scripts, tests, config, CI, hooks, and packaging use paths owned by Vite+ where the repo can support them.
+    - Repo-specific release, binary, or runtime logic is preserved when Vite+ does not replace it cleanly.
+    - The installed Vite+ behavior is verified before relying on memorized command shapes.
+
+    Constraints:
+    - Do not delete working release or packaging logic just to look stock.
+    - Do not migrate unsupported Vite or Vitest versions without surfacing the blocker.
+    - Inspect local guidance files before changing workflows.
+
+    Output: no conversational opener. Use bullet labels only: files changed, Vite+ shape, evidence, exceptions, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
+
+    Stop rules: block when required Vite+ version support, repo package shape, or command behavior cannot be verified.

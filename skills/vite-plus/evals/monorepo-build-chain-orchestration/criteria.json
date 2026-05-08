@@ -1,0 +1,51 @@
+{
+  "context": "Tests whether the agent correctly sets up root-level build and development scripts for a Vite+ monorepo containing a publishable UI library and a documentation/demo app. The key instructions involve using the correct topological build flag, avoiding a known pnpm filter bug, using the documented library-seed-then-parallel-dev pattern, and not introducing external task runners.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "vp run -t for build chain",
+      "max_score": 15,
+      "description": "The build or deploy script for the demo app uses `vp run -t` (with the topological flag) to build the app and its workspace dependencies, rather than a plain `vp run` or a package-manager filter"
+    },
+    {
+      "name": "No pnpm --filter ellipsis",
+      "max_score": 15,
+      "description": "No script or CI step uses `pnpm --filter '...<pkg>'` (leading-ellipsis form) for any transitive build or dependency-inclusive task"
+    },
+    {
+      "name": "Library build seed in dev script",
+      "max_score": 12,
+      "description": "The dev script (e.g. `dev:docs` or `dev:demo`) first runs a one-shot build of the library (`vp run <lib>#build` or equivalent) before starting the parallel dev phase — it does NOT jump straight into a parallel watch without seeding the library's dist/"
+    },
+    {
+      "name": "--parallel flag in dev",
+      "max_score": 10,
+      "description": "The dev script uses `vp run -r --parallel dev` (or equivalent) for the parallel phase that starts all packages' dev tasks simultaneously after seeding"
+    },
+    {
+      "name": "No external task-runner invented",
+      "max_score": 10,
+      "description": "The output does NOT introduce a Turborepo config (`turbo.json`), Nx workspace config (`nx.json`), or any other custom shell-based task-runner wrapper to express cross-package dependency ordering"
+    },
+    {
+      "name": "Library watch uses vp pack --watch",
+      "max_score": 10,
+      "description": "The library package's watch-mode script uses `vp pack --watch` (not `vite build --watch`, `vitest --watch`, or a plain `vp build --watch`) for the library build watcher"
+    },
+    {
+      "name": "Build-first for demo app",
+      "max_score": 10,
+      "description": "The demo/docs app does NOT configure a Vite `resolve.alias` pointing to the library's `src/` folder — the integration point is the library's built `dist/` artifact, not the source tree"
+    },
+    {
+      "name": "Single workspace-wide hook config",
+      "max_score": 8,
+      "description": "Commit-hook configuration is set at the workspace root level (e.g. in root `vite.config.ts` `staged` block or a single `vp config`-managed `.vite-hooks`) rather than defined separately per package"
+    },
+    {
+      "name": "No direct package manager for tasks owned by Vite+",
+      "max_score": 10,
+      "description": "Scripts in the root `package.json` do NOT use `pnpm run`, `npm run`, or `yarn run` for any task that Vite+ owns (install, test, build, check) — those use `vp` commands or `vp run` instead"
+    }
+  ]
+}
