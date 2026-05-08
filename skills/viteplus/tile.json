@@ -2,7 +2,7 @@
   "name": "uinaf/viteplus",
   "version": "0.1.12",
   "private": false,
-  "summary": "Migrate or align frontend repositories to the stock VitePlus workflow. Use when standardizing package or monorepo repos around `vp`, `voidzero-dev/setup-vp`, `vite-plus/test`, and VitePlus-native CI, test, and packaging flows, including updating scripts, test config, CI setup, and packaging commands.",
+  "summary": "Migrate or align frontend repositories to the stock Vite+ workflow. Use when standardizing package or monorepo repos around `vp`, `voidzero-dev/setup-vp`, `vite-plus/test`, and Vite+ native CI, test, and packaging flows, including updating scripts, test config, CI setup, and packaging commands.",
   "skills": {
     "viteplus": {
       "path": "SKILL.md"

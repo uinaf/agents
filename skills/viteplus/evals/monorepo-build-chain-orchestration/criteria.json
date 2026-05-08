@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly sets up root-level build and development scripts for a VitePlus monorepo containing a publishable UI library and a documentation/demo app. The key instructions involve using the correct topological build flag, avoiding a known pnpm filter bug, using the documented library-seed-then-parallel-dev pattern, and not introducing external task runners.",
+  "context": "Tests whether the agent correctly sets up root-level build and development scripts for a Vite+ monorepo containing a publishable UI library and a documentation/demo app. The key instructions involve using the correct topological build flag, avoiding a known pnpm filter bug, using the documented library-seed-then-parallel-dev pattern, and not introducing external task runners.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -43,9 +43,9 @@
       "description": "Commit-hook configuration is set at the workspace root level (e.g. in root `vite.config.ts` `staged` block or a single `vp config`-managed `.vite-hooks`) rather than defined separately per package"
     },
     {
-      "name": "No direct package manager for VitePlus-owned tasks",
+      "name": "No direct package manager for tasks owned by Vite+",
       "max_score": 10,
-      "description": "Scripts in the root `package.json` do NOT use `pnpm run`, `npm run`, or `yarn run` for any task that VitePlus owns (install, test, build, check) — those use `vp` commands or `vp run` instead"
+      "description": "Scripts in the root `package.json` do NOT use `pnpm run`, `npm run`, or `yarn run` for any task that Vite+ owns (install, test, build, check) — those use `vp` commands or `vp run` instead"
     }
   ]
 }

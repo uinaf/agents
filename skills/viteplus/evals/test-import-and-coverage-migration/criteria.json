@@ -40,7 +40,7 @@
     {
       "name": "Coverage-v8 caveat documented",
       "max_score": 10,
-      "description": "The output notes or acknowledges that mixed-version warnings from `@vitest/coverage-v8` are a known VitePlus limitation (not a repo bug), in migration notes or comments"
+      "description": "The output notes or acknowledges that mixed-version warnings from `@vitest/coverage-v8` are a known Vite+ limitation (not a repo bug), in migration notes or comments"
     }
   ]
 }

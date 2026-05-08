@@ -1,21 +1,21 @@
-# VitePlus Upgrade for a Production TypeScript Library
+# Vite+ Upgrade for a Production TypeScript Library
 
 ## Problem Description
 
-The Nexus UI team maintains a widely-used TypeScript component library that was migrated to VitePlus six months ago. VitePlus has since released several updates with bug fixes and new features the team wants to take advantage of, particularly improvements to the type-aware lint pass and faster test startup times.
+The Nexus UI team maintains a widely-used TypeScript component library that was migrated to Vite+ six months ago. Vite+ has since released several updates with bug fixes and new features the team wants to take advantage of, particularly improvements to the type-aware lint pass and faster test startup times.
 
 The team's senior engineer is on leave, and the remaining engineers are unsure of the correct upgrade procedure. A previous attempt by a well-meaning team member ran `pnpm update vite-plus` directly, which updated the `package.json` entry for `vite-plus` but left the project in a broken state — `vp check` was reporting errors that hadn't existed before and `vp test` was running the wrong Vitest version. It took an hour of debugging to realize the issue: some underlying packages hadn't been updated.
 
-The team needs a clear, correct upgrade runbook they can follow now and reuse for future upgrades. They also want a shell script (`upgrade-viteplus.sh`) that automates the steps so that future upgrades are one-command operations. The script should handle both the local tooling on the developer's machine and the project-level dependencies, in the right order, and include verification steps so the engineer knows the upgrade succeeded before they push.
+The team needs a clear, correct upgrade runbook they can follow now and reuse for future upgrades. They also want a shell script (`upgrade-vite-plus.sh`) that automates the steps so that future upgrades are one-command operations. The script should handle both the local tooling on the developer's machine and the project-level dependencies, in the right order, and include verification steps so the engineer knows the upgrade succeeded before they push.
 
 ## Output Specification
 
 Produce the following files:
 
-- `upgrade-viteplus.sh` — a shell script that performs the complete upgrade procedure in the correct order, including verification
+- `upgrade-vite-plus.sh` — a shell script that performs the complete upgrade procedure in the correct order, including verification
 - `UPGRADE.md` — a human-readable runbook explaining each step, why it is needed, and what to do if a step fails
 
-Both files should document all necessary steps a developer would need to run to fully upgrade VitePlus. The script should be executable as-is (no placeholder TODOs).
+Both files should document all necessary steps a developer would need to run to fully upgrade Vite+. The script should be executable as-is (no placeholder TODOs).
 
 ## Input Files
 

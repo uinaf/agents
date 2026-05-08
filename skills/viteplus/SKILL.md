@@ -1,11 +1,11 @@
 ---
 name: viteplus
-description: "Migrate or align frontend repositories to the stock VitePlus workflow. Use when standardizing package or monorepo repos around `vp`, `voidzero-dev/setup-vp`, `vite-plus/test`, and VitePlus-native CI, test, packaging, and hook flows. Default to replacing direct package-manager and Vitest wiring with the VitePlus equivalents unless the repo has a proven exception."
+description: "Migrate or align frontend repositories to the stock Vite+ workflow. Use when standardizing package or monorepo repos around `vp`, `voidzero-dev/setup-vp`, `vite-plus/test`, and Vite+ native CI, test, packaging, and hook flows. Default to replacing direct package-manager and Vitest wiring with the Vite+ equivalents unless the repo has a proven exception."
 ---
 
-# VitePlus
+# Vite+
 
-Move a frontend repo closer to the stock VitePlus toolchain without blindly deleting repo-specific release or runtime logic. VitePlus is in alpha — verify behavior against installed `vp --version` and the latest [release notes](https://github.com/voidzero-dev/vite-plus/releases) rather than memorized command shapes.
+Move a frontend repo closer to the stock Vite+ toolchain without blindly deleting repo-specific release or runtime logic. Vite+ is in alpha — verify behavior against installed `vp --version` and the latest [release notes](https://github.com/voidzero-dev/vite-plus/releases) rather than memorized command shapes.
 
 ## Migration Targets
 
@@ -20,14 +20,14 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 
 ## Workflow
 
-1. Confirm the project is on Vite 8+ and Vitest 4.1+ — VitePlus refuses older versions.
+1. Confirm the project is on Vite 8+ and Vitest 4.1+ — Vite+ refuses older versions.
 2. Audit current scripts, workflows, Vite config, test imports, release flow, package manager, and packaging.
 3. Read [references/bootstrap.md](references/bootstrap.md) for entrypoints (`vp create`, `vp migrate`), local guidance-file discovery, and validation path.
 4. Pick the shape and load only that reference: [references/packages.md](references/packages.md) for standalone packages, or [references/monorepos.md](references/monorepos.md) for workspaces.
 5. Migrate scripts, `vite.config.ts`, test imports, hooks, and packaging together. Verify with `vp check && vp test` before moving on.
 6. Update CI per [references/ci-cd.md](references/ci-cd.md).
 7. Update tests and coverage per [references/testing.md](references/testing.md).
-8. Check [references/commands.md](references/commands.md) before changing command invocations. Load [references/known-issues.md](references/known-issues.md) only on unexpected behavior or when upgrading VitePlus.
+8. Check [references/commands.md](references/commands.md) before changing command invocations. Load [references/known-issues.md](references/known-issues.md) only on unexpected behavior or when upgrading Vite+.
 9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace.
 10. To adopt a newer Vite+ release: `vp upgrade` (global), then `vp update vite-plus @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` (project). Confirm with `vp outdated`.
 11. End-to-end validation: `vp env current && vp install && vp check && vp test`, then verify `vp build` artifacts, `vp test run --coverage`, and `vp staged` on a staged change.
@@ -70,7 +70,7 @@ export default defineConfig({
 
 - Prefer `vp create` / `vp migrate --agent <name> --editor <name>` over hand-rolling agent or editor config.
 - Do not delete release workflows, binary packaging, or publish steps just to look more "stock."
-- If `vp check` is not running type-aware lint or type checks, confirm `lint.options.typeAware` and `lint.options.typeCheck` in `vite.config.ts`, and check for `compilerOptions.baseUrl` in `tsconfig.json` — `tsgolint` does not support `baseUrl` and VitePlus silently skips type-aware checks when it is present.
+- If `vp check` is not running type-aware lint or type checks, confirm `lint.options.typeAware` and `lint.options.typeCheck` in `vite.config.ts`, and check for `compilerOptions.baseUrl` in `tsconfig.json` — `tsgolint` does not support `baseUrl` and Vite+ silently skips type-aware checks when it is present.
 
 ## Known Caveats
 

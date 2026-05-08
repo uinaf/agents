@@ -1,10 +1,10 @@
 # Testing
 
-Use this reference when migrating tests to VitePlus-native usage.
+Use this reference when migrating tests to Vite+ native usage.
 
 ## Defaults
 
-- Import from `vite-plus/test` instead of `vitest` when migrating to VitePlus.
+- Import from `vite-plus/test` instead of `vitest` when migrating to Vite+.
 - Browser-mode imports become `vite-plus/test/browser/context` instead of `@vitest/browser/context`.
 - Move coverage and test-command wiring together with script updates.
 - Verify both the default test pass and any coverage mode the repo actually depends on.
@@ -19,7 +19,7 @@ Use this reference when migrating tests to VitePlus-native usage.
 
 ## Configuration
 
-- Put test config in the `test` block in `vite.config.ts`. Do not maintain a parallel `vitest.config.ts` once the repo is on VitePlus.
+- Put test config in the `test` block in `vite.config.ts`. Do not maintain a parallel `vitest.config.ts` once the repo is on Vite+.
 
 ```ts
 import { defineConfig } from 'vite-plus'
@@ -44,5 +44,5 @@ After rewriting imports, remove the standalone `vitest` dependency. Keep the npm
 
 ## Caveats
 
-- Adding `@vitest/coverage-v8` to a VitePlus project can still produce a mixed-version warning during `vp test run --coverage`, even in a fresh stock scaffold. Treat that as a VitePlus limitation to verify and document, not as an automatic repo regression.
+- Adding `@vitest/coverage-v8` to a Vite+ project can still produce a mixed-version warning during `vp test run --coverage`, even in a fresh stock scaffold. Treat that as a Vite+ limitation to verify and document, not as an automatic repo regression.
 - `@cloudflare/vitest-pool-workers` currently fails under `vp test` (`Cannot read properties of undefined (reading 'config')`) while plain `vitest run` works. For Workers packages, keep the legacy `vitest` invocation until the upstream fix lands (tracking: voidzero-dev/vite-plus#1076).

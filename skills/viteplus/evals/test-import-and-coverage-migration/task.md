@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-The `@acme/parser` library was originally written against Vitest directly. Since then, the team has adopted VitePlus as their standard frontend toolchain. The test files still import from `vitest` and the package scripts still run tests through the old vitest invocation. New contributors are confused because the setup instructions in the README reference the old commands, but the installed toolchain suggests a different way to run tests.
+The `@acme/parser` library was originally written against Vitest directly. Since then, the team has adopted Vite+ as their standard frontend toolchain. The test files still import from `vitest` and the package scripts still run tests through the old vitest invocation. New contributors are confused because the setup instructions in the README reference the old commands, but the installed toolchain suggests a different way to run tests.
 
 A developer on the team has been asked to bring the test setup in line with how the toolchain expects things to work. The existing tests themselves are fine and should not be rewritten — only the import sources, test runner scripts, and coverage configuration need to change. The developer should also leave notes on anything that might look like a problem but isn't.
 

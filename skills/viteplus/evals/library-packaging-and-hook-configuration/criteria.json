@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly configures a TypeScript library for packaging using VitePlus conventions: using vp pack, placing pack config in vite.config.ts, using vp staged for hooks, adding pnpm overrides, and updating contributor docs.",
+  "context": "Tests whether the agent correctly configures a TypeScript library for packaging using Vite+ conventions: using vp pack, placing pack config in vite.config.ts, using vp staged for hooks, adding pnpm overrides, and updating contributor docs.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -30,12 +30,12 @@
     {
       "name": "pnpm overrides for vite and vitest",
       "max_score": 15,
-      "description": "The `package.json` includes a `pnpm.overrides` block (or equivalent) that adds overrides for the VitePlus-wrapped `vite` and `vitest` packages"
+      "description": "The `package.json` includes a `pnpm.overrides` block (or equivalent) that adds overrides for the Vite+ wrapped `vite` and `vitest` packages"
     },
     {
       "name": "No direct pnpm/npm/yarn commands",
       "max_score": 10,
-      "description": "Scripts in package.json do NOT use `pnpm run`, `npm run`, or `yarn run` for any command that VitePlus replaces (install, test, build)"
+      "description": "Scripts in package.json do NOT use `pnpm run`, `npm run`, or `yarn run` for any command that Vite+ replaces (install, test, build)"
     },
     {
       "name": "Docs updated with new commands",

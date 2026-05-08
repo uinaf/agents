@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly consolidates a project's fragmented configuration files into a single vite.config.ts following VitePlus conventions, enables type-aware lint options, and handles the baseUrl incompatibility with VitePlus type-aware checks that causes silent failures.",
+  "context": "Tests whether the agent correctly consolidates a project's fragmented configuration files into a single vite.config.ts following Vite+ conventions, enables type-aware lint options, and handles the baseUrl incompatibility with Vite+ type-aware checks that causes silent failures.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -30,7 +30,7 @@
     {
       "name": "baseUrl incompatibility addressed",
       "max_score": 15,
-      "description": "The `compilerOptions.baseUrl` is either removed from `tsconfig.json` OR the output explicitly documents that `baseUrl` causes VitePlus to silently skip type-aware checks and recommends removing it"
+      "description": "The `compilerOptions.baseUrl` is either removed from `tsconfig.json` OR the output explicitly documents that `baseUrl` causes Vite+ to silently skip type-aware checks and recommends removing it"
     },
     {
       "name": "Staged config in vite.config.ts",

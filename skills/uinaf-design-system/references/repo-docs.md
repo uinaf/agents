@@ -98,12 +98,12 @@ Most uinaf projects ship under MIT. The `LICENSE` file is the canonical text; `R
 
 ## Verify and delivery — the short version
 
-The detailed model lives in other skills (`viteplus`, `agent-readiness`, `gh-release-pipeline`, and `gh-deploy-pipeline`). uinaf's expectations at the repo-doc level:
+The detailed model lives in the Vite+ skill, plus `agent-readiness`, `gh-release-pipeline`, and `gh-deploy-pipeline`. uinaf's expectations at the repo-doc level:
 
 - One repo-local `verify` entrypoint (`pnpm verify` for TypeScript) that gates everything.
 - Every merge to `main` is assumed publishable or deployable. Document the publish path in `CONTRIBUTING.md` so contributors aren't surprised when their merged commit ships.
 - Conventional Commits for commit messages. `feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `ci`, `build`. Breaking changes marked with `!` or a `BREAKING CHANGE:` footer.
-- VitePlus is the default toolchain for new TypeScript repos. Drive `vp` per package, `pnpm` workspace-wide. Don't invoke `vite` or `vitest` directly.
+- Vite+ is the default toolchain for new TypeScript repos. Drive `vp` per package, `pnpm` workspace-wide. Don't invoke `vite` or `vitest` directly.
 
 If the repo can't currently boot, verify, or deliver autonomously, that's an `agent-readiness` problem, not a docs problem — but the docs should reflect reality, not aspiration.
 

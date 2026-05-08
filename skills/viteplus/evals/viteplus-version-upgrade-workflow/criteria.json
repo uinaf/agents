@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly handles a VitePlus version upgrade by distinguishing between the global CLI upgrade surface and the project-local upgrade surface, explicitly updating the VitePlus core and test aliases that are NOT automatically re-resolved by a simple package update, and performing the correct end-to-end validation sequence.",
+  "context": "Tests whether the agent correctly handles a Vite+ version upgrade by distinguishing between the global CLI upgrade surface and the project-local upgrade surface, explicitly updating the Vite+ core and test aliases that are NOT automatically re-resolved by a simple package update, and performing the correct end-to-end validation sequence.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -48,9 +48,9 @@
       "description": "The validation sequence includes `vp build` or `vp pack` (as appropriate for the project type) to verify build artifacts after the upgrade"
     },
     {
-      "name": "No direct package manager for VitePlus packages",
+      "name": "No direct package manager for Vite+ packages",
       "max_score": 5,
-      "description": "The upgrade steps do NOT use `npm install`, `pnpm update`, `yarn upgrade`, or other direct package-manager commands for the VitePlus packages — all updates go through `vp update`"
+      "description": "The upgrade steps do NOT use `npm install`, `pnpm update`, `yarn upgrade`, or other direct package-manager commands for the Vite+ packages — all updates go through `vp update`"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # Packages
 
-Use this reference for standalone package repos adopting VitePlus.
+Use this reference for standalone package repos adopting Vite+.
 
 ## Defaults
 
@@ -10,7 +10,7 @@ Use this reference for standalone package repos adopting VitePlus.
 
 ## Aliased Dependencies
 
-- `pnpm` repos should add overrides for VitePlus-wrapped `vite` and `vitest`:
+- `pnpm` repos should add overrides for Vite+ wrapped `vite` and `vitest`:
 
   ```yaml
   # pnpm-workspace.yaml
@@ -24,5 +24,5 @@ Use this reference for standalone package repos adopting VitePlus.
 ## Notes
 
 - `vp pack --watch` is the watch-mode equivalent for libraries; pair it with `vp run -r --parallel dev` in monorepos that consume the library via `dist/`.
-- Keep SDK, codegen, or bootstrap steps that VitePlus does not replace.
+- Keep SDK, codegen, or bootstrap steps that Vite+ does not replace.
 - Update docs when install, test, or packaging commands change.

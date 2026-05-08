@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly migrates GitHub Actions CI to the VitePlus-native setup, using the right setup action and install commands, while preserving release steps and using vp run for repo-specific scripts.",
+  "context": "Tests whether the agent correctly migrates GitHub Actions CI to the Vite+ native setup, using the right setup action and install commands, while preserving release steps and using vp run for repo-specific scripts.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -25,7 +25,7 @@
     {
       "name": "vp run for custom scripts",
       "max_score": 10,
-      "description": "Any repo-specific scripts not replaced by VitePlus built-ins are invoked via `vp run <script>` (or the `vpr <script>` shorthand) rather than `pnpm run` or `npm run`"
+      "description": "Any repo-specific scripts not replaced by Vite+ built-ins are invoked via `vp run <script>` (or the `vpr <script>` shorthand) rather than `pnpm run` or `npm run`"
     },
     {
       "name": "No direct package manager commands",

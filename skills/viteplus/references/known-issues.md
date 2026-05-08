@@ -1,6 +1,6 @@
 # Known Issues (alpha)
 
-VitePlus is still in alpha. These are real, recent caveats observed against the upstream issue tracker. Surface them only if the repo actually hits them — do not preemptively work around something a stock setup is fine with. Re-check this list against [the issue tracker](https://github.com/voidzero-dev/vite-plus/issues) when adopting a newer release.
+Vite+ is still in alpha. These are real, recent caveats observed against the upstream issue tracker. Surface them only if the repo actually hits them — do not preemptively work around something a stock setup is fine with. Re-check this list against [the issue tracker](https://github.com/voidzero-dev/vite-plus/issues) when adopting a newer release.
 
 ## Hook runner compatibility
 
@@ -33,6 +33,6 @@ Some package managers (notably bun, sometimes npm) install two physical copies o
 
 ## `@vitest/coverage-v8` mixed-version warnings
 
-Adding `@vitest/coverage-v8` to a VitePlus project can still produce a mixed-version warning during `vp test run --coverage`, even in a fresh stock scaffold.
+Adding `@vitest/coverage-v8` to a Vite+ project can still produce a mixed-version warning during `vp test run --coverage`, even in a fresh stock scaffold.
 
-- Treat as a known VitePlus limitation. Verify the same warning reproduces in a fresh stock scaffold before calling it a repo bug.
+- Treat as a known Vite+ limitation. Verify the same warning reproduces in a fresh stock scaffold before calling it a repo bug.

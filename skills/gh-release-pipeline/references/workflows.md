@@ -106,7 +106,7 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Th
 ```
 
 ```yaml
-# Node via VitePlus
+# Node via Vite+
 - uses: voidzero-dev/setup-vp@v1
   with: { node-version-file: ".node-version", cache: true }
 - run: vp install

@@ -2,9 +2,9 @@
 
 ## Problem/Feature Description
 
-The `@acme/utils` team maintains a TypeScript utility library used across several internal products. Their GitHub Actions setup was written before VitePlus was adopted and still uses a hand-rolled Node bootstrapping pattern: they install Corepack, activate pnpm through it, and run `pnpm install` manually before running tests with a direct vitest invocation. The CI also includes a separate release workflow that handles npm publishing and creating GitHub releases.
+The `@acme/utils` team maintains a TypeScript utility library used across several internal products. Their GitHub Actions setup was written before Vite+ was adopted and still uses a hand-rolled Node bootstrapping pattern: they install Corepack, activate pnpm through it, and run `pnpm install` manually before running tests with a direct vitest invocation. The CI also includes a separate release workflow that handles npm publishing and creating GitHub releases.
 
-The team has since fully adopted VitePlus as their toolchain. Their tech lead wants to standardize CI to match the current toolchain and reduce maintenance overhead — ideally by trimming the bootstrap boilerplate — while making sure nothing in the release process breaks.
+The team has since fully adopted Vite+ as their toolchain. Their tech lead wants to standardize CI to match the current toolchain and reduce maintenance overhead — ideally by trimming the bootstrap boilerplate — while making sure nothing in the release process breaks.
 
 ## Output Specification
 
