@@ -37,8 +37,16 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "shadcn",
+      "source": "https://github.com/shadcn/ui"
+    },
+    {
       "name": "uinaf-design-system",
       "source": "uinaf/agents"
+    },
+    {
+      "name": "vercel-react-best-practices",
+      "source": "https://github.com/vercel-labs/agent-skills"
     },
     {
       "name": "verify",
