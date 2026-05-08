@@ -85,6 +85,7 @@ The split is intentional: anything that walks the workspace graph goes through `
 
 - `vp run` of a `package.json` script is uncached by default. Opt in with `vp run --cache <script>` for one invocation, set `run.cache.scripts: true` in `vite.config.ts` to flip the default workspace-wide, or move the task into `vite.config.ts` (cached by default).
 - Compound commands joined with `&&` are split into independent sub-tasks, each cached separately. When a script contains `vp run`, Vite Task inlines those nested calls as sibling tasks instead of spawning a nested process — recursion (root `build` → `vp run -r build` → root `build` …) is detected and the self-reference is pruned automatically.
+- Some targets cannot infer task inputs automatically. If Vite+ reports that a task ran uncached because `input` was not configured, add explicit task inputs in `vite.config.ts` instead of assuming cache is broken.
 - Caveat: `vp check` invoked inside a `run.tasks` `command` (e.g. `"command": "vp check && vp test"`) currently bypasses the normal cache configuration and runs uncached. If cache-hit-rate matters, expose `vp check` as its own task and reference it via `dependsOn` instead of inlining. Tracking: voidzero-dev/vite-plus#994.
 
 ## Graduating to `vite.config.ts` task definitions

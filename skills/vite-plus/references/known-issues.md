@@ -2,14 +2,6 @@
 
 Vite+ is still in alpha. These are real, recent caveats observed against the upstream issue tracker. Surface them only if the repo actually hits them — do not preemptively work around something a stock setup is fine with. Re-check this list against [the issue tracker](https://github.com/voidzero-dev/vite-plus/issues) when adopting a newer release.
 
-## Hook runner compatibility
-
-`vp` opens `/dev/tty` directly, which causes it to hang when spawned by non-interactive hook tools such as lefthook.
-
-- Prefer the stock `vp config` / `.vite-hooks` path.
-- If the repo has a reason to use lefthook or similar, run the hook command through `vp run --silent` and verify it returns under load before merging.
-- Tracking: [voidzero-dev/vite-plus#1396](https://github.com/voidzero-dev/vite-plus/issues/1396).
-
 ## `vp check --fix` on a single file
 
 Single-file invocations can emit spurious `TS2591` errors for `node:*` imports while a full-project `vp check --fix` passes.
