@@ -9,21 +9,43 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  publish:
+  review:
     runs-on: ubuntu-latest
+    env:
+      TESSL_AUTO_UPDATE_INTERVAL_MINUTES: "0"
+      TESSL_THRESHOLD: "90"
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+
+      - name: Review skills with Tessl
+        run: ./scripts/skills/review.sh
+
+  publish:
+    needs: review
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
       - name: Set up Tessl
-        uses: tesslio/setup-tessl@v2
+        uses: tesslio/setup-tessl@25ec223fc0da33b41b8044ff5ab2b85235f4f91e # v2
         with:
           token: ${{ secrets.TESSL_TOKEN }}
 
       - name: Publish changed tiles
-        uses: uinaf/tessl-publish-action@v2.0.0
+        uses: uinaf/tessl-publish-action@4e224c708ac4253ed901ef9125bccfa73a9cd5ba # v2.0.0
         with:
           review-threshold: "90"
