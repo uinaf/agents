@@ -63,6 +63,11 @@ Use when aligning GitHub Actions release workflow files.
   attestations: write
   ```
 
+## Runners
+
+- Use GitHub-hosted floating runner labels for routine CI and release jobs: `ubuntu-latest`, `windows-latest`, and `macos-latest`.
+- Pin a runner image only when the OS image is part of the tested toolchain contract, and document that reason next to the workflow or in the repo release docs.
+
 ## Settings and Secrets
 
 - Check live settings before severity or remediation calls: `main` rules, release tag rules, Actions permission policy, Environment reviewers/branch policy, and publish secret location.
