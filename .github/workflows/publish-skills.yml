@@ -33,7 +33,9 @@ jobs:
     needs: review
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    environment: release
+    environment:
+      name: release
+      deployment: false
     permissions:
       contents: write
     steps:

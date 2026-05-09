@@ -67,6 +67,8 @@ Use when aligning GitHub Actions release workflow files.
 
 - Check live settings before severity or remediation calls: `main` rules, release tag rules, Actions permission policy, Environment reviewers/branch policy, and publish secret location.
 - Continuous releases should use Environment-scoped secrets without approval gates. Use separate reviewer-gated environments only when a human must approve signing, production promotion, or store submission.
+- Package/library/CLI/marketplace release jobs that use an Environment only to read publish secrets set `deployment: false`. This keeps Environment secrets, variables, and branch policy without creating GitHub Deployment records.
+- Keep deployment records enabled for running-service/app deploys and for Environments that use custom deployment protection rules.
 
 ## Release Tooling
 

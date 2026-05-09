@@ -27,7 +27,7 @@ Both jobs check out at `fetch-depth: 0`. The verify job is gated by a cancellabl
 3. Pick the publish target — [references/targets.md](references/targets.md) covers npm, CocoaPods/SwiftPM, Go (GoReleaser), Rust (release-plz + cargo-dist), GitHub Actions marketplace, and Homebrew tap automation. Prefer an existing working repo pattern over a generic marketplace action.
 4. Author `.github/workflows/ci.yml` with verify and release jobs per [references/workflows.md](references/workflows.md).
 5. Add release config (`.releaserc.json`, `release.config.js`, or a `"release"` block in `package.json`) per [references/semantic-release.md](references/semantic-release.md).
-6. Wire publish secrets in repo settings (`NPM_TOKEN`, `COCOAPODS_TRUNK_TOKEN`, `TAP_GITHUB_TOKEN`, etc.) and scope each job's `permissions:` to the exact write surface it needs.
+6. Wire publish secrets in a protected `release` Environment (`NPM_TOKEN`, `COCOAPODS_TRUNK_TOKEN`, `TAP_GITHUB_TOKEN`, etc.) and scope each job's `permissions:` to the exact write surface it needs. Package/library/CLI/marketplace publishes use the Environment as a secret boundary with `deployment: false`.
 7. Add the `[skip ci]` short-circuit to both jobs so the bump commit does not retrigger.
 8. For secret-bearing release/backfill jobs, use trusted checkout refs and validated manual inputs per [references/workflows.md](references/workflows.md).
 9. Set bot identity (`GIT_AUTHOR_NAME`/`GIT_COMMITTER_NAME` + emails) so the bump commit is attributed to the token actor or release bot, not the last human pusher.
