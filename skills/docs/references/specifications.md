@@ -139,4 +139,4 @@ The fundamental tension: specs and code live at different cadences. Without enfo
 - Full SDD adds ceremony that may not be warranted for small features
 - For truly novel work where you don't know what you're building, vibe code first → spec later
 - Specs can become stale overhead if the team doesn't have the discipline to maintain them
-- "Agentic engineering enables waterfall volume at the cadence of agile" — don't accidentally reintroduce waterfall
+- "Agentic engineering enables waterfall volume at the cadence of agile" — keep discovery and delivery iterative

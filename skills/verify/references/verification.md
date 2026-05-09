@@ -1,6 +1,6 @@
 # Verification
 
-Prove your own changes work on real surfaces. The agent that wrote the code must not verify it in the same context.
+Prove your own changes work on real surfaces. Independent ship decisions belong to a separate review context.
 
 ## Sources
 
@@ -28,7 +28,7 @@ Prove your own changes work on real surfaces. The agent that wrote the code must
 2. Can you boot the app?
 3. Can you interact with it? (Playwright CLI for UI, curl for APIs, CLI invocation)
 4. Can you verify your own work from a fresh evaluator context or separate subagent?
-5. If not, flag as a readiness gap — don't improvise a one-off check
+5. If not, flag it as a readiness gap and define the durable check the repo needs
 
 ## Checks
 

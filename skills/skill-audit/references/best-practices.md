@@ -17,7 +17,7 @@ Use it when an audit finds weak activation, a bloated `SKILL.md`, or unclear wor
 ## Body Shape
 
 - keep `SKILL.md` focused on the workflow, principles, boundaries, and routing
-- assume the model is already smart; do not spend tokens explaining basics
+- assume the model is already smart; spend tokens on repo-specific judgment
 - match the level of instruction to the task:
   - high freedom for contextual judgment
   - medium freedom when a preferred pattern exists

@@ -36,7 +36,7 @@ codex --version
 codex login status
 ```
 
-Report only installed/authenticated status. Do not print account details, tokens, or config contents.
+Report only installed/authenticated status. Keep account details, tokens, and config contents out of the report.
 
 ## Shared Prompt
 
@@ -47,7 +47,7 @@ then evidence, unverified, next, and optional notes.
 
 Target: <uncommitted diff | branch vs base | commit | PR | paths>
 
-Review read-only. Do not edit files, stage changes, commit, or apply fixes.
+Review read-only. Leave files, staging, commits, and fixes untouched.
 Prioritize bugs, regressions, missing tests, silent failures, and contract drift. Use concise evidence with file/line references and targeted command results.
 ```
 
@@ -62,7 +62,7 @@ claude -p \
   "<review prompt>"
 ```
 
-Do not use hosted `claude ultrareview` unless the user explicitly asks and accepts the cost.
+Use hosted `claude ultrareview` only when the user explicitly asks and accepts the cost.
 
 ## Claude Active
 

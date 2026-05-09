@@ -47,7 +47,7 @@ Mismatched presets produce inconsistent version decisions and notes.
 ```
 
 - `assets` is the explicit list of files the bump commit includes. Add `pnpm-lock.yaml`, `Package.swift`, `<podname>.podspec`, or other manifests as needed.
-- The `[skip ci]` token in the message is what gates re-triggering. Do not rename it.
+- Keep the `[skip ci]` token in the message; it gates re-triggering.
 - For a tag-only release (no source bump — see GoReleaser flows), omit this plugin entirely.
 
 ## Branch Configuration
@@ -68,7 +68,7 @@ Add prerelease channels only when the repo actually publishes them:
 }
 ```
 
-A prerelease branch creates a separate npm dist-tag and GitHub Release. Do not enable preemptively.
+A prerelease branch creates a separate npm dist-tag and GitHub Release. Enable it when the repo has an actual prerelease lane.
 
 ## Config File Location
 
@@ -91,5 +91,7 @@ The dry-run prints the computed version and notes without tagging or publishing.
 Use `cycjimmy/semantic-release-action@v4` (or the latest v6 if the repo is on it). Inputs worth knowing:
 
 - `working_directory` — for monorepo packages.
-- `extra_plugins` — install plugins not declared in `package.json`. Prefer declaring them in `devDependencies` so the version is pinned.
+- `extra_plugins` — install CI/CD-only release plugins without polluting the repo's runtime or dev dependency graph. Pin every entry to an exact version such as `@semantic-release/npm@13.1.5`; use exact package specs in secret-bearing release jobs.
 - `semantic_version` — pin the semantic-release major to keep release behavior reproducible.
+
+Keep semantic-release dependencies in `package.json` only when the repo intentionally owns local release execution, such as a documented `release` script developers run or a lockfile-owned release wrapper. For normal GitHub Actions release jobs, keep release-only plugins in the action's `extra_plugins` input and pin them there.

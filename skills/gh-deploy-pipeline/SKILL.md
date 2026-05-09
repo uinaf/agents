@@ -29,7 +29,7 @@ A separate `deploy.yml` (`workflow_dispatch`) lets a human re-deploy an existing
 3. Pick the deploy target — [references/targets.md](references/targets.md) covers Cloudflare Pages, AWS Amplify, and GHCR + VPS (blue/green with Traefik). Each gets its own composite action under `.github/actions/<name>` so the workflow stays declarative. Prefer a working repo-local or sibling composite action over a fresh marketplace guess.
 4. Author `.github/workflows/main.yml` and (optionally) `.github/workflows/deploy.yml` per [references/workflows.md](references/workflows.md). Keep the `changes → verify → e2e → deploy` topology; manual dispatch reuses verified artifacts/images.
 5. Stand up change detection: `dorny/paths-filter@v4` for simple per-app rules, or a Turbo `--affected` walker for monorepos that need package-graph awareness. Output one boolean per deploy lane.
-6. Wire env loading via [references/secrets.md](references/secrets.md) — 1Password Connect for application env, AWS OIDC for cloud creds, GHCR auto-token for image push. Never paste secrets directly into workflow YAML.
+6. Wire env loading via [references/secrets.md](references/secrets.md) — 1Password Connect for application env, AWS OIDC for cloud creds, GHCR auto-token for image push. Keep secret values in the secret manager or environment store, referenced from workflow YAML.
 7. Set deploy concurrency: cancellable for verify/e2e, **non-cancellable** for deploy. Group by `(env, lane)` so a web deploy does not block an api deploy, but two web deploys serialize.
 8. Add a smoke step after deploy: hit the deployed URL or container health endpoint and fail the job if it is not 200. A green deploy that does not serve traffic is a failed deploy.
 9. Validate end-to-end: PR (verify only, no deploy) → merge a change touching one lane → watch detect → verify → e2e → deploy → smoke → publish summary. Confirm only the touched lane ran.
@@ -54,7 +54,7 @@ deploy-web:
 
 ## Guardrails
 
-- One artifact end-to-end: e2e and deploy both consume the artifact verify uploaded. Never rebuild inside deploy.
+- One artifact end-to-end: e2e and deploy both consume the artifact verify uploaded.
 - Repo precedent beats generic advice. If a sibling repo already deploys to the same host successfully, preserve that workflow/action shape unless you can point to a concrete mismatch.
 - Deploy concurrency is non-cancellable per `(env, lane)` and shared between `main.yml` and `deploy.yml`.
 - A deploy job is not green until its smoke step has hit the deployed URL.

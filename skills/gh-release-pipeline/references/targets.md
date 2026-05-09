@@ -29,7 +29,7 @@ Workflow step:
 - `registry-url` is required for `setup-node` to write the `_authToken` line. Without it, `@semantic-release/npm` cannot publish.
 - For scoped public packages set `"publishConfig": { "access": "public" }` in `package.json`.
 - For a CLI, set `"bin"` in `package.json` and verify the published tarball includes the entry. `npm pack --dry-run` locally before the first release.
-- If the release builds standalone binaries, verify every downloaded runtime or toolchain archive by digest before extracting or embedding it. Functional smoke tests prove the binary starts; they do not prove archive provenance.
+- If the release builds standalone binaries, verify every downloaded runtime or toolchain archive by digest before extracting or embedding it. Pair functional smoke tests with provenance checks.
 
 ## CocoaPods + SwiftPM
 
@@ -51,7 +51,7 @@ Semantic-release tags via `@semantic-release/git`; CocoaPods publish runs via `@
 - `publish-cocoapods.sh` runs `pod trunk push <podname>.podspec --allow-warnings`.
 - Secrets: `COCOAPODS_TRUNK_TOKEN` exported as env on the publish step. Trunk token is generated with `pod trunk register` once and then stored as a repo secret.
 - SwiftPM consumers pull from the git tag — no separate publish step needed.
-- Do not restore generated dependency trees such as full `Pods/` into signed or publishing jobs across trust boundaries. Cache download artifacts only, or namespace caches by workflow/trust level and regenerate/verify generated trees before signing or publishing.
+- Cache download artifacts across trust boundaries. Regenerate or verify generated dependency trees such as full `Pods/` inside signed or publishing jobs before signing or publishing.
 
 ## Go (GoReleaser)
 
@@ -166,7 +166,7 @@ Whichever flow you pick, you need a token that can push to the tap repo from the
 
 - Create a fine-grained PAT (or GitHub App installation token) with `contents: write` on the tap repo only.
 - Store it as `TAP_GITHUB_TOKEN` (or similar) in the source repo's secrets.
-- Never reuse a broad classic PAT across orgs.
+- Use one narrowly scoped token per org and purpose.
 
 ### Flow A — GoReleaser auto-update
 
@@ -209,7 +209,7 @@ For script or binary CLIs whose Homebrew formula can be generated from the GitHu
     test: 'system "#{bin}/<cli-name>", "--version"'
 ```
 
-Use [`dawidd6/action-homebrew-bump-formula`](https://github.com/dawidd6/action-homebrew-bump-formula) only when you explicitly want its version-bump workflow and have verified its fork/direct-push behavior against the tap repo. Do not choose it as the default just because the task says "bump Homebrew"; in some setups it opens or assumes a fork path where the expected release shape is a direct push to the tap.
+Use [`dawidd6/action-homebrew-bump-formula`](https://github.com/dawidd6/action-homebrew-bump-formula) when you explicitly want its version-bump workflow and have verified its fork/direct-push behavior against the tap repo. Default to the tap repo's expected release shape; some setups need a direct push to the tap.
 
 ```yaml
 - if: steps.release.outputs.new_release_published == 'true'
@@ -223,7 +223,7 @@ Use [`dawidd6/action-homebrew-bump-formula`](https://github.com/dawidd6/action-h
 
 - The action computes the tarball sha256 from the GitHub-hosted release archive, so the source release must complete before this step runs.
 - For a Node CLI distributed via npm rather than a GitHub release archive, write a custom formula that uses `Language::Node::Shebang` and a `resource` block; the bump action does not handle that shape.
-- If the working sibling repo uses `Justintime50/homebrew-releaser`, do not replace it with an inline clone/sed/push script. Standard action first; custom shell only after proving no maintained action fits.
+- If the working sibling repo uses `Justintime50/homebrew-releaser`, keep that standard action. Use custom shell only after proving no maintained action fits.
 
 ### Tap repo conventions
 

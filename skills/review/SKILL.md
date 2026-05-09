@@ -13,7 +13,7 @@ Independently audit existing code with concern-specific lenses and decide whethe
 - Evidence beats taste
 - Load shared doctrine from the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules
 - Keep the final verdict tied to concrete evidence, not reviewer instinct alone
-- Keep findings risk-focused; do not drown the user in low-value nits
+- Keep findings risk-focused and filter low-value nits
 - Track reviewer personas internally; include them visibly only when asked or when the harness has compact metadata
 - If runtime proof for your own completed change is the goal, hand off to `verify`
 
@@ -69,7 +69,7 @@ Concrete starting points:
 
 - Cite exact file references for static findings
 - Run the smallest runtime check that changes the verdict when the repo supports it
-- If something is unverified, say so explicitly instead of bluffing
+- If something is unverified, say so explicitly
 - If legacy or dead code is still present, say whether it should be deleted or why it must stay
 - If tests mock the main integrations or boundaries, say that the behavior is still unverified on the real surface
 
@@ -88,14 +88,14 @@ After review, report in this compact bullet shape:
 - `- next:` one of `implementation`, `verify`, `agent-readiness`, or `docs`
 - `- notes:` only for out-of-scope repo state the user must act on
 
-Use those labels explicitly. Do not replace them with softer prose like "safe to merge" or "do not ship today". Do not add an opener, closer, apology, status preface, or conversational recap.
+Use those labels explicitly. Keep the verdict label exact and omit opener, closer, apology, status preface, or conversational recap.
 
 Prefer the active harness's best native review representation instead of a prose-heavy wall of text.
 
 Keep the final answer short:
 
 - Put detailed issue text, file references, and line numbers in native findings or the fallback findings list
-- Do not repeat native finding details in the verdict block
+- Keep native finding details in the findings and keep the verdict block short
 - Keep the core verdict footer to 4 labeled lines or fewer after findings; add `notes:` only when necessary
 - Keep each label to one short sentence or fragment
 - Summarize passing commands by intent and result, for example `typecheck passed for tv-vite` or `browser e2e covered pointer long-press`; include the full command only when it failed, is needed for reproduction, or the user asks for it
@@ -108,7 +108,7 @@ Harness-specific presentation rules:
 
 - Prefer the strongest structured finding format available: Codex/OpenAI native `P0` / `P1` / `P2` / `P3` cards, or a compact table in Claude/Anthropic harnesses
 - If no richer primitive exists, use a short severity-ordered findings list with file/line, issue, impact, and evidence
-- Never hide actionable findings inside the footer or a long prose recap
+- Put actionable findings first, before footer or recap material
 
 Example:
 

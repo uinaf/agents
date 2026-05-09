@@ -29,7 +29,7 @@ If a sentence reads like a generic SaaS landing page, rewrite it.
 
 ## README.md
 
-Default order. Skip a section when the repo genuinely doesn't need it; don't invent filler.
+Default order. Include a section when the repo genuinely needs it.
 
 1. Hero — project name (H1), one literal sentence under it, optional one-line positioning sentence.
 2. Installation — single fenced block with the canonical install command.
@@ -46,8 +46,8 @@ Patterns:
 - Hero stays compact. Project name, one sentence, no logo block unless the project has a real recognizable mark. uinaf brand illustrations from `cdn.uinaf.dev` are fine when the repo warrants one — but most don't.
 - Badges only when they signal real status: CI, version, license, downloads if relevant. No decorative badges. If using shields, match the uinaf monochrome treatment (`colorA=000000`, `colorB=000000`, `style=flat`).
 - Use human-facing labels in section names (`Contributing`, `Security`, `License`), not raw filenames. The link target is the file.
-- Don't dump every top-level file under a `Docs` section. Keep `Contributing`, `Security`, and `License` as their own sections.
-- Don't include a "Features" bullet list. If the one-line description doesn't sell it, a bullet list won't.
+- Use the `Docs` section for reader-facing documentation links. Keep `Contributing`, `Security`, and `License` as their own sections.
+- Lead with one strong description rather than a generic "Features" bullet list.
 - Repo-relative links for in-repo files, for example `CONTRIBUTING.md` linked to `CONTRIBUTING.md`. External links get the `↗` arrow as part of the link text.
 
 ## CONTRIBUTING.md
@@ -65,7 +65,7 @@ Patterns:
 - Put environment bootstrap first. The reader is here to start working.
 - Copy-pastable commands only, verified against the repo. No placeholder `<your-command>` left in.
 - `pnpm verify` (or the repo's equivalent) is the canonical pre-PR gate. Mention it explicitly.
-- Don't restate end-user usage; that lives in `README.md`.
+- Let `README.md` own end-user usage.
 - Keep the PR section short. If the repo has `.github/pull_request_template.md`, that file owns the detailed checklist; `CONTRIBUTING.md` points at it.
 
 ## SECURITY.md
@@ -74,9 +74,9 @@ Short, private-first. Default contact for uinaf repos is `dev@uinaf.dev`.
 
 Sections (one or two short paragraphs each):
 
-1. Reporting a Vulnerability — email `dev@uinaf.dev`. Do not open public issues.
+1. Reporting a Vulnerability — email `dev@uinaf.dev`.
 2. What to Include — affected package/path, reproduction steps, impact, suggested mitigation.
-3. Response Expectations — triaged as quickly as possible. Don't promise SLAs the studio can't keep.
+3. Response Expectations — triaged as quickly as possible. Promise only the SLAs the studio actually supports.
 
 Link from `README.md` when it materially helps navigation.
 
@@ -90,7 +90,7 @@ Link from `README.md` when it materially helps navigation.
   ln -s AGENTS.md CLAUDE.md
   ```
 - Use proper-case headlines here too. Agents read these files in editor and terminal contexts where lowercase headings break scanning.
-- Don't paste the brand spec into `AGENTS.md`. If brand work is a real concern in the repo, link to the relevant brand guidance.
+- Link to the relevant brand guidance from `AGENTS.md` when brand work is a real concern in the repo.
 
 ## LICENSE
 
@@ -103,7 +103,7 @@ The detailed model lives in the Vite+ skill, plus `agent-readiness`, `gh-release
 - One repo-local `verify` entrypoint (`pnpm verify` for TypeScript) that gates everything.
 - Every merge to `main` is assumed publishable or deployable. Document the publish path in `CONTRIBUTING.md` so contributors aren't surprised when their merged commit ships.
 - Conventional Commits for commit messages. `feat`, `fix`, `docs`, `refactor`, `chore`, `test`, `ci`, `build`. Breaking changes marked with `!` or a `BREAKING CHANGE:` footer.
-- Vite+ is the default toolchain for new TypeScript repos. Drive `vp` per package, `pnpm` workspace-wide. Don't invoke `vite` or `vitest` directly.
+- Vite+ is the default toolchain for new TypeScript repos. Drive `vp` per package and `pnpm` workspace-wide.
 
 If the repo can't currently boot, verify, or deliver autonomously, that's an `agent-readiness` problem, not a docs problem — but the docs should reflect reality, not aspiration.
 

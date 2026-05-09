@@ -93,9 +93,9 @@ After an audit, report a compact audit footer:
 
 Keep details compact:
 
-- Do not paste long Tessl output; report the score and only actionable suggestions
+- Report the Tessl score and actionable suggestions; summarize long output
 - Keep the footer to 5 labeled lines or fewer
-- If edits were made, avoid restating every diff hunk; name the behavioral change and verification
+- If edits were made, name the behavioral change and verification
 
 ## References
 

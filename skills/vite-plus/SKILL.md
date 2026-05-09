@@ -5,7 +5,7 @@ description: "Migrate or align frontend repositories to the stock Vite+ workflow
 
 # Vite+
 
-Move a frontend repo closer to the stock Vite+ toolchain without blindly deleting repo-specific release or runtime logic. Vite+ is in alpha — verify behavior against installed `vp --version` and the latest [release notes](https://github.com/voidzero-dev/vite-plus/releases) rather than memorized command shapes.
+Move a frontend repo closer to the stock Vite+ toolchain while preserving repo-specific release and runtime logic. Vite+ is in alpha — verify behavior against installed `vp --version` and the latest [release notes](https://github.com/voidzero-dev/vite-plus/releases) instead of relying on memorized command shapes.
 
 ## Migration Targets
 
@@ -14,7 +14,7 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 - CI uses `voidzero-dev/setup-vp@v1`; the action owns Node and package-manager bootstrap, then runs `vp install`, `vp check`, `vp test`, `vp build`
 - test files use `vite-plus/test` (and `vite-plus/test/browser/context` for browser mode)
 - scripts prefer `vp dev`, `vp test`, `vp test watch`, `vp test run --coverage`, `vp pack`, `vp build`, `vp preview`, `vp update`, and `vp run <script>` (or `vpr <script>`) over direct package-manager, raw Vitest, or tsdown wiring
-- hooks use `vp config`, `.vite-hooks`, and `vp staged` instead of custom Husky or `lint-staged`
+- hooks use `vp config`, `.vite-hooks`, and `vp staged` as the default hook stack
 - single-source config in `vite.config.ts`: no parallel `vitest.config.ts`, `.oxlintrc*`, `.oxfmtrc*`, or `tsdown.config.ts`
 - contributor docs move to the new `vp` commands in the same change
 
@@ -69,7 +69,7 @@ export default defineConfig({
 ## Guardrails
 
 - Prefer `vp create` / `vp migrate --agent <name> --editor <name>` over hand-rolling agent or editor config.
-- Do not delete release workflows, binary packaging, or publish steps just to look more "stock."
+- Preserve working release workflows, binary packaging, and publish steps while migrating the surrounding Vite+ flow.
 - If `vp check` is not running type-aware lint or type checks, confirm `lint.options.typeAware` and `lint.options.typeCheck` in `vite.config.ts`, and check for `compilerOptions.baseUrl` in `tsconfig.json` — `tsgolint` does not support `baseUrl` and Vite+ silently skips type-aware checks when it is present.
 
 ## Known Caveats

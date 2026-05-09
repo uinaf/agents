@@ -13,9 +13,9 @@ interface:
     - The verdict is exactly one of: ready for review, needs more work, blocked.
 
     Constraints:
-    - Do not issue a ship decision; use $review for that.
-    - Do not review someone else's code; use $review.
-    - Do not pretend verification passed when checks could not run.
+    - Report readiness for review; route ship decisions to $review.
+    - Route reviews of someone else's code to $review.
+    - Mark checks that could not run as unverified or blocked.
 
     Output: no conversational opener. Use bullet labels only: verdict, evidence, fixed during verify when any, unverified gaps, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

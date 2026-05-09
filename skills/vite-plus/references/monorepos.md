@@ -4,10 +4,10 @@ Use this reference for workspace repos adopting Vite+.
 
 ## Defaults
 
-- Move workspace scripts, test surface, and CI together instead of partially migrating leaf packages.
+- Move workspace scripts, test surface, and CI together.
 - Keep workspace package-manager conventions and cache boundaries unless Vite+ replaces them cleanly.
 - Leaf packages and apps should still prefer `vp check`, `vp test`, and `vp pack` where Vite+ is the real tool owner.
-- Use `vp run <pkg>#<task>`, `vp run -r`, `vp run -t`, and `vp run --filter` instead of inventing custom workspace task wrappers when Vite+ already owns the task graph.
+- Use `vp run <pkg>#<task>`, `vp run -r`, `vp run -t`, and `vp run --filter` when Vite+ owns the task graph.
 - Keep commit-hook setup repo-wide: prefer one `vp config`-managed `.vite-hooks` install plus staged checks in root `vite.config.ts` over per-package hook tooling.
 
 ## Orchestration with `vp run`
@@ -61,7 +61,7 @@ Two valid patterns for "demo app inside a publishable-library monorepo":
 
 For OSS or published libraries, prefer build-first. For a purely internal demo whose only job is fast iteration, source alias is fine.
 
-## Don't blindly migrate every script to `vp run`
+## Migrate Scripts Deliberately
 
 `vp run -r` and `vp run -t` earn their keep when there is cross-package ordering or a transitive dependency to walk. For leaf-only tasks that just fan out the same command in every package — `test`, `check`, `verify` — `pnpm -r run <task>` (or the equivalent for the active package manager) is the same shape with one less abstraction. Real-world reference from a verified two-package repo:
 
@@ -85,7 +85,7 @@ The split is intentional: anything that walks the workspace graph goes through `
 
 - `vp run` of a `package.json` script is uncached by default. Opt in with `vp run --cache <script>` for one invocation, set `run.cache.scripts: true` in `vite.config.ts` to flip the default workspace-wide, or move the task into `vite.config.ts` (cached by default).
 - Compound commands joined with `&&` are split into independent sub-tasks, each cached separately. When a script contains `vp run`, Vite Task inlines those nested calls as sibling tasks instead of spawning a nested process — recursion (root `build` → `vp run -r build` → root `build` …) is detected and the self-reference is pruned automatically.
-- Some targets cannot infer task inputs automatically. If Vite+ reports that a task ran uncached because `input` was not configured, add explicit task inputs in `vite.config.ts` instead of assuming cache is broken.
+- Some targets cannot infer task inputs automatically. If Vite+ reports that a task ran uncached because `input` was not configured, add explicit task inputs in `vite.config.ts`.
 - Caveat: `vp check` invoked inside a `run.tasks` `command` (e.g. `"command": "vp check && vp test"`) currently bypasses the normal cache configuration and runs uncached. If cache-hit-rate matters, expose `vp check` as its own task and reference it via `dependsOn` instead of inlining. Tracking: voidzero-dev/vite-plus#994.
 
 ## Graduating to `vite.config.ts` task definitions
@@ -117,11 +117,11 @@ Per the pnpm documentation, `--filter "...<pkg>"` should select `<pkg>` and all 
 pnpm -r --filter '...<pkg>' list --depth -1
 ```
 
-If only one package is listed, use `vp run -t <pkg>#<task>` for transitive builds instead of trying to coerce pnpm's filter. `vp run -t` walks the same workspace dependency graph and gives the expected topological order.
+If only one package is listed, use `vp run -t <pkg>#<task>` for transitive builds. `vp run -t` walks the same workspace dependency graph and gives the expected topological order.
 
 ## Guardrails
 
-- Do not force Vite+ onto non-frontend or non-Node packages.
+- Apply Vite+ to frontend or Node packages.
 - Keep workspace-specific caching and dependency ordering rules if Vite+ does not fully cover them yet.
 - Verify the important leaf packages still build and test after the migration.
-- Do not invent an extra task-runner config (Turborepo, Nx, custom shell wrappers) just to express ordering — `vp run -t` already reads the workspace dependency graph.
+- Use `vp run -t` for workspace ordering before adding another task-runner config.

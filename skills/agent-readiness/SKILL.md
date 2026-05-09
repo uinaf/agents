@@ -135,7 +135,7 @@ After readiness work, report in this compact bullet shape:
 Keep details compact:
 
 - Put dimension-by-dimension evidence in the audit table when useful, not again in the footer
-- Do not paste logs; name the command or file that proves the claim
+- Name the command or file that proves the claim and summarize logs by signal
 - Keep the footer to 5 labeled lines or fewer
 - Omit unchanged dimensions unless they explain the final grade
 - Summarize passing checks by intent and result; include full commands only when they failed, are needed for reproduction, or the user asks for them

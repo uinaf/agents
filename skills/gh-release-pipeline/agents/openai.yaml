@@ -14,8 +14,8 @@ interface:
 
     Constraints:
     - Use this for packages, libraries, CLIs, marketplace actions, and registry publishing, not deployed running apps.
-    - Do not add a second active release path unless the repo already requires one and the reason is documented.
-    - Do not weaken verify or bypass it with manual release paths.
+    - Keep one active release path unless the repo already requires a documented second path.
+    - Preserve verify as the release gate for both automatic and manual release paths.
 
     Output: no conversational opener. Use bullet labels only: files changed, publish target, evidence, risks, remaining setup, and next. Summarize passing validation by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

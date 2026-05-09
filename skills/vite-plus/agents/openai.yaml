@@ -12,8 +12,8 @@ interface:
     - The installed Vite+ behavior is verified before relying on memorized command shapes.
 
     Constraints:
-    - Do not delete working release or packaging logic just to look stock.
-    - Do not migrate unsupported Vite or Vitest versions without surfacing the blocker.
+    - Preserve working release or packaging logic while aligning the surrounding workflow.
+    - Surface unsupported Vite or Vitest versions as blockers before migration.
     - Inspect local guidance files before changing workflows.
 
     Output: no conversational opener. Use bullet labels only: files changed, Vite+ shape, evidence, exceptions, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.

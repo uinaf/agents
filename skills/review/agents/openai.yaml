@@ -13,8 +13,8 @@ interface:
     - The verdict is exactly one of: ship it, needs review, blocked.
 
     Constraints:
-    - Do not self-check your own completed change; use $verify for that.
-    - Do not expand into unrelated refactors or polish.
+    - Route self-checks of your own completed change to $verify.
+    - Keep the review scoped to risks in the requested diff, branch, or PR.
     - Prefer the smallest evidence set that can change the verdict.
 
     Output: no conversational opener. Use bullet labels only: findings (or `findings: none`), verdict, evidence, unverified, next, and optional notes for out-of-scope repo state. Keep each label to one short sentence or fragment. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.

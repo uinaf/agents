@@ -5,7 +5,7 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 ## Core Behavior
 
 - Lead with the answer, then reasoning. Cite file paths, command output, errors
-- Keep replies compact. Prefer the minimum structure that makes the answer scannable; do not narrate routine steps or paste long logs unless the user asked
+- Keep replies compact. Use the minimum structure that makes the answer scannable; narrate routine steps or paste long logs only when the user asked
 - In replies and reports, link references when possible: PRs, issues, commits, docs, dashboards, and external resources should be Markdown links when the URL is known
 - In replies and reports, show commit links with the short hash label: `[abc1234](url)`. For PRs/issues, always link the number: `[#123](url)`. Add a title after it when useful
 - If an approach is weak, say so and propose a better one
@@ -26,7 +26,7 @@ For non-trivial tasks, before writing code:
 1. Read the current code, docs, and contracts you'll touch
 2. Confirm what changes, what must NOT change, and what "done" looks like
 3. Write a short plan: what, where, why, verification, non-goals
-4. If the plan has unresolvable ambiguities or breaks mid-flight, stop and surface — don't guess
+4. If the plan has unresolvable ambiguities or breaks mid-flight, stop and surface the decision point
 
 ### Verification
 
@@ -34,7 +34,7 @@ For non-trivial tasks, before writing code:
 - Bootstrap fresh worktrees before checks: install deps, run codegen, and make the repo runnable
 - Use repo guardrails (`make verify`, `just verify`) when present; otherwise run format, lint, typecheck, test explicitly
 - Prefer integration / contract / e2e checks over mock-heavy unit tests
-- If verification infra is missing, flag it (use `agent-readiness`) — do not declare done
+- If verification infra is missing, flag the readiness gap and route it through `agent-readiness`
 - If it is not verified, it is not done
 
 ### Worktree isolation
@@ -43,9 +43,9 @@ For non-trivial tasks, before writing code:
 
 ### Feedback loops
 
-- Lint, format, typecheck, push hooks are deterministic gates — never substitute agent judgment for them
+- Lint, format, typecheck, and push hooks are deterministic gates; use them as the source of truth
 - Cap retries at 2 CI rounds per change; partial success beats infinite retry
-- Run independent concerns as parallel subagents; do not serialize what can fan out
+- Run independent concerns as parallel subagents when they can fan out cleanly
 
 ### Keep docs alive
 
@@ -60,7 +60,7 @@ Doc drift degrades every future agent's performance. Update docs as part of the 
 
 ### When blocked
 
-Reproduce the failure, find the root cause with evidence, fix the root cause. No `--no-verify`, no skipped tests, no workarounds without explicit approval. In autonomous mode, surface the blocker rather than burning tokens speculating.
+Reproduce the failure, find the root cause with evidence, and fix the root cause. Use the normal verification path; apply workarounds or skipped gates only with explicit approval. In autonomous mode, surface the blocker with evidence.
 
 ---
 
@@ -82,11 +82,11 @@ Reproduce the failure, find the root cause with evidence, fix the root cause. No
 - Follow repo conventions and existing dependencies before inventing new patterns or adding packages
 - Benchmark hot paths and performance-sensitive changes with before/after numbers
 - Keep docs command-derived: no volatile metrics, absolute filesystem paths, `file://`, or editor URIs
-- Avoid TypeScript escape hatches (`as`, non-null `!`, `unknown as T`, double assertions) unless explicitly approved
-- Do not disable linters, type checks, tests, or hooks — fix the root cause
-- Treat errors as typed, contextful, and recoverable where possible; never log or surface secrets
+- Prefer type-safe TypeScript models over escape hatches such as `as`, non-null `!`, `unknown as T`, and double assertions; use an escape hatch only with explicit approval
+- Keep linters, type checks, tests, and hooks enabled; fix the root cause
+- Treat errors as typed, contextful, and recoverable where possible; redact secrets before logging or surfacing errors
 - Schema/state changes must be forward-compatible with a documented rollback path; flag irreversible migrations before running them
-- Tests should avoid real timers and logger assertions; prefer in-process tests unless the process boundary matters
+- Prefer in-process tests with controlled clocks over real timers and logger assertions unless the process boundary matters
 
 ---
 
@@ -114,5 +114,5 @@ Reproduce the failure, find the root cause with evidence, fix the root cause. No
 
 - Changed lists files or surfaces with intent, not a noisy commit log
 - Risks names what could regress and what reviewers should verify
-- Verification is compact: list only the meaningful local, CI, preview, or live proof; avoid long command dumps, repeated green checks, and raw logs unless they explain a risk or failure
+- Verification is compact: list only the meaningful local, CI, preview, or live proof; include command dumps, repeated green checks, and raw logs only when they explain a risk or failure
 - Complexity is reduced, neutral, or increased; justify increased complexity

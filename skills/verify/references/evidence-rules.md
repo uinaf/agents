@@ -34,7 +34,7 @@ Prefer reproducible proof:
 6. **Flag unverified claims honestly**
    - if you could not hit the real surface, say `unverified` and why
 
-7. **Do not flood context with giant logs**
+7. **Summarize logs by signal**
    - quote only the relevant lines or summarize with exact pointers
 
 8. **Keep final evidence human-readable**
@@ -52,7 +52,7 @@ For each meaningful finding:
 
 For the overall verification:
 
-- verdict: `ready for review` / `needs more work` / `blocked` (verify never issues `ship it` — that's `review`'s call)
+- verdict: `ready for review` / `needs more work` / `blocked` (`review` owns the `ship it` call)
 - change verified
 - surfaces exercised
 - evidence summary: what passed or failed, not a raw command list unless reproduction requires it

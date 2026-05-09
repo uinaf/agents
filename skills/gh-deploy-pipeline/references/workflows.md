@@ -47,9 +47,9 @@ on:
 - `pull_request: { types: [...ready_for_review] }` keeps draft PRs out of CI but picks them up the moment they're marked ready.
 - Do **not** add `push:` to `verify.yml` — the verify gate runs inside `main.yml` for push events.
 - Secret-bearing manual deploys validate `inputs.ref` in a secretless step before checkout or secret loading. Prefer `main`, protected release tags, or exact SHAs with a matching successful artifact/image.
-- Environment branch/tag rules constrain the workflow run ref; they do not prove a separately checked-out `inputs.ref` is trusted.
-- Manual redeploys download an existing artifact or pull an image by immutable digest/SHA; they do not rebuild arbitrary refs in the secret-bearing job.
-- Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or artifact/image lookup. Do not interpolate `${{ inputs.* }}` inside `run:`.
+- Environment branch/tag rules constrain the workflow run ref; validate any separately checked-out `inputs.ref` as its own trust boundary.
+- Manual redeploys download an existing artifact or pull an image by immutable digest/SHA in the secret-bearing job.
+- Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or artifact/image lookup.
 
 ## Concurrency
 
@@ -61,7 +61,7 @@ concurrency:
   group: ${{ github.workflow }}-verify-${{ github.ref }}-${{ matrix.lane }}
   cancel-in-progress: true
 
-# deploy — never cancel; serialize per (env, lane)
+# deploy — serialize per (env, lane)
 concurrency:
   group: deploy-${{ inputs.environment || 'production' }}-${{ matrix.lane }}
   cancel-in-progress: false
@@ -92,7 +92,7 @@ jobs:
 
 - `id-token: write` is required for any OIDC-backed cloud auth (`aws-actions/configure-aws-credentials`, GHCR's keyless tokens, Cloudflare's API-token-via-OIDC).
 - `packages: write` is required for `docker/build-push-action` to push to GHCR.
-- Never put `pull-requests: write` on the verify job — it should not be able to mutate the PR.
+- Keep verify jobs read-only for pull requests.
 
 ## Checkout
 
@@ -170,7 +170,7 @@ The same artifact must flow `verify → e2e → deploy`. Upload once, download t
 ## Caches
 
 - Caches speed dependency downloads and tool setup; they are not deployment artifacts.
-- Do not restore generated app output, package/vendor trees, container layers, or built bundles from a lower-trust workflow into a secret-bearing deploy job.
+- Rebuild or verify generated app output, package/vendor trees, container layers, and built bundles inside the trusted deploy path.
 - If deploy-time setup needs a cache, namespace by workflow, event/trust level, platform, and lockfile. The deployed artifact still comes from the current verified artifact or immutable image digest.
 
 ## Job dependencies
@@ -181,7 +181,7 @@ deploy-web:
   if: ${{ needs.verify-web.result == 'success' && needs.e2e-web.result == 'success' }}
 ```
 
-Avoid `if: success()` — it does not catch the case where `verify-web` was *skipped* (the lane wasn't affected). Explicit `result == 'success'` makes the gate exact and readable. The `always() && (...)` form is for the final summary job, not for deploy gates.
+Use explicit `result == 'success'` checks for deploy gates. `if: success()` treats skipped upstream jobs as success when the lane was not affected, while `always() && (...)` belongs on final summary jobs.
 
 ## Bootstrap snippets
 

@@ -13,8 +13,8 @@ interface:
 
     Constraints:
     - Skip this skill for non-uinaf work.
-    - Do not treat this as a generic UI kit.
-    - Do not vendor brand assets when CDN references are required.
+    - Treat this as uinaf-specific brand guidance.
+    - Use CDN references for brand assets when required.
 
     Output: name the surface, changed files or produced artifact, brand checks performed, gaps, and next step.
 

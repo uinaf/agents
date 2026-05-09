@@ -37,7 +37,7 @@ Trust policy on the IAM role:
 }
 ```
 
-- One role per blast radius: `GhActionsDeploy-Production` (sub: `refs/heads/main`), `GhActionsDeploy-Preview` (sub: `pull_request`). Never one role with both.
+- One role per blast radius: `GhActionsDeploy-Production` (sub: `refs/heads/main`), `GhActionsDeploy-Preview` (sub: `pull_request`).
 - Permissions on the role: only what the deploy needs (`amplify:*` on the specific app ARN, S3 `PutObject` on the deploy bucket prefix). Audit with the IAM Access Analyzer.
 - Region is parameterized so a repo can deploy to multiple regions without a second role.
 
@@ -53,7 +53,7 @@ The `GITHUB_TOKEN` works automatically for pushing images to `ghcr.io/<owner>/<r
     password: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-For **pulling** the image from a different host (the VPS deploy target), the auto-token is not enough — it doesn't leave the runner. Use a fine-grained PAT scoped read-only to that org's packages, store it on the VPS in `~/.docker/config.json`, rotate quarterly. Do not pass it through the runner.
+For **pulling** the image from a different host (the VPS deploy target), the auto-token is not enough — it doesn't leave the runner. Use a fine-grained PAT scoped read-only to that org's packages, store it on the VPS in `~/.docker/config.json`, and rotate quarterly.
 
 ### Cloudflare
 
@@ -116,7 +116,7 @@ The 1Password action reads the template, resolves each `op://` reference, and ex
 
 ### Service account token
 
-- Issue a 1Password service account scoped to a single vault (`shared-prod`). Never reuse one across vaults — that defeats blast-radius separation.
+- Issue a 1Password service account scoped to a single vault (`shared-prod`) so vault blast radius stays separated.
 - Store it as `OP_SERVICE_ACCOUNT_TOKEN` in the repo's secrets. Rotate annually.
 - For the VPS deploy pattern, render the env file inside the runner, scp it to the VPS, then use it as `env_file` on the container. Do **not** install 1Password on the VPS — the runner is the only thing that talks to 1Password.
 
@@ -142,7 +142,7 @@ Issue a fine-grained PAT scoped to that single repo, with the minimum permission
 | Trigger workflow in another repo | `<org>/<other>` | `actions: write`, `contents: read` |
 | Comment on cross-repo PR | `<org>/<other>` | `pull-requests: write` |
 
-Store as `<PURPOSE>_GITHUB_TOKEN` (`TAP_GITHUB_TOKEN`, `OPS_TRIGGER_TOKEN`). Never reuse one PAT across purposes — a token that can both push code and trigger workflows is a token that, when leaked, can deploy malicious code.
+Store as `<PURPOSE>_GITHUB_TOKEN` (`TAP_GITHUB_TOKEN`, `OPS_TRIGGER_TOKEN`). Use one PAT per purpose; a token that can both push code and trigger workflows can deploy malicious code when leaked.
 
 Classic PATs (`ghp_…` without scopes) are forbidden. If a workflow currently uses one, replace it before adding new functionality.
 
@@ -160,7 +160,7 @@ deploy-prod:
 ```
 
 - Repo-level secrets are visible to every workflow run on every branch. Environment-scoped secrets are only readable when the job declares that environment, gated by the environment's protection rules.
-- Use environments for the secrets a non-prod build *must not* see (production DB URL, payment processor keys). Use repo-level secrets for everything else.
+- Use environments for production-only secrets such as production DB URLs and payment processor keys. Use repo-level secrets for everything else.
 
 ## Logging hygiene
 
@@ -172,5 +172,5 @@ GitHub masks declared secrets in logs. It does not mask:
 
 Two rules:
 
-1. Pass secrets via env vars or stdin, never as CLI flags.
-2. Never `cat`, `echo`, or otherwise dump a rendered env file in a workflow step. If you need to debug, log the *keys* present (`grep -c '^[A-Z_]*=' "$RENDERED"`), not the values.
+1. Pass secrets via env vars or stdin.
+2. Debug rendered env files by logging key counts or key names (`grep -c '^[A-Z_]*=' "$RENDERED"`), keeping values out of logs.

@@ -57,7 +57,7 @@ While exercising the change, fix anything cheap and obvious that you spot:
 - An `any`, unsafe `as`, or non-null assertion you can replace with a real type in seconds
 - A failure path that swallows errors silently when a one-line `throw` makes the diagnostic useful
 
-Do not turn this into a full review pass. Substantive code-shape concerns (architecture mismatches, broader duplication, error-classification redesigns) belong to `review`. Use [references/simplification.md](references/simplification.md) only as a short self-check, not as a refactoring backlog.
+Keep this as a self-check pass. Route substantive code-shape concerns (architecture mismatches, broader duplication, error-classification redesigns) to `review`. Use [references/simplification.md](references/simplification.md) as a short self-check.
 
 ### 4. Probe adjacent risk
 
@@ -74,7 +74,7 @@ Produce one clear outcome:
 - `needs more work` — the change is not ready to be reviewed; specific issues to address are listed
 - `blocked` — verification cannot proceed, usually because infrastructure is too weak (hand off to `agent-readiness`)
 
-Verify never issues `ship it`. The independent ship decision is `review`'s job.
+Verify reports readiness for review. The independent ship decision belongs to `review`.
 
 ## Output
 
@@ -89,11 +89,11 @@ After verification, report in this compact bullet shape:
 Keep the final answer short:
 
 - Put detailed failures, screenshots, traces, and file references in native findings or the work log, not in the footer
-- Do not repeat command output that already appeared in the terminal
+- Summarize command output that already appeared in the terminal
 - Keep the footer to 5 labeled lines or fewer
 - Omit `fixed during verify` when nothing was corrected
 - Summarize passing checks by intent and result, for example `typecheck passed for tv-vite` or `API smoke check returned 200`; include full commands only when they failed, are needed for reproduction, or the user asks for them
-- For failures or blocked checks, include the relevant error/status line or response snippet; do not hide the only evidence in terminal output
+- For failures or blocked checks, include the relevant error/status line or response snippet in the report
 
 Example:
 

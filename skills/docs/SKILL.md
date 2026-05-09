@@ -50,7 +50,7 @@ Keep top-level docs terse and navigational.
 - `SECURITY.md` should hold private-first vulnerability reporting guidance
 - Push detail downward instead of bloating top-level files
 - For coordination or workspace repos, keep one canonical setup doc and let `README.md` point to it instead of repeating the full bootstrap flow inline
-- Use the concrete top-level split and section order in [references/documentation.md](references/documentation.md) instead of inventing a new shape every time
+- Use the concrete top-level split and section order in [references/documentation.md](references/documentation.md)
 - Keep visible docs copy human-facing and task-ordered; let the reference file own the detailed labeling and scannability rules
 - Use document titles or purpose labels in routing/index lists. Prefer `Contributing`, `Release workflow`, `Architecture`, or `Agent guide` over visible labels like `CONTRIBUTING.md`, `docs/RELEASE.md`, or `AGENTS.md`
 - Prefer terse routing over narrative sprawl, for example `README.md` should link to deeper docs instead of re-explaining them inline
@@ -64,7 +64,7 @@ Refresh the detailed documents that actually carry the knowledge.
 - feature specs, plans, and decision records
 - readiness infrastructure docs after agent-readiness changes
 
-Write each updated section as the reader's current source of truth. Avoid "previously/now" or "before/after" framing unless the doc is a migration note, changelog, or decision record.
+Write each updated section as the reader's current source of truth. Use "previously/now" or "before/after" framing only in migration notes, changelogs, and decision records.
 
 For new features, use the directory layout and templates in [references/structuring.md](references/structuring.md) — specs, plans, and decisions each have their own shape.
 
@@ -87,7 +87,7 @@ Example — fixing a stale path after a rename:
 
 ### 5. Validate reality
 
-Do not trust prose. Check that commands, file paths, and entry points still match the repo.
+Verify prose against the repo. Check that commands, file paths, and entry points still match.
 
 Concrete checks:
 
@@ -105,7 +105,7 @@ After docs work, report a compact docs footer:
 - gaps: remaining doc gaps, or `none`
 - next: `agent-readiness`, `review`, `verify`, or `none`
 
-Keep the footer to 5 labeled lines or fewer. Do not repeat the same file list in prose after listing changed files.
+Keep the footer to 5 labeled lines or fewer. List changed files once.
 
 ## References
 

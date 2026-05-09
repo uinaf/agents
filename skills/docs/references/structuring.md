@@ -98,7 +98,7 @@ What this enables and what it blocks.
 `decisions/NNNN-slug.md` — e.g. `decisions/0003-use-sqlite-not-json.md`
 
 ### Lifecycle
-Append-only. New decisions get the next number. Never edit a past decision — add a new one if you reverse course.
+Append-only. New decisions get the next number. Add a new decision when you reverse course.
 
 ## Discovery
 
@@ -113,12 +113,12 @@ When the docs skill audits a repo and finds (or creates) specs/plans/decisions d
 - Decisions: docs/decisions/
 ```
 
-No deep linking in AGENTS.md. Just the directory + one-line description. One pointer per directory, never per file.
+Keep AGENTS.md links shallow: directory plus one-line description, one pointer per directory.
 
 ## Rules
 
-1. **One purpose per directory.** Specs don't contain plans. Plans don't contain specs.
+1. **One purpose per directory.** Keep specs in specs directories and plans in plans directories.
 2. **Specs outlive plans.** A spec survives multiple plan attempts. A plan is disposable.
 3. **Delete plans when done.** The PR tells the story. Plans are working documents, not archives.
-4. **Link, don't duplicate.** Plans reference specs by path. Decisions reference both.
+4. **Link canonical docs.** Plans reference specs by path. Decisions reference both.
 5. **Drift is a signal.** Plan changed but spec didn't = normal. Spec changed but tests didn't = bug.

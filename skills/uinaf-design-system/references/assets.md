@@ -41,7 +41,7 @@ font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospa
 
 ## Brand illustrations
 
-Two illustrations exist. Don't generate or commission look-alikes; commission new originals if more are needed.
+Two illustrations exist. Commission new originals when more are needed.
 
 Pick by what the surface is *about*:
 
@@ -81,7 +81,7 @@ https://cdn.uinaf.dev/images/uinaf-computer-og-image.png
 
 ### Hard rules
 
-- Never rotate, recolor, gradient-fill, or filter the illustrations.
+- Render illustrations in their original orientation, colors, fills, and filters.
 - Always present on pure black with no surrounding chrome.
 - Logo lockup is the framed 240×240 square. The 1px `--neutral-900` border is part of the mark.
 - Avatar / small-icon usage: 60–80px on the same black canvas.

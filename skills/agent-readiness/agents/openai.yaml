@@ -12,9 +12,9 @@ interface:
     - The repo has a clear next verification path.
 
     Constraints:
-    - Do not review an existing diff for ship readiness; use $review for that.
-    - Do not validate your own product change; use $verify for that.
-    - Do not turn documentation-only cleanup into readiness work; use $docs.
+    - Route existing-diff ship readiness to $review.
+    - Route validation of your own product change to $verify.
+    - Route documentation-only cleanup to $docs.
 
     Output: no conversational opener. Use bullet labels only: grade, evidence, files changed, remaining gaps, and next. Summarize passing checks by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

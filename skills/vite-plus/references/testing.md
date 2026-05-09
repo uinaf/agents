@@ -4,8 +4,8 @@ Use this reference when migrating tests to Vite+ native usage.
 
 ## Defaults
 
-- Import from `vite-plus/test` instead of `vitest` when migrating to Vite+.
-- Browser-mode imports become `vite-plus/test/browser/context` instead of `@vitest/browser/context`.
+- Import from `vite-plus/test` when migrating to Vite+.
+- Browser-mode imports become `vite-plus/test/browser/context`.
 - Move coverage and test-command wiring together with script updates.
 - Verify both the default test pass and any coverage mode the repo actually depends on.
 - Use the built-in `vp test` family rather than attempting to invoke Vitest through a made-up subcommand.
@@ -19,7 +19,7 @@ Use this reference when migrating tests to Vite+ native usage.
 
 ## Configuration
 
-- Put test config in the `test` block in `vite.config.ts`. Do not maintain a parallel `vitest.config.ts` once the repo is on Vite+.
+- Put test config in the `test` block in `vite.config.ts` once the repo is on Vite+.
 
 ```ts
 import { defineConfig } from 'vite-plus'

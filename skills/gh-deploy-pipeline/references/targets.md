@@ -30,7 +30,7 @@ runs:
 ```
 
 - `branch: main` deploys to production. Any other branch creates a preview deployment with a `<branch>.<project>.pages.dev` URL — that's the cheap PR-preview pattern.
-- The api-token needs `Account › Cloudflare Pages › Edit` only. Do not reuse a global API key.
+- The api-token needs `Account › Cloudflare Pages › Edit` only. Use a scoped API token for this target.
 - Wrangler reads `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` from env; passing them as flags is redundant and leaks into logs.
 - `_redirects` and `_headers` files at the root of `dist-dir` are picked up automatically. Custom `wrangler.toml` is only needed for Workers, not Pages.
 
@@ -124,12 +124,12 @@ build-image:
         provenance: mode=max
 ```
 
-- The image tag the deploy step consumes is the **commit SHA**, never `:main` or `:latest`. Tags can be reassigned; SHAs cannot. The `:main` tag is for humans browsing GHCR.
+- The image tag the deploy step consumes is the **commit SHA**. Keep `:main` or `:latest` as human browsing tags only because they can be reassigned.
 - `provenance: mode=max` writes a SLSA build attestation alongside the image. Free; on by default in newer buildx.
 
 ### Render env from 1Password
 
-The container needs runtime env (DB URLs, third-party API keys, internal service tokens) that does not live in the GitHub secret store. Render once into a `.env` file inside the runner, ship it to the VPS over SSH alongside the image tag, never log its contents.
+The container needs runtime env (DB URLs, third-party API keys, internal service tokens) that does not live in the GitHub secret store. Render once into a `.env` file inside the runner, ship it to the VPS over SSH alongside the image tag, and keep its contents out of logs.
 
 ```yaml
 - uses: ./.github/actions/load-1password-env
@@ -260,7 +260,7 @@ The runner-side smoke step is what closes the loop. A green Ansible playbook on 
 
 - The VPS deploy user (`deploy@`) needs `docker` group membership but no sudo. A compromised CI runner should not be able to `apt install` on the VPS.
 - The ghcr-pull PAT used on the VPS is **separate** from the GitHub Actions `GITHUB_TOKEN`. It's a fine-grained PAT, read-only on packages, scoped to the org. Rotate quarterly.
-- Do not bake env vars into the image. The same image must run dev/staging/prod — env file at runtime is the only safe shape.
+- Inject env vars at runtime so the same image runs dev, staging, and prod.
 - A failed health probe must leave the live slot untouched. The Ansible task graph above does that by labeling the target `traefik.enable=false` until the probe passes; if the probe fails, the playbook aborts before flipping the router label.
 
 ## GitHub Pages

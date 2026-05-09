@@ -15,7 +15,7 @@ The canonical brand spec is [references/brand-spec.md](references/brand-spec.md)
 - **Lowercase voice on product and marketing surfaces.** Headings, nav, button labels, post titles, file names that show in UI, the studio name. Always on uinaf-controlled product and marketing surfaces. Documentation surfaces (`README.md`, `CHANGELOG.md`, product docs pages, `docs/*.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, `CLAUDE.md`, GitHub templates) use proper-case headlines and sentence-case body; see [references/repo-docs.md](references/repo-docs.md) for repo docs.
 - **No emoji.** Anywhere. Brand artwork is the only flair.
 - **Voice is short, direct, dry.** No SaaS sludge ("empower", "unlock", "synergies"). Sentence fragments end with periods. This applies everywhere, including repo docs.
-- **Illustrations live on pure black with no chrome.** The slime palette (lime / green / cyan / blue / purple / magenta / pink) stays *inside* artwork, terminal output, and rare data-viz — never as button fills, gradient washes, or default text.
+- **Illustrations live on pure black with no chrome.** The slime palette (lime / green / cyan / blue / purple / magenta / pink) stays *inside* artwork, terminal output, and rare data-viz. UI fills, gradients, and default text stay neutral.
 
 ## Hard rules — UI surfaces (web, slides, native, email HTML)
 
@@ -29,7 +29,7 @@ The canonical brand spec is [references/brand-spec.md](references/brand-spec.md)
 
 1. Confirm what you are producing — web interface, marketing/content page (blog / terms / release announcement), documentation surface (`README.md` / `CHANGELOG.md` / product docs page / `docs/*.md` / `CONTRIBUTING.md` / `SECURITY.md` / `AGENTS.md` / `CLAUDE.md`), slide deck, OG / social asset, email, terminal banner, or app / native UI starting point.
 2. Read the smallest matching reference set under "Read by task". For mixed outputs (e.g. a blog post on the website), combine only the relevant references.
-3. Pull fonts from `https://cdn.uinaf.dev/fonts/berkeley-mono/variable/font.css` and illustrations from `https://cdn.uinaf.dev/images/` (see [references/assets.md](references/assets.md) for filenames and when to use each). Images are hosted on the CDN only; do not duplicate them locally.
+3. Pull fonts from `https://cdn.uinaf.dev/fonts/berkeley-mono/variable/font.css` and illustrations from `https://cdn.uinaf.dev/images/` (see [references/assets.md](references/assets.md) for filenames and when to use each). Images stay CDN-hosted.
 4. Write copy against [references/voice.md](references/voice.md). Voice rules apply to every surface; the lowercase rule is scoped to product and marketing surfaces only.
 5. Verify against the hard rules above before declaring done. Visual rules apply only where there is a visual surface; voice rules always apply, with the casing carve-out for documentation surfaces.
 
@@ -51,7 +51,7 @@ The canonical brand spec is [references/brand-spec.md](references/brand-spec.md)
 
 ## Image URLs (production)
 
-Do not vendor brand illustrations. Link hot to `cdn.uinaf.dev` (see [references/assets.md](references/assets.md) for roles and `og` wiring):
+Link brand illustrations directly from `cdn.uinaf.dev` (see [references/assets.md](references/assets.md) for roles and `og` wiring):
 
 - `https://cdn.uinaf.dev/images/uinaf-computer.png` — primary in-page / hero mark
 - `https://cdn.uinaf.dev/images/uinaf-computer-favicon.png` — favicon and apple touch icon

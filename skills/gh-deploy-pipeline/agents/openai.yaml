@@ -14,8 +14,8 @@ interface:
 
     Constraints:
     - Use this for deployed services or apps, not package releases; use $gh-release-pipeline for publishing versioned artifacts.
-    - Do not paste secrets into workflow YAML.
-    - Do not rebuild inside deploy.
+    - Keep secrets in secret stores and reference them from workflow YAML.
+    - Deploy the already verified artifact or image.
 
     Output: no conversational opener. Use bullet labels only: files changed, targets, evidence, risks, remaining setup, and next. Summarize passing validation by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

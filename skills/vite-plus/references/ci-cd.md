@@ -38,10 +38,11 @@ Prefer the documented Vite+ setup:
 - Prefer `vp config` when the repo wants stock hooks or agent integration instead of hand-rolled hook setup.
 - Prefer one repo-local verify entrypoint if CI needs extra repo-specific commands.
 - Keep release orchestration in GitHub Actions when the repo has npm, GitHub Release, binary, or Homebrew automation that goes beyond stock Vite+.
-- When CI behavior must stay aligned with a repo's chosen Vite+ release, pin the `setup-vp` action's `version` input explicitly. Do not assume it will read the local `vite-plus` dependency version from `package.json`.
+- Vite+ can run repo scripts, but it does not make runtime-installed release plugins reproducible by itself. For semantic-release jobs, follow `gh-release-pipeline`: keep CI/CD-only plugins in the workflow's `extra_plugins` input with exact versions instead of adding release-only packages to repo `devDependencies`.
+- When CI behavior must stay aligned with a repo's chosen Vite+ release, pin the `setup-vp` action's `version` input explicitly. Treat the local `vite-plus` dependency version in `package.json` as separate from the action's runtime version.
 
 ## Guardrails
 
 - Prefer `vp run <script>` (or `vpr <script>`) when CI needs a repo-specific script that Vite+ does not replace.
-- Do not delete release-only steps just to make the workflow look more stock.
+- Preserve release-only steps while making the surrounding workflow more stock.
 - Keep packaging and publish steps that Vite+ does not own.

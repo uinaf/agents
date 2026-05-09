@@ -43,7 +43,7 @@ Single column, narrow, framed-logo top-left, footer below.
 
 ## Headings
 
-One typeface, size does the work. Never bolder than regular for h1/h2.
+One typeface, size does the work. Keep h1/h2 at regular weight.
 
 | Role | Size | Class |
 |---|---|---|
@@ -73,7 +73,7 @@ Wrap blocks in `.u-prose` so the link pattern picks up automatically.
 | Nav, footer, card title, card wrapper | `.u-link-plain` | `opacity: 0.8`, no underline |
 | External link | trailing `<span aria-hidden="true">↗</span>` | inherits the parent's hover |
 
-Cyan is the only link accent. Never recolor a link per-product, per-brand, or per-section.
+Cyan is the only link accent across products, brands, and sections.
 
 ## Cards — the only container pattern
 
@@ -110,7 +110,7 @@ UI hierarchy comes from weight, not color. Three styles:
 </button>
 ```
 
-**Never** colour a button fill. The "primary" colour is white, full stop.
+Button fills stay neutral. The "primary" colour is white, full stop.
 
 ## Inputs
 
@@ -179,7 +179,7 @@ Default to `uinaf-computer.png` for product surfaces (tools, demos, docs, app sh
 </a>
 ```
 
-The 1px `border-neutral-900` frame is part of the lockup. Never rotate, recolor, gradient-fill, or place on a non-black background.
+The 1px `border-neutral-900` frame is part of the lockup. Keep the mark upright, original-color, unfiltered, and on black.
 
 ## Motion — fade-up-in entry
 

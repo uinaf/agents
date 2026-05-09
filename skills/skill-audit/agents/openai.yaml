@@ -12,10 +12,10 @@ interface:
     - Proposed fixes are prioritized and scoped to the requested skill surface.
 
     Constraints:
-    - Do not verify application behavior; use $verify.
-    - Do not review general code or PRs; use $review.
-    - Do not rewrite unrelated docs; use $docs.
-    - Do not run optimizer mode unless explicitly requested.
+    - Route application behavior verification to $verify.
+    - Route general code or PR review to $review.
+    - Route unrelated doc rewrites to $docs.
+    - Run optimizer mode only when explicitly requested.
 
     Output: scope audited, Tessl command and score, highest-priority findings, changes or recommended changes, and rerun status.
 

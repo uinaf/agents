@@ -100,7 +100,7 @@ Use a small default top-level set with one responsibility per file:
 - **`SECURITY.md`** — private-first vulnerability reporting path and boundaries
 - **`LICENSE`** — legal terms, not contributor instructions
 
-Do not cram all four responsibilities into `README.md` unless the repo is tiny enough that the split adds no value.
+Split the four responsibilities across focused docs unless the repo is tiny enough that one file is clearer.
 
 General doc-surface rules:
 
@@ -149,7 +149,7 @@ Guidance:
 - Keep one canonical setup doc for machine bootstrap or shared install commands
 - Let `README.md` point to that setup doc instead of duplicating full bootstrap flows
 - Keep peer-repo or multi-repo layout explanations short and source-of-truth oriented
-- Do not stuff cross-repo reference lists into the top-level README when those links belong in deeper docs or in the peer repos themselves
+- Put cross-repo reference lists in deeper docs or in the peer repos when they are not part of the top-level user path
 
 ### Shape selection
 
@@ -202,10 +202,10 @@ When `README.md` has a `Docs` section, keep it compact and canonical.
 
 - Link to deeper docs without dumping their contents into the README
 - Common links: About, Guides, Architecture, Deployment, Security
-- Do not treat it like a directory listing. Use human labels, not raw filenames or paths
+- Treat it as reader navigation. Use human labels, not raw filenames or paths
 - Keep `Contributing` and `License` in their own sections when the README already has those sections
 - Put agent-only or generated docs last, or move them into a small `Repo Internals` section when that reads better
-- Do not duplicate the same navigation list across multiple top-level files
+- Keep the same navigation list in one canonical place
 - Keep it skimmable
 - Carry the same ordering rule into other visible lists and sections across the doc surface. If a sequence reads like filesystem order instead of reader priority, rewrite it
 
@@ -227,7 +227,7 @@ Run periodically or after a burst of changes:
 6. **Scannability**: agent-facing docs are technically correct but visually awkward, over-cased, or hard to skim → rewrite for fast orientation
 7. **Structure**: file growing past ~80 lines of prose → split detail into `references/`, keep parent as routing layer
 8. **Staleness**: delete or archive docs for removed features, finished plans, superseded decisions
-9. **Symlinks over copies**: two files need identical content → symlink, never two copies
+9. **Symlinks over copies**: two files need identical content → symlink them
 
 ## Keep Docs Alive
 

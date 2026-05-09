@@ -27,7 +27,7 @@ Both jobs check out at `fetch-depth: 0`. The verify job is gated by a cancellabl
 3. Pick the publish target — [references/targets.md](references/targets.md) covers npm, CocoaPods/SwiftPM, Go (GoReleaser), Rust (release-plz + cargo-dist), GitHub Actions marketplace, and Homebrew tap automation. Prefer an existing working repo pattern over a generic marketplace action.
 4. Author `.github/workflows/ci.yml` with verify and release jobs per [references/workflows.md](references/workflows.md).
 5. Add release config (`.releaserc.json`, `release.config.js`, or a `"release"` block in `package.json`) per [references/semantic-release.md](references/semantic-release.md).
-6. Wire publish secrets in repo settings (`NPM_TOKEN`, `COCOAPODS_TRUNK_TOKEN`, `TAP_GITHUB_TOKEN`, etc.) and scope `permissions:` per job — never broaden the default token.
+6. Wire publish secrets in repo settings (`NPM_TOKEN`, `COCOAPODS_TRUNK_TOKEN`, `TAP_GITHUB_TOKEN`, etc.) and scope each job's `permissions:` to the exact write surface it needs.
 7. Add the `[skip ci]` short-circuit to both jobs so the bump commit does not retrigger.
 8. For secret-bearing release/backfill jobs, use trusted checkout refs and validated manual inputs per [references/workflows.md](references/workflows.md).
 9. Set bot identity (`GIT_AUTHOR_NAME`/`GIT_COMMITTER_NAME` + emails) so the bump commit is attributed to the token actor or release bot, not the last human pusher.
@@ -59,9 +59,9 @@ release:
 
 ## Guardrails
 
-- One release pipeline per repo. If the repo already has a tag-driven backstop workflow, document why; do not silently introduce a second active path.
+- Keep one release pipeline per repo. If the repo already has a tag-driven backstop workflow, document why that second path exists.
 - Repo precedent beats generic advice. If a sibling repo already ships the same artifact class successfully, preserve that action and shape unless you can point to a concrete mismatch.
-- Verify is the only gate to publish. Do not move guardrails into the release job, do not bypass via `workflow_dispatch`, do not weaken `needs: [verify]`.
+- Keep verify as the only gate to publish: release depends on verify, manual paths preserve the same gate, and guardrails stay before publish.
 - The bump commit is an invariant: bot-authored, `[skip ci]` in the message, and respected by both jobs' `if:` guards.
 - When push-back is restricted, use the allowed bot/app token and matching author/committer metadata. Metadata alone does not authorize the write.
 - Pin high-trust release, publish, upload, and signing actions to full commit SHAs with a trailing human version comment when the repo's maintenance model can support Dependabot or scheduled pin refreshes.
