@@ -1,6 +1,6 @@
 {
   "name": "uinaf/review",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "private": false,
   "summary": "Review existing code, diffs, branches, or pull requests using concern-specific reviewer personas and evidence. Use when auditing someone else's work, triaging risk in a PR, or producing a ship-it / needs-review / blocked verdict. Do not use to verify your own completed change; use `verify` for that.",
   "skills": {

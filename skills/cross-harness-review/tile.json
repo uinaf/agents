@@ -1,6 +1,6 @@
 {
   "name": "uinaf/cross-harness-review",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "summary": "Run a read-only code review through the opposite AI coding harness and return uinaf review-style findings, evidence, unverified gaps, and a ship-it / needs-review / blocked verdict. Use for /review-with-claudex, cross-harness review, opposite-model review, Claude reviewing Codex work, or Codex reviewing Claude work.",
   "skills": {

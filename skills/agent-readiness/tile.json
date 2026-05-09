@@ -1,6 +1,6 @@
 {
   "name": "uinaf/agent-readiness",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "private": false,
   "summary": "Audit and build the infrastructure a repo needs so agents can work autonomously — boot scripts, smoke tests, CI/CD gates, dev environment setup, observability, and isolation. Use when a repo can't boot, tests are broken or missing, there's no dev environment, agents can't verify their work, or agents need human help to get anything done. Do not use for reviewing an existing diff or for documentation-only cleanup.",
   "skills": {
