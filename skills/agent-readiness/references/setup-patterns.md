@@ -120,7 +120,7 @@ jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@<full-sha> # v6.x.y
       - run: <your-boot-command>
       - run: <your-smoke-command>
       - run: <your-test-command>

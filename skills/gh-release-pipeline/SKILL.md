@@ -63,5 +63,5 @@ release:
 - Repo precedent beats generic advice. If a sibling repo already ships the same artifact class successfully, preserve that action and shape unless you can point to a concrete mismatch.
 - Keep verify as the only gate to publish: release depends on verify, manual paths preserve the same gate, and guardrails stay before publish.
 - The bump commit is an invariant: bot-authored, `[skip ci]` in the message, and respected by both jobs' `if:` guards.
-- When push-back is restricted, use the allowed bot/app token and matching author/committer metadata. Metadata alone does not authorize the write.
+- When push-back is restricted, check the repo's branch rules and allowed actors before choosing credentials. Use the default Actions actor when it can be allowed cleanly; otherwise use a dedicated release bot or GitHub App token that branch rules explicitly allow, plus matching author/committer metadata. Metadata alone does not authorize the write, and broad admin-style exceptions are not the default answer.
 - Pin high-trust release, publish, upload, and signing actions to full commit SHAs with a trailing same-line version comment when the repo's maintenance model can support Dependabot or scheduled pin refreshes. Prefer exact comments such as `# v1.10.0`; verify the SHA resolves upstream before committing it.

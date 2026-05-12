@@ -132,7 +132,7 @@ Two-step release job:
 - `cargo dist init` writes `[workspace.metadata.dist]` in `Cargo.toml`. Set `tap = "<org>/homebrew-tap"` and `installers = ["shell", "powershell", "homebrew"]`.
 - Default targets: `x86_64-unknown-linux-gnu`, `aarch64-apple-darwin`, `x86_64-apple-darwin`, `x86_64-pc-windows-msvc`. Add `x86_64-unknown-linux-musl` for static Linux; `aarch64-unknown-linux-gnu` for ARM64 Linux.
 - `cargo-binstall` works out of the box — cargo-dist follows binstall's naming conventions.
-- Simpler alternative if you don't need installers or Homebrew: `taiki-e/upload-rust-binary-action@v1` in a matrix job.
+- Simpler alternative if you don't need installers or Homebrew: `taiki-e/upload-rust-binary-action@<full-sha> # v1.x.y` in a matrix job.
 
 ### Flavor B — Library or dual-distribution (crates.io)
 
@@ -147,7 +147,7 @@ When you do publish to crates.io, swap semantic-release for **[`release-plz`](ht
 ```
 
 - Default mode opens a "Release PR" that bumps `Cargo.toml` + `CHANGELOG.md`. Merging the PR triggers tag + crates.io publish. Replaces the `[skip ci]` bump-back loop with an explicit-merge gate.
-- For the auto-push variant (matching the semantic-release `[skip ci]` shape), set `git_release_enable = true` in `release-plz.toml` and run with a bot PAT that bypasses branch protection.
+- For the auto-push variant (matching the semantic-release `[skip ci]` shape), set `git_release_enable = true` in `release-plz.toml` only when the repo can push through branch rules with `GITHUB_TOKEN`, a dedicated release bot, or a narrowly scoped GitHub App token that is explicitly allowed for release pushback. If no narrow release actor can be allowed, keep the default Release PR flow.
 - Workspace repos: release-plz handles per-crate independent versioning natively via `[[package]]` blocks in `release-plz.toml`.
 - For dual-distribution (crates.io + binaries), pair release-plz with cargo-dist exactly as in Flavor A — release-plz creates the tag, cargo-dist builds binaries on it.
 
@@ -194,7 +194,7 @@ GoReleaser commits the updated `Formula/<cli-name>.rb` straight to the tap's def
 
 First check whether the org already has a non-Go CLI publishing to the same tap. If it does, copy that action and input shape unless the packaging format is different.
 
-For script or binary CLIs whose Homebrew formula can be generated from the GitHub Release archive, [`Justintime50/homebrew-releaser`](https://github.com/Justintime50/homebrew-releaser) is the boring direct-to-tap pattern. It clones the source repo and tap repo, generates or updates the formula, and commits straight to the tap branch using the supplied token. Pin the same major version the working sibling repo uses.
+For script or binary CLIs whose Homebrew formula can be generated from the GitHub Release archive, [`Justintime50/homebrew-releaser`](https://github.com/Justintime50/homebrew-releaser) is the boring direct-to-tap pattern. It clones the source repo and tap repo, generates or updates the formula, and commits straight to the tap branch using the supplied token. Pin the action to a full commit SHA with a same-line version comment matching the version line the working sibling repo uses.
 
 ```yaml
 - if: steps.release.outputs.new_release_published == 'true'

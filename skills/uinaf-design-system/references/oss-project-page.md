@@ -54,7 +54,7 @@ Package-manager picker on top, command snippet below, copy-to-clipboard affordan
       data-tab="0">brew</button>
     <button type="button" role="tab" aria-selected="false"
       class="cursor-pointer border-0 bg-transparent text-[11px] text-neutral-600 px-3 py-[5px] border-l border-neutral-800 hover:text-neutral-200 aria-selected:bg-black/50 aria-selected:text-neutral-200 transition-colors"
-      data-tab="1">curl</button>
+      data-tab="1">cargo</button>
   </div>
   <div class="relative min-w-0 border border-neutral-800 rounded-b-[2px] rounded-tr-[2px] bg-black/50 text-sm text-neutral-200 leading-relaxed py-2.5 pl-3.5 pr-[76px] tabular-nums">
     <button type="button"
@@ -64,7 +64,7 @@ Package-manager picker on top, command snippet below, copy-to-clipboard affordan
       <span class="text-slime-cyan select-none mr-2.5">$</span>brew install uinaf/tap/healthd
     </code>
     <code class="block m-0 [white-space:pre-wrap] [overflow-wrap:anywhere]" data-pane="1" hidden>
-      <span class="text-slime-cyan select-none mr-2.5">$</span>curl -fsSL https://raw.githubusercontent.com/uinaf/healthd/main/scripts/install.sh | bash
+      <span class="text-slime-cyan select-none mr-2.5">$</span>cargo binstall healthd
     </code>
   </div>
 </div>
@@ -76,7 +76,7 @@ The `$` prompt uses `mr-2.5` (10px) instead of a literal space — keep this con
 
 Copy button on success: swap the label to `copied` and add `data-copied` for the slime-green ring, then revert after ~1.4s. Don't animate the swap; the color shift is enough.
 
-Long URLs (curl install scripts) wrap rather than overflow — `[white-space:pre-wrap] [overflow-wrap:anywhere]` on the pane.
+Long install commands wrap rather than overflow — `[white-space:pre-wrap] [overflow-wrap:anywhere]` on the pane.
 
 ```html
 <script>

@@ -88,7 +88,7 @@ The dry-run prints the computed version and notes without tagging or publishing.
 
 ## Action Wrapper
 
-Use `cycjimmy/semantic-release-action@v4` (or the latest v6 if the repo is on it). Inputs worth knowing:
+Use `cycjimmy/semantic-release-action@<full-sha> # v4.x.y` (or a full-SHA-pinned v6 line if the repo is already on it). Inputs worth knowing:
 
 - `working_directory` — for monorepo packages.
 - `extra_plugins` — install CI/CD-only release plugins without polluting the repo's runtime or dev dependency graph. Pin every entry to an exact version such as `@semantic-release/npm@13.1.5`; use exact package specs in secret-bearing release jobs.

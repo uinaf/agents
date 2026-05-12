@@ -71,7 +71,7 @@ Use when aligning GitHub Actions release workflow files.
 
 ## Settings and Secrets
 
-- Check live settings before severity or remediation calls: `main` rules, release tag rules, Actions permission policy, Environment reviewers/branch policy, and publish secret location.
+- Check live settings before severity or remediation calls: `main` rules, allowed push actors, release tag rules, Actions permission policy, Environment reviewers/branch policy, and publish secret location.
 - Continuous releases should use Environment-scoped secrets without approval gates. Use separate reviewer-gated environments only when a human must approve signing, production promotion, or store submission.
 - Package/library/CLI/marketplace release jobs that use an Environment only to read publish secrets set `deployment: false`. This keeps Environment secrets, variables, and branch policy without creating GitHub Deployment records.
 - Keep deployment records enabled for running-service/app deploys and for Environments that use custom deployment protection rules.
@@ -85,7 +85,7 @@ Use when aligning GitHub Actions release workflow files.
 ## Checkout
 
 - Both jobs: `actions/checkout@<full-sha> # v6.x.y` with `fetch-depth: 0`. Semantic-release walks history to compute the next version; a shallow clone breaks it.
-- Release also needs `persist-credentials: true` (the default) so `@semantic-release/git` can push the bump commit using `GITHUB_TOKEN`.
+- Release also needs `persist-credentials: true` (the default) so `@semantic-release/git` can push the bump commit using the checkout token. Do not assume the default Actions actor is allowed or blocked; verify the branch rules. If those rules cannot allow the default actor cleanly, use a dedicated release bot or GitHub App token that is explicitly allowed by the same rules.
 
 ## `[skip ci]` Gate
 
@@ -111,7 +111,7 @@ env:
 
 Use a `noreply.github.com` address or a dedicated bot account so bump commits are attributed to automation.
 
-- The token actor and commit identity must agree. `GIT_AUTHOR_*`/`GIT_COMMITTER_*` with `GITHUB_TOKEN` still writes as `github-actions[bot]`.
+- The token actor and commit identity must agree. `GIT_AUTHOR_*`/`GIT_COMMITTER_*` with `GITHUB_TOKEN` still writes as `github-actions[bot]`; use a dedicated release bot or GitHub App token when branch rules need a separately allowlisted actor.
 - If a third-party action commits internally, verify it accepts author/committer inputs or honors `GIT_AUTHOR_*`/`GIT_COMMITTER_*`. Checkout tokens do not override hardcoded metadata.
 
 ## Caches
