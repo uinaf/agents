@@ -64,4 +64,4 @@ release:
 - Keep verify as the only gate to publish: release depends on verify, manual paths preserve the same gate, and guardrails stay before publish.
 - The bump commit is an invariant: bot-authored, `[skip ci]` in the message, and respected by both jobs' `if:` guards.
 - When push-back is restricted, use the allowed bot/app token and matching author/committer metadata. Metadata alone does not authorize the write.
-- Pin high-trust release, publish, upload, and signing actions to full commit SHAs with a trailing human version comment when the repo's maintenance model can support Dependabot or scheduled pin refreshes.
+- Pin high-trust release, publish, upload, and signing actions to full commit SHAs with a trailing same-line version comment when the repo's maintenance model can support Dependabot or scheduled pin refreshes. Prefer exact comments such as `# v1.10.0`; verify the SHA resolves upstream before committing it.

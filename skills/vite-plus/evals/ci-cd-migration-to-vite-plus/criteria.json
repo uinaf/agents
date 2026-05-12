@@ -5,12 +5,12 @@
     {
       "name": "Uses setup-vp action",
       "max_score": 15,
-      "description": "The migrated workflow uses `voidzero-dev/setup-vp@v1` instead of a hand-rolled `actions/setup-node` or Corepack bootstrapping step"
+      "description": "The migrated workflow uses `voidzero-dev/setup-vp` instead of a hand-rolled `actions/setup-node` or Corepack bootstrapping step. If the repo pins GitHub Actions, the action is pinned to a full commit SHA with a same-line exact version comment for Dependabot."
     },
     {
       "name": "No redundant vp env step",
       "max_score": 10,
-      "description": "The CI workflow does NOT add a separate `vp env` setup step. `setup-vp@v1` already handles Node and package-manager bootstrap; the skill explicitly tells agents not to duplicate it unless the repo has a specific environment need the action does not cover."
+      "description": "The CI workflow does NOT add a separate `vp env` setup step. `setup-vp` already handles Node and package-manager bootstrap; the skill explicitly tells agents not to duplicate it unless the repo has a specific environment need the action does not cover."
     },
     {
       "name": "Uses vp install",

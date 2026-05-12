@@ -191,7 +191,7 @@ Use explicit `result == 'success'` checks for deploy gates. `if: success()` trea
 For a Vite+ workspace:
 
 ```yaml
-- uses: voidzero-dev/setup-vp@v1
+- uses: voidzero-dev/setup-vp@<full-sha> # v1.x.y
   with:
     version: ${{ env.VITE_PLUS_VERSION }}
     node-version-file: .node-version

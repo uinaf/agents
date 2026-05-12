@@ -5,7 +5,7 @@ Use this reference before changing GitHub Actions or release automation.
 Prefer the documented Vite+ setup:
 
 ```yaml
-- uses: voidzero-dev/setup-vp@v1
+- uses: voidzero-dev/setup-vp@<full-sha> # v1.x.y
   with:
     node-version-file: ".node-version"
     cache: true
@@ -17,7 +17,7 @@ Prefer the documented Vite+ setup:
 
 ## Action Inputs
 
-`voidzero-dev/setup-vp@v1` exposes:
+`voidzero-dev/setup-vp` exposes:
 
 | Input | Purpose |
 | ----- | ------- |
@@ -32,7 +32,7 @@ Prefer the documented Vite+ setup:
 
 ## Defaults
 
-- Prefer `voidzero-dev/setup-vp@v1` over hand-rolled Node/Corepack bootstrapping unless the repo has a proven exception.
+- Prefer `voidzero-dev/setup-vp` over hand-rolled Node/Corepack bootstrapping unless the repo has a proven exception. In repos that pin Actions, use a full commit SHA with a same-line exact version comment and a `github-actions` Dependabot entry so updates stay reviewable.
 - Prefer `setup-vp`'s built-in Node and package-manager bootstrap over adding separate CI-time `vp env` setup steps unless the repo has a specific environment need the action does not cover.
 - Prefer `vp install` over separate package-manager bootstrap logic when Vite+ is the tool owner. The action's `run-install: true` input collapses setup + install into one step.
 - Prefer `vp config` when the repo wants stock hooks or agent integration instead of hand-rolled hook setup.

@@ -78,7 +78,7 @@ Use when aligning GitHub Actions release workflow files.
 
 ## Release Tooling
 
-- Pin high-trust release, publish, upload, and signing actions to full commit SHAs with a trailing human version comment.
+- Pin high-trust release, publish, upload, and signing actions to full commit SHAs with a trailing same-line version comment. Dependabot can update SHA-pinned GitHub Actions when the ref line carries the version comment; stale SHAs that no longer exist upstream should be fixed before relying on the updater.
 - When a release action installs plugins at runtime, pin each requested plugin to an exact version in jobs with registry, signing, or repository-write secrets.
 - Keep CI/CD-only release tooling out of the repo dependency graph by default. Use action inputs such as `extra_plugins` for workflow-owned release plugins, and reserve `devDependencies` for tooling the repo intentionally exposes through local scripts or lockfile-owned release wrappers.
 
@@ -152,7 +152,7 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Us
 
 ```yaml
 # Node via Vite+
-- uses: voidzero-dev/setup-vp@v1
+- uses: voidzero-dev/setup-vp@<full-sha> # v1.x.y
   with: { node-version-file: ".node-version", cache: false }
 - run: vp install
 ```
