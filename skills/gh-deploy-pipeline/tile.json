@@ -1,6 +1,6 @@
 {
   "name": "uinaf/gh-deploy-pipeline",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "private": false,
   "summary": "Set up or align a GitHub Actions deploy pipeline for a running app or service. Use when standardizing repos around the verify-then-deploy shape: push to main -> detect affected lanes -> verify and build artifacts -> e2e -> deploy each lane through a GitHub Environment using OIDC or environment-scoped credentials.",
   "skills": {
