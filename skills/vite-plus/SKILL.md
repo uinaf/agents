@@ -28,7 +28,7 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 6. Update CI per [references/ci-cd.md](references/ci-cd.md).
 7. Update tests and coverage per [references/testing.md](references/testing.md).
 8. Check [references/commands.md](references/commands.md) before changing command invocations. Load [references/known-issues.md](references/known-issues.md) only on unexpected behavior or when upgrading Vite+.
-9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace.
+9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace. Verify jobs may use Vite+ dependency caches; secret-bearing release, publish, signing, and deploy jobs disable dependency caches and run fresh installs.
 10. To adopt a newer Vite+ release: `vp upgrade` (global), then `vp update vite-plus @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` (project). Confirm with `vp outdated`.
 11. End-to-end validation: `vp env current && vp install && vp check && vp test`, then verify `vp build` or `vp pack` artifacts, `vp preview` where applicable, `vp test run --coverage`, and `vp staged` on a staged change.
 

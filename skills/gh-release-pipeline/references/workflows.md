@@ -13,6 +13,7 @@ Use when aligning GitHub Actions release workflow files.
 
 - Verify: `pull_request` and `push` to `main`.
 - Release: `push` to `main` only. Encode this as an `if:` on the release job rather than a separate `on:` block, so verify and release stay coupled.
+- Do not use `pull_request_target` for any workflow that checks out, installs, builds, tests, packages, signs, publishes, or otherwise executes project code. Keep fork and outsider code on `pull_request` with read-only credentials and no release secrets.
 - Manual `workflow_dispatch` is fine to add for verify; release paths still honor the `[skip ci]` gate.
 - Secret-bearing manual release/backfill workflows use trusted checkout refs: `main`, a published `v*` tag, or a separately validated protected ref.
 - GitHub Environment branch/tag policies gate the workflow run ref; they do not prove that a later `actions/checkout` `with.ref` or `git checkout` input is trusted. Treat run ref and checkout ref as separate trust boundaries.
@@ -115,9 +116,17 @@ Use a `noreply.github.com` address or a dedicated bot account so bump commits ar
 
 ## Caches
 
-- Release caches are for downloads and tool caches, not generated dependency trees or build outputs that become signed/published artifacts.
+- Verify jobs may use dependency caches. Secret-bearing release, publish, signing, and promotion jobs do fresh dependency installs by default.
+- Do not share package-manager caches between `pull_request` and privileged `push: main`, `workflow_dispatch`, or tag-driven jobs. The dangerous shape is outsider-controlled code populating a cache that a later publish job consumes.
+- Release caches are only for unavoidable download/tool caches, not package-manager stores, generated dependency trees, or build outputs that become signed/published artifacts.
 - Regenerate or verify generated trees such as `Pods/`, `vendor/`, `dist/`, build directories, or packaged runtime bundles inside secret-bearing release jobs.
-- If a cache is unavoidable, namespace it by workflow, event/trust level, platform, and lockfile. Release jobs must regenerate or verify generated trees before signing or publishing.
+- If a cache is unavoidable, namespace it by workflow, event/trust level, platform, and lockfile. Release jobs must consume only caches from the same trusted event class and must regenerate or verify generated trees before signing or publishing.
+
+## npm Supply-Chain Incident Checks
+
+- For active npm compromise response, scan manifests and lockfiles before installing. Look for affected versions from the advisory, unexpected git dependencies, malicious `optionalDependencies`, and package-root payloads such as `router_init.js`.
+- If an affected package was installed on a developer machine or CI runner, treat that host as compromised and rotate registry, GitHub, cloud, SSH, Vault, and package-manager credentials reachable from the host before publishing again.
+- SLSA or npm provenance proves the package came from a workflow identity, not that the workflow runner was clean. Keep provenance, but do not let it replace trusted refs, fresh release installs, and cache separation.
 
 ## Multi-Verify Composition
 
@@ -137,14 +146,14 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Us
 ```yaml
 # Node / TypeScript
 - uses: actions/setup-node@v5
-  with: { node-version-file: ".nvmrc", cache: "npm" }
+  with: { node-version-file: ".nvmrc" }
 - run: npm ci
 ```
 
 ```yaml
 # Node via Vite+
 - uses: voidzero-dev/setup-vp@v1
-  with: { node-version-file: ".node-version", cache: true }
+  with: { node-version-file: ".node-version", cache: false }
 - run: vp install
 ```
 
@@ -159,5 +168,5 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Us
 - uses: maxim-lobanov/setup-xcode@v1
   with: { xcode-version: latest-stable }
 - uses: ruby/setup-ruby@v1
-  with: { bundler-cache: true }
+  with: { bundler-cache: false }
 ```

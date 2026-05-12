@@ -50,6 +50,7 @@ on:
 - Environment branch/tag rules constrain the workflow run ref; validate any separately checked-out `inputs.ref` as its own trust boundary.
 - Manual redeploys download an existing artifact or pull an image by immutable digest/SHA in the secret-bearing job.
 - Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or artifact/image lookup.
+- Do not use `pull_request_target` for any workflow that checks out, installs, builds, tests, packages, deploys, or otherwise executes project code. Keep fork and outsider code on `pull_request` with read-only credentials and no deploy secrets.
 
 ## Concurrency
 
@@ -170,8 +171,10 @@ The same artifact must flow `verify → e2e → deploy`. Upload once, download t
 ## Caches
 
 - Caches speed dependency downloads and tool setup; they are not deployment artifacts.
+- Secret-bearing deploy and promotion jobs should prefer immutable artifacts or image digests produced by the verified trusted run over fresh package-manager cache restores.
+- Do not share package-manager caches between `pull_request` and privileged `push: main`, `workflow_dispatch`, or tag-driven jobs.
 - Rebuild or verify generated app output, package/vendor trees, container layers, and built bundles inside the trusted deploy path.
-- If deploy-time setup needs a cache, namespace by workflow, event/trust level, platform, and lockfile. The deployed artifact still comes from the current verified artifact or immutable image digest.
+- If deploy-time setup needs a cache, namespace by workflow, event/trust level, platform, and lockfile. Privileged jobs consume only caches from the same trusted event class. The deployed artifact still comes from the current verified artifact or immutable image digest.
 
 ## Job dependencies
 

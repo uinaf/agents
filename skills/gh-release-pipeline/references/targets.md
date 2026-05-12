@@ -27,6 +27,7 @@ Workflow step:
 ```
 
 - `registry-url` is required for `setup-node` to write the `_authToken` line. Without it, `@semantic-release/npm` cannot publish.
+- Do not enable package-manager caches in the npm publish job. Install fresh in the secret-bearing job, then run `npm pack --dry-run` or the repo's pack smoke before publishing when the package surface is non-trivial.
 - For scoped public packages set `"publishConfig": { "access": "public" }` in `package.json`.
 - For a CLI, set `"bin"` in `package.json` and verify the published tarball includes the entry. `npm pack --dry-run` locally before the first release.
 - If the release builds standalone binaries, verify every downloaded runtime or toolchain archive by digest before extracting or embedding it. Pair functional smoke tests with provenance checks.
@@ -51,7 +52,7 @@ Semantic-release tags via `@semantic-release/git`; CocoaPods publish runs via `@
 - `publish-cocoapods.sh` runs `pod trunk push <podname>.podspec --allow-warnings`.
 - Secrets: `COCOAPODS_TRUNK_TOKEN` exported as env on the publish step. Trunk token is generated with `pod trunk register` once and then stored as a repo secret.
 - SwiftPM consumers pull from the git tag — no separate publish step needed.
-- Cache download artifacts across trust boundaries. Regenerate or verify generated dependency trees such as full `Pods/` inside signed or publishing jobs before signing or publishing.
+- Cache download artifacts only inside a single trust class. Regenerate or verify generated dependency trees such as full `Pods/` inside signed or publishing jobs before signing or publishing.
 
 ## Go (GoReleaser)
 
