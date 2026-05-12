@@ -55,15 +55,6 @@ else
   echo "Skipping Cursor skills: 'cursor' is not on PATH (install Shell Command from Cursor command palette)"
 fi
 
-if command -v pi >/dev/null 2>&1; then
-  mkdir -p "$HOME/.pi/agent"
-  ln -sf "$REPO_DIR/rules/agents.md" "$HOME/.pi/agent/AGENTS.md"
-  echo "Linked: ~/.pi/agent/AGENTS.md -> rules/agents.md"
-  SKILL_AGENTS+=(pi)
-else
-  echo "Skipping pi setup: 'pi' is not installed"
-fi
-
 # openclaw has no PATH binary; presence of ~/.openclaw is the install signal.
 if [ -d "$HOME/.openclaw" ]; then
   SKILL_AGENTS+=(openclaw)
