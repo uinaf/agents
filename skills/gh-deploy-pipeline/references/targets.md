@@ -55,7 +55,7 @@ runs:
         name: ${{ inputs.artifact-name }}
         path: ${{ inputs.artifact-directory }}
 
-    - uses: aws-actions/configure-aws-credentials@v6
+    - uses: aws-actions/configure-aws-credentials@v6.1.1
       with:
         role-to-assume: ${{ env.AWS_AMPLIFY_DEPLOY_ROLE_ARN }}
         aws-region:     ${{ env.AWS_REGION }}

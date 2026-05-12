@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 steps:
-  - uses: aws-actions/configure-aws-credentials@v6
+  - uses: aws-actions/configure-aws-credentials@v6.1.1
     with:
       role-to-assume: arn:aws:iam::123456789012:role/GhActionsDeploy
       aws-region:     us-east-1
