@@ -14,12 +14,12 @@ Start by reading the repo's existing workflow/action files and any same-org repo
 │   └── verify.yml    # pull_request + merge_group → verify only (no deploy)
 └── actions/
     ├── setup-workspace/        # one place to bootstrap (Node, pnpm/vite+, cache)
-    ├── load-1password-env/     # secret rendering, see references/secrets.md
-    ├── <host>-deploy/          # cloudflare-pages-deploy / amplify-deploy / vps-deploy
-    └── publish-preview-comment/  # only if you do PR previews
+    ├── assume-deploy-identity/ # optional OIDC/provider federation wrapper
+    ├── deploy-<lane>/          # repo-owned provider-thin deploy primitive, often SST
+    └── smoke-<lane>/           # credential-free environment health check
 ```
 
-Composite actions, not reusable workflows, for the deploy primitives. Reusable workflows are useful when you have many lanes that share the *whole* job graph (build → e2e → deploy); composite actions are right when only the deploy step itself is shared. A larger uinaf app may use both: `lane.yml` as a reusable workflow that calls `deploy-hosted-app` (composite). A smaller app can stay simpler with composite actions only and duplicated jobs per lane.
+Composite actions can be useful for repo-owned deploy primitives, but do not turn this skill into a host cookbook. Keep provider mechanics in SST, scripts, infrastructure code, or a small local action whose inputs are artifact path, environment, lane, immutable version, and explicit deploy config path.
 
 ## Triggers
 
@@ -39,14 +39,15 @@ on:
 on:
   workflow_dispatch:
     inputs:
-      ref:  { type: string, default: main, description: "Git ref to deploy" }
-      lane: { type: choice, options: [all, <lane-1>, <lane-2>], default: all }
+      ref:         { type: string, required: true, description: "Verified git ref or SHA to promote" }
+      environment: { type: choice, options: [staging, production], required: true }
+      lane:        { type: choice, options: [web, api], required: true }
 ```
 
 - `merge_group:` covers the GitHub merge queue. Without it the queue blocks PRs that depend on green checks from this workflow.
 - `pull_request: { types: [...ready_for_review] }` keeps draft PRs out of CI but picks them up the moment they're marked ready.
 - Do **not** add `push:` to `verify.yml` — the verify gate runs inside `main.yml` for push events.
-- Secret-bearing manual deploys validate `inputs.ref` in a secretless step before checkout or secret loading. Prefer `main`, protected release tags, or exact SHAs with a matching successful artifact/image.
+- Secret-bearing manual deploys validate `inputs.ref`, `inputs.environment`, and `inputs.lane` in a secretless step before checkout or secret loading. Prefer `main`, protected release tags, or exact SHAs with a matching successful artifact/image.
 - Environment branch/tag rules constrain the workflow run ref; validate any separately checked-out `inputs.ref` as its own trust boundary.
 - Manual redeploys download an existing artifact or pull an image by immutable digest/SHA in the secret-bearing job.
 - Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or artifact/image lookup.
@@ -87,18 +88,19 @@ jobs:
   deploy-web:
     permissions:
       contents: read
-      id-token: write          # AWS OIDC / Cloudflare with OIDC / GitHub attestations
+      id-token: write          # provider OIDC / deploy federation / GitHub attestations
       pull-requests: write     # only if posting preview comments
 ```
 
-- `id-token: write` is required for any OIDC-backed cloud auth (`aws-actions/configure-aws-credentials`, GHCR's keyless tokens, Cloudflare's API-token-via-OIDC).
-- `packages: write` is required for `docker/build-push-action` to push to GHCR.
+- `id-token: write` is required for OIDC-backed provider auth and keyless attestations.
+- Add registry-specific write permissions only when the verified build job pushes an image or release artifact to that registry.
 - Keep verify jobs read-only for pull requests.
+- Smoke jobs are read-only and should not receive OIDC or deploy-provider credentials.
 
 ## Checkout
 
 ```yaml
-- uses: actions/checkout@v6
+- uses: actions/checkout@<full-sha> # v6.x.y
   with:
     fetch-depth: 0      # required for paths-filter and turbo --affected
     persist-credentials: true   # default; keep on if a later step pushes
@@ -110,11 +112,11 @@ jobs:
 
 Two patterns; pick by repo shape.
 
-### `dorny/paths-filter@v4` (per-app rules, simple repos)
+### `dorny/paths-filter` (per-app rules, simple repos)
 
 ```yaml
 - id: filter
-  uses: dorny/paths-filter@v4
+  uses: dorny/paths-filter@<full-sha> # v4.x.y
   with:
     filters: |
       web:
@@ -150,7 +152,7 @@ The same artifact must flow `verify → e2e → deploy`. Upload once, download t
 
 ```yaml
 # verify-<lane>
-- uses: actions/upload-artifact@v7
+- uses: actions/upload-artifact@<full-sha> # v7.x.y
   with:
     name: <lane>-dist
     path: apps/<lane>/dist
@@ -158,7 +160,7 @@ The same artifact must flow `verify → e2e → deploy`. Upload once, download t
     include-hidden-files: true   # next/_next/, vite ssr manifests, etc.
 
 # e2e-<lane>, deploy-<lane>
-- uses: actions/download-artifact@v8
+- uses: actions/download-artifact@<full-sha> # v8.x.y
   with:
     name: <lane>-dist
     path: apps/<lane>/dist
@@ -182,9 +184,49 @@ The same artifact must flow `verify → e2e → deploy`. Upload once, download t
 deploy-web:
   needs: [verify-web, e2e-web]
   if: ${{ needs.verify-web.result == 'success' && needs.e2e-web.result == 'success' }}
+
+smoke-web:
+  needs: deploy-web
+  if: ${{ needs.deploy-web.result == 'success' }}
 ```
 
 Use explicit `result == 'success'` checks for deploy gates. `if: success()` treats skipped upstream jobs as success when the lane was not affected, while `always() && (...)` belongs on final summary jobs.
+
+## SST deploy action shape
+
+For an SST-backed static or app surface, keep deploy and smoke separate:
+
+```yaml
+# .github/actions/deploy-surface/action.yml
+inputs:
+  artifact-name: { required: true }
+  artifact-path: { required: true }
+  role-to-assume: { required: true }
+  aws-region: { required: true }
+  role-session-name: { required: true }
+  sst-config: { required: true }
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/download-artifact@<full-sha> # v8.x.y
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: ${{ inputs.artifact-path }}
+    - uses: aws-actions/configure-aws-credentials@<full-sha> # v6.x.y
+      with:
+        role-to-assume: ${{ inputs.role-to-assume }}
+        role-session-name: ${{ inputs.role-session-name }}
+        aws-region: ${{ inputs.aws-region }}
+    - shell: bash
+      env:
+        SST_CONFIG: ${{ inputs.sst-config }}
+      run: vp exec -- sst --config "${SST_CONFIG}" deploy --stage production
+```
+
+- Pass `sst-config` explicitly per lane, for example `infra/web/sst.config.ts`.
+- Disable dependency and build caches in the credential-bearing deploy setup unless the cache is scoped to trusted deploy events.
+- Put smoke checks in a downstream job with only `contents: read`; assert cloud credentials are absent before Playwright or HTTP probes.
 
 ## Bootstrap snippets
 
@@ -202,38 +244,40 @@ For a Vite+ workspace:
 For a plain pnpm + Node workspace:
 
 ```yaml
-- uses: actions/setup-node@v5
+- uses: actions/setup-node@<full-sha> # v5.x.y
   with:
     node-version-file: .node-version
     cache: pnpm
-- uses: pnpm/action-setup@v4
+- uses: pnpm/action-setup@<full-sha> # v4.x.y
   with: { run_install: false }
 - run: pnpm install --frozen-lockfile
 ```
 
-For a Docker build (api/backend lane):
+For a container build (api/backend lane), push to the repo's chosen registry with the narrowest write token or OIDC-supported identity available:
 
 ```yaml
-- uses: docker/setup-buildx-action@v3
-- uses: docker/login-action@v3
+- uses: docker/setup-buildx-action@<full-sha> # v3.x.y
+- uses: docker/login-action@<full-sha> # v3.x.y
   with:
-    registry: ghcr.io
-    username: ${{ github.actor }}
-    password: ${{ secrets.GITHUB_TOKEN }}
-- uses: docker/build-push-action@v6
+    registry: ${{ vars.CONTAINER_REGISTRY }}
+    username: ${{ vars.CONTAINER_REGISTRY_USER }}
+    password: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
+- uses: docker/build-push-action@<full-sha> # v6.x.y
   with:
     context: .
     push: true
     tags: |
-      ghcr.io/${{ github.repository }}:${{ github.sha }}
-      ghcr.io/${{ github.repository }}:main
+      ${{ vars.CONTAINER_REGISTRY_IMAGE }}:${{ github.sha }}
+      ${{ vars.CONTAINER_REGISTRY_IMAGE }}:main
     cache-from: type=gha
     cache-to:   type=gha,mode=max
 ```
 
+Deploy jobs consume the resulting immutable image digest or commit-SHA tag. They do not rebuild the image.
+
 ## Step summary
 
-End every deploy run with a `GITHUB_STEP_SUMMARY` block listing what shipped, where, and at which commit. That is the artifact the on-call human reads when something is on fire — not the raw job log.
+End every deploy run with a `GITHUB_STEP_SUMMARY` block listing what shipped, which environment received it, where to inspect it, and which commit produced it. That is the artifact the on-call human reads when something is on fire, not the raw job log.
 
 ```yaml
 - run: |

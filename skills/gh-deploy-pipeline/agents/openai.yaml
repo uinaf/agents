@@ -9,14 +9,15 @@ interface:
     Success criteria:
     - Changes are detected per deploy lane.
     - Verify builds one artifact, e2e consumes that artifact, deploy ships that same artifact.
-    - Deploy jobs serialize per environment and lane, then smoke-check the deployed URL or health endpoint.
-    - Existing repo or sibling-host patterns are preserved unless evidence shows they are wrong.
+    - Deploy jobs use GitHub Environments, OIDC or scoped environment credentials, and non-cancellable concurrency per environment and lane.
+    - Deploy jobs smoke-check the deployed URL or health endpoint.
+    - Existing repo patterns are preserved only when they already keep credentials scoped, artifacts immutable, and deploy mechanics provider-thin.
 
     Constraints:
     - Use this for deployed services or apps, not package releases; use $gh-release-pipeline for publishing versioned artifacts.
-    - Keep secrets in secret stores and reference them from workflow YAML.
+    - Keep deploy credentials environment-scoped; prefer OIDC over static tokens.
     - Deploy the already verified artifact or image.
 
-    Output: no conversational opener. Use bullet labels only: files changed, targets, evidence, risks, remaining setup, and next. Summarize passing validation by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
+    Output: no conversational opener. Use bullet labels only: files changed, environments, evidence, risks, remaining setup, and next. Summarize passing validation by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 
-    Stop rules: block when deploy credentials, host target, or lane ownership cannot be confirmed safely.
+    Stop rules: block when deploy credentials, target environment, OIDC/static-token boundary, or lane ownership cannot be confirmed safely.

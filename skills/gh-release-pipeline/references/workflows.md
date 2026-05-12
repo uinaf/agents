@@ -84,7 +84,7 @@ Use when aligning GitHub Actions release workflow files.
 
 ## Checkout
 
-- Both jobs: `actions/checkout@v6` with `fetch-depth: 0`. Semantic-release walks history to compute the next version; a shallow clone breaks it.
+- Both jobs: `actions/checkout@<full-sha> # v6.x.y` with `fetch-depth: 0`. Semantic-release walks history to compute the next version; a shallow clone breaks it.
 - Release also needs `persist-credentials: true` (the default) so `@semantic-release/git` can push the bump commit using `GITHUB_TOKEN`.
 
 ## `[skip ci]` Gate
@@ -145,7 +145,7 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Us
 
 ```yaml
 # Node / TypeScript
-- uses: actions/setup-node@v5
+- uses: actions/setup-node@<full-sha> # v5.x.y
   with: { node-version-file: ".nvmrc" }
 - run: npm ci
 ```
@@ -159,14 +159,14 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Us
 
 ```yaml
 # Go CLI
-- uses: jdx/mise-action@v4
+- uses: jdx/mise-action@<full-sha> # v4.x.y
 - run: mise run verify
 ```
 
 ```yaml
 # Swift (CocoaPods + SwiftPM)
-- uses: maxim-lobanov/setup-xcode@v1
+- uses: maxim-lobanov/setup-xcode@<full-sha> # v1.x.y
   with: { xcode-version: latest-stable }
-- uses: ruby/setup-ruby@v1
+- uses: ruby/setup-ruby@<full-sha> # v1.x.y
   with: { bundler-cache: false }
 ```

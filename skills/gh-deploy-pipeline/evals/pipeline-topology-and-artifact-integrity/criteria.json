@@ -15,7 +15,7 @@
     {
       "name": "Upload version v7",
       "max_score": 8,
-      "description": "Uses actions/upload-artifact@v7 (not v3, v4, or other versions) in the verify/build job"
+      "description": "Uses actions/upload-artifact pinned to a full commit SHA with a v7 version comment (not v3, v4, or other versions) in the verify/build job"
     },
     {
       "name": "if-no-files-found error",
@@ -40,7 +40,7 @@
     {
       "name": "Smoke step present",
       "max_score": 12,
-      "description": "A smoke or health-check step exists in the deploy job that makes an HTTP request (curl, wget, or similar) to the deployed URL after deployment completes"
+      "description": "A separate smoke or health-check job exists after deploy and makes an HTTP request (curl, wget, Playwright, or similar) to the deployed URL"
     },
     {
       "name": "Smoke step fails on non-200",
@@ -49,13 +49,18 @@
     },
     {
       "name": "GITHUB_STEP_SUMMARY",
-      "max_score": 8,
+      "max_score": 6,
       "description": "A step in the deploy job writes to `$GITHUB_STEP_SUMMARY` including what was deployed and where (URL or environment)"
     },
     {
       "name": "Deploy needs both verify and e2e",
-      "max_score": 7,
+      "max_score": 5,
       "description": "The deploy job declares `needs: [verify-<lane>, e2e-<lane>]` (or equivalent) to depend on both upstream jobs"
+    },
+    {
+      "name": "Smoke job has no deploy credentials",
+      "max_score": 4,
+      "description": "The smoke job is read-only and does not receive OIDC or provider deploy credentials"
     }
   ]
 }

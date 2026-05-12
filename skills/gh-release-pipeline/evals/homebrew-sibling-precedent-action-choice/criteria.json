@@ -5,7 +5,7 @@
     {
       "name": "Uses sibling action",
       "max_score": 16,
-      "description": "The Homebrew update step uses `Justintime50/homebrew-releaser@v3`, matching the provided working sibling pattern"
+      "description": "The Homebrew update step uses `Justintime50/homebrew-releaser` pinned to a full commit SHA with a v3 version comment, matching the provided working sibling pattern"
     },
     {
       "name": "Removes incompatible action",
@@ -35,7 +35,7 @@
     {
       "name": "Preserves semantic-release",
       "max_score": 8,
-      "description": "The existing `cycjimmy/semantic-release-action@v4` release step is preserved rather than replaced with a separate release system"
+      "description": "The existing `cycjimmy/semantic-release-action` v4 release step is preserved as a full-SHA-pinned action rather than replaced with a separate release system"
     },
     {
       "name": "No broad PAT advice",

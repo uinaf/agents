@@ -26,6 +26,8 @@ Sync is additive by default. To remove globally installed skills that are not li
 ./scripts/sync/sync.sh --prune
 ```
 
+Third-party skill sources are skipped by default during sync. Set `ALLOW_THIRD_PARTY_SKILLS=1` only when intentionally installing non-`uinaf/agents` skills.
+
 ## Evaluate
 
 ```bash

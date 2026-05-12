@@ -5,7 +5,7 @@
     {
       "name": "paths-filter for detection",
       "max_score": 8,
-      "description": "Uses dorny/paths-filter@v4 (not v2 or v3) to detect which lane changed"
+      "description": "Uses dorny/paths-filter pinned to a full commit SHA with a v4 version comment (not v2 or v3) to detect which lane changed"
     },
     {
       "name": "Lockfile in filter",

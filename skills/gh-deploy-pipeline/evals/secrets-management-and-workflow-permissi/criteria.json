@@ -1,21 +1,21 @@
 {
-  "context": "Tests whether the agent uses 1Password Connect for runtime application secrets (not GitHub repository secrets), OIDC for cloud authentication (not long-lived credentials), enforces correct secret hygiene in workflow steps, and sets minimal workflow permissions.",
+  "context": "Tests whether the agent uses environment-scoped runtime secrets, OIDC for deploy identity (not long-lived credentials), correct secret hygiene in workflow steps, and minimal workflow permissions.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "1Password for runtime env",
+      "name": "Environment-scoped runtime env",
       "max_score": 12,
-      "description": "Uses 1password/load-secrets-action (or the load-1password-env composite action) to render runtime application secrets, rather than referencing them directly from `secrets.*` in the deploy step"
+      "description": "Keeps runtime application secrets in the production GitHub Environment or runtime secret store, rather than referencing repository-level `secrets.*` directly from the deploy step"
     },
     {
       "name": "op:// references in template",
       "max_score": 8,
-      "description": "An env template file is committed to the repo containing `op://` references (not plaintext secrets), e.g. `op://vault/item/field` format"
+      "description": "An env template file is committed to the repo containing secret-store references (not plaintext secrets), e.g. `secret://production/api/DATABASE_URL` format"
     },
     {
       "name": "OIDC for cloud credentials",
       "max_score": 12,
-      "description": "Uses aws-actions/configure-aws-credentials (with `role-to-assume`) or equivalent OIDC mechanism for cloud access, NOT a long-lived AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY in secrets"
+      "description": "Uses an OIDC-backed provider identity mechanism for deploy access, NOT long-lived provider credentials in repository secrets"
     },
     {
       "name": "id-token write at job level",
@@ -28,34 +28,39 @@
       "description": "The workflow-level `permissions:` block grants only `contents: read` (or is absent and the job-level grants are used exclusively)"
     },
     {
+      "name": "Production environment declared",
+      "max_score": 10,
+      "description": "The secret-bearing deploy job declares the production GitHub Environment before loading deploy credentials or runtime secrets"
+    },
+    {
+      "name": "Smoke job credential isolation",
+      "max_score": 10,
+      "description": "A separate smoke job runs after deploy with read-only permissions and asserts cloud/provider credential variables are absent"
+    },
+    {
       "name": "No secrets as CLI flags",
-      "max_score": 9,
+      "max_score": 7,
       "description": "Secret values are passed to commands via environment variables (the `env:` block), NOT as positional or named command-line arguments"
     },
     {
       "name": "No env file dump",
-      "max_score": 9,
+      "max_score": 7,
       "description": "No workflow step uses `cat`, `echo`, or `print` to output the full contents of a rendered `.env` or secrets file"
     },
     {
-      "name": "account-id in vars not secrets",
+      "name": "non-sensitive ids in vars",
       "max_score": 7,
-      "description": "Non-sensitive identifiers like Cloudflare account ID or AWS account ID are referenced from `vars.*` (not `secrets.*`) in the workflow"
+      "description": "Non-sensitive identifiers like account IDs, project IDs, regions, service names, and environment URLs are referenced from `vars.*` (not `secrets.*`) in the workflow"
     },
     {
       "name": "Fine-grained PAT",
-      "max_score": 8,
+      "max_score": 6,
       "description": "Any PAT used for cross-repo operations is stored with a scoped name (e.g. `TAP_GITHUB_TOKEN`, `OPS_TRIGGER_TOKEN`) and the explanation does NOT reference a classic `ghp_` PAT or an unscoped token"
     },
     {
       "name": "GitHub secrets only for bootstrap",
-      "max_score": 9,
-      "description": "The written explanation or comments describe GitHub secrets as holding only CI-access credentials (e.g. OP_SERVICE_ACCOUNT_TOKEN, cloud OIDC role ARN) — not application runtime env values"
-    },
-    {
-      "name": "Env rendered in runner not VPS",
-      "max_score": 10,
-      "description": "For VPS/container deployments, the env file is rendered on the GitHub Actions runner (not on the VPS), and the rendered file is transferred to the VPS via scp or equivalent"
+      "max_score": 5,
+      "description": "The written explanation or comments describe repository secrets as bootstrap-only and place production deploy/runtime secrets on GitHub Environments or the runtime secret store"
     }
   ]
 }

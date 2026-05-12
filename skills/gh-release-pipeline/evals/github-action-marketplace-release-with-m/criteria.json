@@ -60,7 +60,7 @@
     {
       "name": "SR action v4",
       "max_score": 7,
-      "description": "Uses `cycjimmy/semantic-release-action@v4`"
+      "description": "Uses `cycjimmy/semantic-release-action` pinned to a full commit SHA with a v4 version comment"
     }
   ]
 }

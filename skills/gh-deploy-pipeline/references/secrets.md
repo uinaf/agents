@@ -1,176 +1,75 @@
-# Secrets and Environment
+# Secrets and Credentials
 
-Three layers of secrets show up in a deploy pipeline: **CI access** (cloud creds, registry tokens), **runtime env** (DB URLs, third-party keys baked into the deployed app), and **bot identity** (PATs that push to other repos or pull cross-repo images). Each layer has a single right answer.
+Use this reference to keep deploy credentials short-lived, scoped, and quiet in logs. Prefer OIDC and GitHub Environments over provider-specific static-token recipes.
 
-## CI access — prefer OIDC
+## Layers
 
-Whenever the cloud provider supports it, use GitHub's OIDC token instead of long-lived secrets.
+Deploy workflows usually touch three secret classes:
 
-### AWS
+- CI identity: the trust material GitHub Actions uses to authenticate to the deploy provider.
+- Deploy configuration: environment names, project IDs, regions, service names, URLs, and role names.
+- Runtime secrets: values the running app reads, such as database URLs, payment keys, signing keys, and internal service tokens.
 
-```yaml
-permissions:
-  id-token: write
-  contents: read
+Keep these classes separate. Repo-level secrets are bootstrap-only; production deploy credentials and runtime secrets belong to GitHub Environments or the provider's secret system.
 
-steps:
-  - uses: aws-actions/configure-aws-credentials@v6.1.1
-    with:
-      role-to-assume: arn:aws:iam::123456789012:role/GhActionsDeploy
-      aws-region:     us-east-1
-```
+## OIDC First
 
-Trust policy on the IAM role:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-    "Effect": "Allow",
-    "Principal": { "Federated": "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com" },
-    "Action":    "sts:AssumeRoleWithWebIdentity",
-    "Condition": {
-      "StringEquals":   { "token.actions.githubusercontent.com:aud": "sts.amazonaws.com" },
-      "StringLike":     { "token.actions.githubusercontent.com:sub": "repo:<org>/<repo>:ref:refs/heads/main" }
-    }
-  }]
-}
-```
-
-- One role per blast radius: `GhActionsDeploy-Production` (sub: `refs/heads/main`), `GhActionsDeploy-Preview` (sub: `pull_request`).
-- Permissions on the role: only what the deploy needs (`amplify:*` on the specific app ARN, S3 `PutObject` on the deploy bucket prefix). Audit with the IAM Access Analyzer.
-- Region is parameterized so a repo can deploy to multiple regions without a second role.
-
-### GHCR (Container Registry)
-
-The `GITHUB_TOKEN` works automatically for pushing images to `ghcr.io/<owner>/<repo>`:
+When the provider supports federation, use GitHub's OIDC token instead of long-lived credentials:
 
 ```yaml
-- uses: docker/login-action@v3
-  with:
-    registry: ghcr.io
-    username: ${{ github.actor }}
-    password: ${{ secrets.GITHUB_TOKEN }}
-```
-
-For **pulling** the image from a different host (the VPS deploy target), the auto-token is not enough — it doesn't leave the runner. Use a fine-grained PAT scoped read-only to that org's packages, store it on the VPS in `~/.docker/config.json`, and rotate quarterly.
-
-### Cloudflare
-
-Cloudflare's OIDC integration is opt-in per token. For most cases, a scoped API token (`Account › Cloudflare Pages › Edit`) is simpler and equivalent in blast radius.
-
-```yaml
-- uses: ./.github/actions/cloudflare-pages-deploy
-  with:
-    api-token:  ${{ secrets.CLOUDFLARE_API_TOKEN }}
-    account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}   # not a secret
-```
-
-- Keep the account ID in `vars.*`, not `secrets.*`. It's not sensitive and the visibility helps debugging.
-- One token per project. `web-prod` and `web-staging` get separate tokens so revoking one cannot break the other.
-
-## Runtime env — 1Password Connect
-
-The deployed app needs env vars that are not safe to keep in the GitHub secret store (third-party API keys, DB URLs, internal service tokens). Use 1Password as the secret system of record; render into a `.env` file at deploy time.
-
-### Template file (committed to repo)
-
-`deploy/production.env.example` is committed; values are 1Password references, not secrets:
-
-```
-DATABASE_URL=op://shared-prod/api-db/connection-string
-STRIPE_SECRET_KEY=op://shared-prod/stripe/api-key
-SENTRY_DSN=op://shared-prod/sentry/dsn
-APP_BASE_URL=https://api.example.com
-```
-
-`op://shared-prod/<item>/<field>` references are URLs into the 1Password vault. They mean nothing without an `OP_SERVICE_ACCOUNT_TOKEN`.
-
-### Composite action (`.github/actions/load-1password-env/action.yml`)
-
-```yaml
-name: Load 1Password environment
-description: Render an env file with op:// references into job env
-
-inputs:
-  env-file: { required: true }
-
-runs:
-  using: composite
-  steps:
-    - id: render
-      shell: bash
-      run: |
-        rendered="$RUNNER_TEMP/$(basename '${{ inputs.env-file }}').rendered"
-        echo "rendered=$rendered" >> "$GITHUB_OUTPUT"
-
-    - uses: 1password/load-secrets-action@v4
-      with:
-        export-env: true
-      env:
-        OP_ENV_FILE: ${{ inputs.env-file }}                         # template path
-        OP_SERVICE_ACCOUNT_TOKEN: ${{ env.OP_SERVICE_ACCOUNT_TOKEN }}
-```
-
-The 1Password action reads the template, resolves each `op://` reference, and exports the result as job env (`export-env: true`) **and** as masked GitHub Actions secrets so they cannot accidentally be echoed.
-
-### Service account token
-
-- Issue a 1Password service account scoped to a single vault (`shared-prod`) so vault blast radius stays separated.
-- Store it as `OP_SERVICE_ACCOUNT_TOKEN` in the repo's secrets. Rotate annually.
-- For the VPS deploy pattern, render the env file inside the runner, scp it to the VPS, then use it as `env_file` on the container. Do **not** install 1Password on the VPS — the runner is the only thing that talks to 1Password.
-
-### Why not GitHub repository secrets?
-
-You can put runtime env in `secrets.*` and pipe it to the app. Two reasons not to:
-
-1. GitHub secrets are per-repo. A monorepo with three deployable apps and shared env (DB URL, etc.) duplicates secrets — drift is a matter of when, not if.
-2. Rotation requires a human in the GitHub UI per repo. With 1Password, rotating the value in the vault propagates to every render automatically.
-
-Use GitHub secrets for **CI access** (the bootstrap layer that lets you talk to 1Password); use 1Password for **everything the deployed app reads**.
-
-## Bot identity — fine-grained PATs only
-
-When the workflow needs to mutate something outside the source repo (push to a tap repo, comment on PRs in another repo, trigger another repo's workflow), `GITHUB_TOKEN` is not enough.
-
-Issue a fine-grained PAT scoped to that single repo, with the minimum permissions:
-
-| Need | Repo | Permissions |
-|---|---|---|
-| Pull GHCR image from VPS | n/a (used outside Actions) | `packages: read` on the org |
-| Push formula to tap repo | `<org>/homebrew-tap` | `contents: write` |
-| Trigger workflow in another repo | `<org>/<other>` | `actions: write`, `contents: read` |
-| Comment on cross-repo PR | `<org>/<other>` | `pull-requests: write` |
-
-Store as `<PURPOSE>_GITHUB_TOKEN` (`TAP_GITHUB_TOKEN`, `OPS_TRIGGER_TOKEN`). Use one PAT per purpose; a token that can both push code and trigger workflows can deploy malicious code when leaked.
-
-Classic PATs (`ghp_…` without scopes) are forbidden. If a workflow currently uses one, replace it before adding new functionality.
-
-## Environment-scoped secrets
-
-GitHub Environments (`environment: production`) let you scope secrets to specific deploy targets. Pair with required reviewers when the team needs a manual approval gate before production:
-
-```yaml
-deploy-prod:
+deploy:
+  permissions:
+    contents: read
+    id-token: write
   environment:
     name: production
-    url: https://web.example.com
   steps:
-    - run: echo "$DATABASE_URL"   # only the production-environment value
+    - run: ./scripts/ci/assume-deploy-identity --environment production
 ```
 
-- Repo-level secrets are visible to every workflow run on every branch. Environment-scoped secrets are only readable when the job declares that environment, gated by the environment's protection rules.
-- Use environments for production-only secrets such as production DB URLs and payment processor keys. Use repo-level secrets for everything else.
+The provider trust policy should bind at least:
 
-## Logging hygiene
+- repository owner/name
+- branch, protected tag, or GitHub Environment
+- provider audience
+- deployment role or environment
 
-GitHub masks declared secrets in logs. It does not mask:
+Use one identity per blast radius. Production and staging should not share the same provider role.
 
-- Values rendered to disk (a leaked `cat .env` step exposes everything).
-- Substrings of secrets concatenated with other text.
-- Secrets passed as command-line arguments (visible in `ps`).
+## Static Tokens
 
-Two rules:
+Use static tokens only when federation is unavailable or the provider API does not support it.
 
-1. Pass secrets via env vars or stdin.
-2. Debug rendered env files by logging key counts or key names (`grep -c '^[A-Z_]*=' "$RENDERED"`), keeping values out of logs.
+- Store static tokens on the GitHub Environment, not as repository-level secrets.
+- Give each token one purpose and one environment.
+- Prefer narrowly scoped provider tokens over broad user tokens.
+- Rotate static tokens on a schedule and after any runner, dependency, or workflow compromise.
+- Document why OIDC was not used.
+
+## Runtime Secrets
+
+Runtime secrets should be resolved by the deploy provider or environment-specific secret store whenever possible. If the workflow must render runtime config:
+
+- render inside the GitHub runner after the environment is selected
+- keep the rendered file in `$RUNNER_TEMP`
+- transfer only to the deploy target that needs it
+- remove it at the end of the job when practical
+- log key names or counts only, never values
+
+Do not commit plaintext runtime values. Template files may contain secret-store references when those references are non-sensitive without their corresponding access token.
+
+## Logging Hygiene
+
+GitHub masks declared secrets in logs. It does not reliably mask:
+
+- values rendered to disk
+- substrings of secrets concatenated with other text
+- secrets passed as command-line arguments
+- provider tokens returned by CLI debug output
+
+Rules:
+
+1. Pass secrets through env vars or stdin.
+2. Disable verbose CLI logging in secret-bearing jobs.
+3. Avoid `set -x` in deploy scripts.
+4. Debug rendered env files by logging key counts or key names only.

@@ -92,6 +92,11 @@ if [ -f "$MANIFEST" ]; then
 
     jq -r '.skills[] | "\(.name) \(.source)"' "$MANIFEST" |
     while read -r name source; do
+      if [ "$source" != "uinaf/agents" ] && [ "${ALLOW_THIRD_PARTY_SKILLS:-0}" != "1" ]; then
+        echo "Skipping third-party skill by default: $name from $source"
+        echo "  Set ALLOW_THIRD_PARTY_SKILLS=1 to install non-uinaf sources intentionally."
+        continue
+      fi
       echo "Installing skill: $name from $source"
       npx skills add "$source" -g -y -a "${SKILL_AGENTS[@]}" -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
     done

@@ -4,7 +4,7 @@
 
 The `tccutil` repo publishes a small non-Go CLI and needs its release workflow fixed so new GitHub releases update `uinaf/homebrew-tap` automatically. A previous attempt used `dawidd6/action-homebrew-bump-formula`, but the action tried to follow a fork/PR path and failed with the existing fine-grained `TAP_GITHUB_TOKEN`.
 
-The organization already has a known-good sibling repo, `uinaf/healthd`, with an `update-homebrew-tap` job that successfully pushes directly to the same style of tap using `Justintime50/homebrew-releaser@v3`. The desired fix is to copy that boring working pattern, not invent an inline clone/sed/push script and not swap in another Homebrew action.
+The organization already has a known-good sibling repo, `uinaf/healthd`, with an `update-homebrew-tap` job that successfully pushes directly to the same style of tap using the v3 line of `Justintime50/homebrew-releaser`, pinned to a full commit SHA. The desired fix is to copy that boring working pattern, not invent an inline clone/sed/push script and not swap in another Homebrew action.
 
 ## Output Specification
 
@@ -28,16 +28,16 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@<full-sha> # v6.x.y
         with:
           fetch-depth: 0
-      - uses: cycjimmy/semantic-release-action@v4
+      - uses: cycjimmy/semantic-release-action@<full-sha> # v4.x.y
         id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Bump Homebrew formula
         if: steps.release.outputs.new_release_published == 'true'
-        uses: dawidd6/action-homebrew-bump-formula@v5
+        uses: dawidd6/action-homebrew-bump-formula@<full-sha> # v5.x.y
         with:
           token: ${{ secrets.TAP_GITHUB_TOKEN }}
           tap: uinaf/homebrew-tap
@@ -51,7 +51,7 @@ update-homebrew-tap:
   if: needs.release.outputs.new_release_published == 'true'
   runs-on: ubuntu-latest
   steps:
-    - uses: Justintime50/homebrew-releaser@v3
+    - uses: Justintime50/homebrew-releaser@<full-sha> # v3.x.y
       with:
         homebrew_owner: uinaf
         homebrew_tap: homebrew-tap
