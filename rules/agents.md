@@ -82,6 +82,7 @@ Reproduce the failure, find the root cause with evidence, and fix the root cause
 - Follow repo conventions and existing dependencies before inventing new patterns or adding packages
 - Benchmark hot paths and performance-sensitive changes with before/after numbers
 - Keep docs command-derived: no volatile metrics, absolute filesystem paths, `file://`, or editor URIs
+- Do not author or recommend unsafe-typed source files, scripts, configs, or examples when a type-safe option exists. This includes `.js`, `.mjs`, `.cjs`, ad hoc `.py` scripts, shell-heavy glue, and other dynamically typed escape hatches. Default to TypeScript or another statically typed language, use the repo's existing typed tooling, and require explicit approval for exceptions
 - Prefer type-safe TypeScript models over escape hatches such as `as`, non-null `!`, `unknown as T`, and double assertions; use an escape hatch only with explicit approval
 - Keep linters, type checks, tests, and hooks enabled; fix the root cause
 - Treat errors as typed, contextful, and recoverable where possible; redact secrets before logging or surfacing errors
