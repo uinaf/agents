@@ -11,6 +11,7 @@ fi
 
 skill_name="$1"
 shift
+tessl_version="${TESSL_CLI_VERSION:-0.79.1}"
 
 skill_dir="skills/$skill_name"
 
@@ -19,4 +20,4 @@ if [[ ! -d "$skill_dir" ]]; then
   exit 1
 fi
 
-npx tessl skill review --optimize --yes --max-iterations 1 "$skill_dir" "$@"
+npx "tessl@$tessl_version" skill review --optimize --yes --max-iterations 1 "$skill_dir" "$@"

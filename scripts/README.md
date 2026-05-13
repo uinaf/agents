@@ -11,12 +11,15 @@ Run a read-only review across every local skill:
 ```
 
 By default this enforces `--threshold 90`. Override with `TESSL_THRESHOLD=94` or pass `--threshold` explicitly.
+The wrapper pins the Tessl CLI through `TESSL_CLI_VERSION`, defaulting to the
+version in the script. Bump it intentionally rather than relying on moving npm
+latest.
 
 Useful direct invocations:
 
 ```bash
-npx tessl skill review skills/review
-npx tessl skill review --json --threshold 90 skills/verify
+npx tessl@0.79.1 skill review skills/review
+npx tessl@0.79.1 skill review --json --threshold 90 skills/verify
 ```
 
 Use per-skill `--json` output directly with Tessl rather than `skills/review.sh`, because the batch wrapper emits one review per skill.
@@ -32,7 +35,7 @@ Apply Tessl's optimizer to one skill at a time:
 Direct form:
 
 ```bash
-npx tessl skill review --optimize --yes --max-iterations 1 skills/review
+npx tessl@0.79.1 skill review --optimize --yes --max-iterations 1 skills/review
 ```
 
 ## Suggested workflow

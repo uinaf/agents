@@ -28,9 +28,16 @@ Sync is additive by default. To remove globally installed skills that are not li
 
 Third-party skill sources are skipped by default during sync. Set `ALLOW_THIRD_PARTY_SKILLS=1` only when intentionally installing non-`uinaf/agents` skills.
 
+The sync script pins the `skills` CLI by default. Override with
+`SKILLS_CLI_VERSION=<version>` only when intentionally testing or rotating the
+installer.
+
 ## Evaluate
 
 ```bash
 ./scripts/skills/review.sh
 ./scripts/skills/optimize.sh review
 ```
+
+The Tessl helper scripts pin the `tessl` CLI by default. Override with
+`TESSL_CLI_VERSION=<version>` when intentionally rotating the evaluator.

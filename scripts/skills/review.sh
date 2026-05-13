@@ -5,6 +5,7 @@ repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
 
 threshold="${TESSL_THRESHOLD:-90}"
+tessl_version="${TESSL_CLI_VERSION:-0.79.1}"
 args=()
 
 has_threshold=false
@@ -32,6 +33,6 @@ args+=("$@")
 for skill_dir in skills/*; do
   if [[ -d "$skill_dir" ]]; then
     echo "== tessl review: ${skill_dir#skills/} =="
-    npx tessl skill review "${args[@]}" "$skill_dir"
+    npx "tessl@$tessl_version" skill review "${args[@]}" "$skill_dir"
   fi
 done

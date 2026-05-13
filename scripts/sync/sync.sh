@@ -2,6 +2,7 @@
 set -euo pipefail
 
 PRUNE=0
+SKILLS_CLI_VERSION="${SKILLS_CLI_VERSION:-1.5.6}"
 for arg in "$@"; do
   case "$arg" in
     --prune)
@@ -98,7 +99,7 @@ if [ -f "$MANIFEST" ]; then
         continue
       fi
       echo "Installing skill: $name from $source"
-      npx skills add "$source" -g -y -a "${SKILL_AGENTS[@]}" -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
+      npx "skills@$SKILLS_CLI_VERSION" add "$source" -g -y -a "${SKILL_AGENTS[@]}" -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
     done
 
     if [ "$PRUNE" -eq 1 ]; then
@@ -118,7 +119,7 @@ if [ -f "$MANIFEST" ]; then
         while read -r skill_name; do
           [ -n "$skill_name" ] || continue
           echo "Removing stale skill: $skill_name"
-          npx skills remove "$skill_name" -g -y </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
+          npx "skills@$SKILLS_CLI_VERSION" remove "$skill_name" -g -y </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
         done
       else
         echo "No global skill lockfile found; skipping prune"
