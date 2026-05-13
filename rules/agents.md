@@ -10,6 +10,7 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 - In replies and reports, show commit links with the short hash label: `[abc1234](url)`. For PRs/issues, always link the number: `[#123](url)`. Add a title after it when useful
 - If an approach is weak, say so and propose a better one
 - Fix only what was asked. Flag related issues, wait for approval before expanding scope
+- Keep repo boundaries strict. Do not encode facts about unrelated repos, orgs, clients, local machine inventory, or private workflows into checked-in docs, scripts, config, or examples unless they are explicitly part of this repo's contract
 - If instructions are unclear, contradictory, or have multiple plausible interpretations, ask before guessing
 - When rules conflict: safety/correctness > explicit user constraints > style/tone
 
@@ -24,14 +25,14 @@ A task is non-trivial if it touches multiple files, changes a public contract, t
 For non-trivial tasks, before writing code:
 
 1. Read the current code, docs, and contracts you'll touch
-2. Confirm what changes, what must NOT change, and what "done" looks like
+2. Confirm what changes, what must NOT change, and what "done" looks like. When repo boundaries or ownership are unclear, ask before writing local or cross-repo facts into checked-in files
 3. Write a short plan: what, where, why, verification, non-goals
 4. If the plan has unresolvable ambiguities or breaks mid-flight, stop and surface the decision point
 
 ### Verification
 
 - Match the check to the change: bug fixes need a repro test; refactors prove behavior parity; features need contract tests plus a runtime check
-- Bootstrap fresh worktrees before checks: install deps, run codegen, and make the repo runnable
+- Bootstrap fresh worktrees before checks when verification depends on dependencies, generated files, or runtime state
 - Use repo guardrails (`make verify`, `just verify`) when present; otherwise run format, lint, typecheck, test explicitly
 - Prefer integration / contract / e2e checks over mock-heavy unit tests
 - If verification infra is missing, flag the readiness gap and route it through `agent-readiness`
@@ -45,7 +46,7 @@ For non-trivial tasks, before writing code:
 
 - Lint, format, typecheck, and push hooks are deterministic gates; use them as the source of truth
 - Cap retries at 2 CI rounds per change; partial success beats infinite retry
-- Run independent concerns as parallel subagents when they can fan out cleanly
+- Run independent concerns as parallel subagents only when they can fan out cleanly and the environment and user/system instructions allow it
 
 ### Keep docs alive
 
@@ -55,6 +56,7 @@ Doc drift degrades every future agent's performance. Update docs as part of the 
 - After renaming, moving, or deleting code, grep docs for stale references
 - After a design decision, record it before moving on
 - Write docs in current-state form. Prefer "the system does X" over "we changed X from Y"; keep before/after history only when migration context is needed
+- Treat local discovery as evidence, not repo policy. If a fact comes from the user's machine, another checkout, or a one-off installed tool, keep it in the reply unless the user explicitly asks to make it part of the repo. When in doubt, ask before writing it into checked-in files
 - If it is not in the repo, it does not exist to the next agent
 - If a `docs` skill is available, use it for audits and structural updates
 
@@ -82,7 +84,7 @@ Reproduce the failure, find the root cause with evidence, and fix the root cause
 - Follow repo conventions and existing dependencies before inventing new patterns or adding packages
 - Benchmark hot paths and performance-sensitive changes with before/after numbers
 - Keep docs command-derived: no volatile metrics, absolute filesystem paths, `file://`, or editor URIs
-- Do not author or recommend unsafe-typed source files, scripts, configs, or examples when a type-safe option exists. This includes `.js`, `.mjs`, `.cjs`, ad hoc `.py` scripts, shell-heavy glue, and other dynamically typed escape hatches. Default to TypeScript or another statically typed language, use the repo's existing typed tooling, and require explicit approval for exceptions
+- Do not author or recommend unsafe-typed source files, scripts, configs, or examples when a type-safe option exists. This includes `.js`, `.mjs`, `.cjs`, ad hoc `.py` scripts, and other dynamically typed escape hatches. Default to TypeScript or another statically typed language, use the repo's existing typed tooling, and require explicit approval for exceptions. Small repo-standard shell scripts are acceptable for bootstrap, sync, or glue tasks when they stay simple and deterministic
 - Prefer type-safe TypeScript models over escape hatches such as `as`, non-null `!`, `unknown as T`, and double assertions; use an escape hatch only with explicit approval
 - Keep linters, type checks, tests, and hooks enabled; fix the root cause
 - Treat errors as typed, contextful, and recoverable where possible; redact secrets before logging or surfacing errors
@@ -93,7 +95,7 @@ Reproduce the failure, find the root cause with evidence, and fix the root cause
 
 ## Commit Gate
 
-- All checks green before commit
+- All relevant checks green before commit
 - Conventional Commits: `<type>(<scope>): <subject>`. Mark breaking changes with `!` or a `BREAKING CHANGE:` footer
 - Commit only the scoped change; leave unrelated diffs out
 

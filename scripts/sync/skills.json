@@ -9,6 +9,10 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "emil-design-eng",
+      "source": "emilkowalski/skill"
+    },
+    {
       "name": "gh-deploy-pipeline",
       "source": "uinaf/agents"
     },
@@ -17,8 +21,16 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "react-doctor",
+      "source": "millionco/react-doctor"
+    },
+    {
       "name": "review",
       "source": "uinaf/agents"
+    },
+    {
+      "name": "shadcn",
+      "source": "shadcn/ui"
     },
     {
       "name": "skill-audit",
@@ -27,6 +39,10 @@
     {
       "name": "uinaf-design-system",
       "source": "uinaf/agents"
+    },
+    {
+      "name": "vercel-react-best-practices",
+      "source": "vercel-labs/agent-skills"
     },
     {
       "name": "verify",

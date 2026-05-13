@@ -10,7 +10,7 @@ for arg in "$@"; do
     -h|--help)
       echo "Usage: $0 [--prune]"
       echo
-      echo "  --prune  Remove globally installed skills that are not listed in scripts/sync/skills.json."
+      echo "  --prune  Remove globally installed skills from manifest-managed sources that are not listed in scripts/sync/skills.json."
       exit 0
       ;;
     *)
@@ -104,10 +104,16 @@ if [ -f "$MANIFEST" ]; then
     if [ "$PRUNE" -eq 1 ]; then
       LOCKFILE="$HOME/.agents/.skill-lock.json"
       if [ -f "$LOCKFILE" ]; then
-        echo "Pruning skills missing from manifest"
+        echo "Pruning skills from manifest-managed sources missing from manifest"
         jq -r \
           --argjson manifest "$(jq -c '[.skills[].name]' "$MANIFEST")" \
-          '(.skills // {}) | keys[] | select(. as $name | $manifest | index($name) | not)' \
+          --argjson manifest_sources "$(jq -c '[.skills[].source] | unique' "$MANIFEST")" \
+          '
+          (.skills // {}) | to_entries[]
+          | select(.value.source as $source | $manifest_sources | index($source))
+          | select(.key as $name | $manifest | index($name) | not)
+          | .key
+          ' \
           "$LOCKFILE" |
         while read -r skill_name; do
           [ -n "$skill_name" ] || continue
