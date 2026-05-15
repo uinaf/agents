@@ -5,6 +5,10 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "codex-review",
+      "source": "uinaf/agents"
+    },
+    {
       "name": "docs",
       "source": "uinaf/agents"
     },

@@ -1,0 +1,21 @@
+interface:
+  display_name: "Codex Review"
+  short_description: "Run Codex CLI review closeout"
+  default_prompt: |
+    Use $codex-review.
+
+    Goal: choose the right target, run the Codex CLI `codex review` command, filter findings, and rerun focused tests plus review after fixes.
+
+    Success criteria:
+    - The review target is correct: dirty local work, branch/PR base, or single commit.
+    - Findings are verified against real code before any fix is accepted.
+    - Focused tests or proof are rerun after review-triggered code changes.
+    - The final report names the review command, proof run, accepted/rejected findings, and clean result.
+
+    Constraints:
+    - Treat review output as advisory.
+    - Use $review for ordinary review verdicts.
+    - Do not push just to review.
+    - Use `~/.agents/skills/codex-review/scripts/codex-review` when the helper is installed globally.
+
+    Output: compact closeout with command used, proof run, findings accepted/rejected, and the final clean review result or conscious rejection.
