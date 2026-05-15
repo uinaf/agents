@@ -1,6 +1,6 @@
 {
   "name": "uinaf/codex-review",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "summary": "Run the Codex CLI `codex review` command as an advisory closeout pass: choose the right target, run local/branch/commit review, filter findings, and rerun focused tests plus review after fixes. Use when the user asks for Codex review, codex-review, autoreview, second-model review, or a final `codex review` sweep. Do not use for ordinary review verdicts; use `review` for that.",
   "skills": {
