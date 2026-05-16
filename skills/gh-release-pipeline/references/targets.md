@@ -8,6 +8,22 @@ Before picking an action, inspect the repo's current release files and at least 
 
 Default to npm Trusted Publishing from GitHub Actions. Configure the package on npm with the GitHub organization/repo, workflow filename, and `release` Environment when used; then grant the release job `id-token: write` and remove `NPM_TOKEN`. Trusted publishing uses short-lived OIDC credentials and automatically produces npm provenance for public packages from public repos.
 
+Use the npm CLI when enabling trusted publishing for one or many packages. `npm trust` requires npm `11.10.0` or newer, so pin the operator command to `npm@^11.10.0` instead of relying on the local npm version. Login once with a package owner/admin account, then register each package's GitHub workflow identity:
+
+```bash
+npx -y npm@^11.10.0 login
+npx -y npm@^11.10.0 trust github <package-name> --repo <owner>/<repo> --file <workflow-file> --env <environment> --yes
+```
+
+Examples:
+
+```bash
+npx -y npm@^11.10.0 trust github @scope/library --repo scope/library --file ci.yml --env release --yes
+npx -y npm@^11.10.0 trust github cli-package --repo scope/cli-package --file release.yml --yes
+```
+
+Use `--env release` when the release job declares `environment: { name: release, deployment: false }`. Omit `--env` only when the publishing job does not use a GitHub Environment.
+
 Plugins:
 
 ```json

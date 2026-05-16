@@ -42,6 +42,7 @@ Common failure modes when standing up or operating this pipeline. Check here bef
 ## npm publish fails with "ENEEDAUTH" or 403
 
 - Trusted publishing mismatch: the npm package settings must name the GitHub owner, repo, workflow filename, and Environment exactly as the workflow runs.
+- Use the npm CLI to register or repair the trusted publisher: `npx -y npm@^11.10.0 trust github <package-name> --repo <owner>/<repo> --file <workflow-file> --env <environment> --yes`.
 - The release job must grant `id-token: write`, use a GitHub-hosted runner, and run a recent enough Node/npm toolchain for npm OIDC.
 - For scoped packages on the public registry, `package.json` needs `"publishConfig": { "access": "public" }`.
 - `package.json` needs a public `repository` URL matching the GitHub repo configured on npm.
