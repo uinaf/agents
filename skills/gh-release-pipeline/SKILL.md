@@ -23,11 +23,11 @@ Both jobs check out at `fetch-depth: 0`. The verify job is gated by a cancellabl
 ## Workflow
 
 1. Inspect the current repo first: existing `.github/workflows/*`, release config, tap formula, package metadata, and any failed PR/check logs. If the org has a known-good sibling repo for the same target, read that workflow before choosing an action.
-2. Confirm prerequisites: `main` is the release branch, commits follow Conventional Commits, and a publish token for the target registry exists.
+2. Confirm prerequisites: `main` is the release branch, commits follow Conventional Commits, and the target registry has a trusted publishing/OIDC path or another narrowly scoped publish credential.
 3. Pick the publish target — [references/targets.md](references/targets.md) covers npm, CocoaPods/SwiftPM, Go (GoReleaser), Rust (release-plz + cargo-dist), GitHub Actions marketplace, and Homebrew tap automation. Prefer an existing working repo pattern over a generic marketplace action.
 4. Author `.github/workflows/ci.yml` with verify and release jobs per [references/workflows.md](references/workflows.md).
 5. Add release config (`.releaserc.json`, `release.config.js`, or a `"release"` block in `package.json`) per [references/semantic-release.md](references/semantic-release.md).
-6. Wire publish secrets in a protected `release` Environment (`NPM_TOKEN`, `COCOAPODS_TRUNK_TOKEN`, `TAP_GITHUB_TOKEN`, etc.) and scope each job's `permissions:` to the exact write surface it needs. Package/library/CLI/marketplace publishes use the Environment as a secret boundary with `deployment: false`.
+6. Prefer OIDC trusted publishing for npm. Use long-lived publish tokens only when the registry or target does not support trusted publishing, and keep those secrets in a protected `release` Environment (`COCOAPODS_TRUNK_TOKEN`, `TAP_GITHUB_TOKEN`, etc.). Package/library/CLI/marketplace publishes use the Environment as a secret boundary with `deployment: false`.
 7. Add the `[skip ci]` short-circuit to both jobs so the bump commit does not retrigger.
 8. For secret-bearing release/backfill jobs, use trusted checkout refs and validated manual inputs per [references/workflows.md](references/workflows.md).
 9. Set bot identity (`GIT_AUTHOR_NAME`/`GIT_COMMITTER_NAME` + emails) so the bump commit is attributed to the token actor or release bot, not the last human pusher.

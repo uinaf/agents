@@ -6,6 +6,8 @@ Before picking an action, inspect the repo's current release files and at least 
 
 ## npm (Library or CLI)
 
+Default to npm Trusted Publishing from GitHub Actions. Configure the package on npm with the GitHub organization/repo, workflow filename, and `release` Environment when used; then grant the release job `id-token: write` and remove `NPM_TOKEN`. Trusted publishing uses short-lived OIDC credentials and automatically produces npm provenance for public packages from public repos.
+
 Plugins:
 
 ```json
@@ -18,17 +20,20 @@ Workflow step:
 
 ```yaml
 - uses: actions/setup-node@<full-sha> # v5.x.y
-  with: { node-version-file: ".nvmrc", registry-url: "https://registry.npmjs.org" }
+  with:
+    node-version-file: ".nvmrc"
+    package-manager-cache: false
 - run: npm ci
 - uses: cycjimmy/semantic-release-action@<full-sha> # v4.x.y
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 ```
 
-- `registry-url` is required for `setup-node` to write the `_authToken` line. Without it, `@semantic-release/npm` cannot publish.
+- Do not set `registry-url` for semantic-release npm publishing. With trusted publishing, npm authenticates from the job's OIDC identity rather than a registry token written by `setup-node`.
+- If the package cannot use trusted publishing, use a granular automation token only as a fallback, scope it to the package, store it in the `release` Environment, and expose `NPM_TOKEN` only on the semantic-release step.
 - Do not enable package-manager caches in the npm publish job. Install fresh in the secret-bearing job, then run `npm pack --dry-run` or the repo's pack smoke before publishing when the package surface is non-trivial.
 - For scoped public packages set `"publishConfig": { "access": "public" }` in `package.json`.
+- Ensure `package.json` has a public `repository` URL that exactly matches the GitHub repo used in the trusted publisher configuration.
 - For a CLI, set `"bin"` in `package.json` and verify the published tarball includes the entry. `npm pack --dry-run` locally before the first release.
 - If the release builds standalone binaries, verify every downloaded runtime or toolchain archive by digest before extracting or embedding it. Pair functional smoke tests with provenance checks.
 

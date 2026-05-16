@@ -4,7 +4,7 @@
 
 The team at Fieldstone Labs has been maintaining `@fieldstone/form-validator`, a TypeScript form validation library published to npm. Right now, releases are entirely manual: a developer runs `npm version`, pushes a tag, and publishes by hand. This process is error-prone — two releases have been accidentally published without the changelog updated, and once a developer pushed to npm from their local machine with stale dependencies.
 
-The team wants to automate this using GitHub Actions and semantic-release, so that every conventional commit pushed to `main` that warrants a release (feat, fix, or breaking change) automatically: runs the test suite, bumps the version, updates the changelog, publishes to npm, creates a GitHub Release, and commits the version bump back to the repo. They want protection against two releases accidentally racing each other, and they want the version bump commit to never retrigger CI.
+The team wants to automate this using GitHub Actions and semantic-release, so that every conventional commit pushed to `main` that warrants a release (feat, fix, or breaking change) automatically: runs the test suite, bumps the version, updates the changelog, publishes to npm through npm Trusted Publishing/OIDC, creates a GitHub Release, and commits the version bump back to the repo. They want protection against two releases accidentally racing each other, and they want the version bump commit to never retrigger CI.
 
 ## Output Specification
 
@@ -37,6 +37,13 @@ The following files represent the current state of the repository. Extract them 
     "typescript": "^5.4.0",
     "vitest": "^1.6.0",
     "eslint": "^8.57.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fieldstone/form-validator.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
 =============== END FILE ===============

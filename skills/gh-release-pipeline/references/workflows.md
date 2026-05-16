@@ -47,17 +47,15 @@ Use when aligning GitHub Actions release workflow files.
 
 ## Permissions
 
-- Workflow default: `permissions: read-all` (or just omit and rely on the default token's read scope).
+- Workflow default: `permissions: {}`. Jobs opt into only the scopes they need.
 - Release job:
 
   ```yaml
   permissions:
     contents: write
-    issues: write
-    pull-requests: write
   ```
 
-- Add only when producing build provenance (e.g., GoReleaser + `actions/attest-build-provenance`):
+- Add `id-token: write` only when the job uses npm trusted publishing, provider OIDC, or keyless provenance. Add `issues: write` and `pull-requests: write` only when semantic-release is configured to comment on issues or pull requests. Add `attestations: write` only when producing GitHub build provenance:
 
   ```yaml
   id-token: write
@@ -75,6 +73,7 @@ Use when aligning GitHub Actions release workflow files.
 - Continuous releases should use Environment-scoped secrets without approval gates. Use separate reviewer-gated environments only when a human must approve signing, production promotion, or store submission.
 - Package/library/CLI/marketplace release jobs that use an Environment only to read publish secrets set `deployment: false`. This keeps Environment secrets, variables, and branch policy without creating GitHub Deployment records.
 - Keep deployment records enabled for running-service/app deploys and for Environments that use custom deployment protection rules.
+- Do not add CODEOWNERS as a blanket default for small repos. Use it only when the repo's maintainers explicitly want owner-gated workflow or release-file review.
 
 ## Release Tooling
 
@@ -85,7 +84,7 @@ Use when aligning GitHub Actions release workflow files.
 ## Checkout
 
 - Both jobs: `actions/checkout@<full-sha> # v6.x.y` with `fetch-depth: 0`. Semantic-release walks history to compute the next version; a shallow clone breaks it.
-- Release also needs `persist-credentials: true` (the default) so `@semantic-release/git` can push the bump commit using the checkout token. Do not assume the default Actions actor is allowed or blocked; verify the branch rules. If those rules cannot allow the default actor cleanly, use a dedicated release bot or GitHub App token that is explicitly allowed by the same rules.
+- Keep `persist-credentials: false` through checkout, install, build, and pack steps whenever possible, especially before package-manager lifecycle scripts run. If `@semantic-release/git` must push a bump commit, add write credentials only at the narrow release boundary: use a release bot or GitHub App token that branch rules explicitly allow, configure the git remote or credential helper immediately before semantic-release, and avoid exposing that token to dependency install steps.
 
 ## `[skip ci]` Gate
 
@@ -126,6 +125,7 @@ Use a `noreply.github.com` address or a dedicated bot account so bump commits ar
 
 - For active npm compromise response, scan manifests and lockfiles before installing. Look for affected versions from the advisory, unexpected git dependencies, malicious `optionalDependencies`, and package-root payloads such as `router_init.js`.
 - If an affected package was installed on a developer machine or CI runner, treat that host as compromised and rotate registry, GitHub, cloud, SSH, Vault, and package-manager credentials reachable from the host before publishing again.
+- npm trusted publishing is the default for public npm packages published from GitHub-hosted Actions: configure the package on npm for the repo, workflow filename, and optional Environment; grant `id-token: write`; remove `NPM_TOKEN`; and rely on npm's automatic provenance for public packages from public repos.
 - SLSA or npm provenance proves the package came from a workflow identity, not that the workflow runner was clean. Keep provenance, but do not let it replace trusted refs, fresh release installs, and cache separation.
 
 ## Multi-Verify Composition

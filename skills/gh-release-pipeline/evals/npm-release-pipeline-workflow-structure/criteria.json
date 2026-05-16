@@ -45,12 +45,12 @@
     {
       "name": "Release permissions",
       "max_score": 6,
-      "description": "The release job explicitly declares `permissions: { contents: write, issues: write, pull-requests: write }`"
+      "description": "The release job explicitly declares only the needed write permissions, including `contents: write` for GitHub release/pushback and `id-token: write` for npm Trusted Publishing; `issues: write` and `pull-requests: write` are absent unless comments are configured"
     },
     {
       "name": "semantic-release action version",
       "max_score": 5,
-      "description": "Uses `cycjimmy/semantic-release-action` pinned to a full commit SHA with a v4 version comment (not v3, v5, v6, or a different action)"
+      "description": "Uses `cycjimmy/semantic-release-action` pinned to a full commit SHA with an exact same-line version comment, preserving the repo's current major unless there is a concrete migration reason"
     },
     {
       "name": "Plugin order",
@@ -68,9 +68,9 @@
       "description": "The @semantic-release/git plugin's message contains `[skip ci]` and uses the `chore(release): ${nextRelease.version}` format"
     },
     {
-      "name": "registry-url in setup-node",
+      "name": "No registry token auth",
       "max_score": 8,
-      "description": "The `actions/setup-node` step in the release job includes `registry-url: \"https://registry.npmjs.org\"`"
+      "description": "The semantic-release npm publish path uses npm Trusted Publishing/OIDC and does not set `registry-url` or expose `NPM_TOKEN`"
     },
     {
       "name": "release needs verify",
@@ -78,9 +78,19 @@
       "description": "The release job declares `needs: [verify]` (or equivalent), making verify the gate to publish"
     },
     {
-      "name": "Secrets on step",
+      "name": "GitHub token on step",
       "max_score": 6,
-      "description": "NPM_TOKEN and GITHUB_TOKEN are declared in the semantic-release step's `env:`, not at the job level"
+      "description": "GITHUB_TOKEN or the dedicated release-bot token is declared only on the semantic-release step, not at the job level"
+    },
+    {
+      "name": "Checkout credential boundary",
+      "max_score": 6,
+      "description": "Checkout/install/build steps do not expose persisted write credentials before package-manager lifecycle scripts run; any pushback credential is introduced only at the release boundary"
+    },
+    {
+      "name": "npm package metadata",
+      "max_score": 5,
+      "description": "package.json includes public `repository` metadata matching the GitHub repo and public `publishConfig.access` when publishing a scoped public package"
     }
   ]
 }
