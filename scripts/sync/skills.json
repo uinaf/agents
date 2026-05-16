@@ -1,6 +1,10 @@
 {
   "skills": [
     {
+      "name": "agent-dx-cli-scale",
+      "source": "jpoehnelt/skills"
+    },
+    {
       "name": "agent-readiness",
       "source": "uinaf/agents"
     },
@@ -11,6 +15,10 @@
     {
       "name": "docs",
       "source": "uinaf/agents"
+    },
+    {
+      "name": "effect-ts",
+      "source": "Effect-TS/skills"
     },
     {
       "name": "emil-design-eng",

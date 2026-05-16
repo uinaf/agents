@@ -66,20 +66,6 @@ else
   echo "Skipping Codex setup: 'codex' is not installed"
 fi
 
-# Cursor User Rules are not filesystem-synced; copy from rules/agents.final.md in Settings if you want them.
-if command -v cursor >/dev/null 2>&1; then
-  SKILL_AGENTS+=(cursor)
-else
-  echo "Skipping Cursor skills: 'cursor' is not on PATH (install Shell Command from Cursor command palette)"
-fi
-
-# openclaw has no PATH binary; presence of ~/.openclaw is the install signal.
-if [ -d "$HOME/.openclaw" ]; then
-  SKILL_AGENTS+=(openclaw)
-else
-  echo "Skipping openclaw skills: ~/.openclaw not found"
-fi
-
 MANIFEST="$REPO_DIR/scripts/sync/skills.json"
 
 # Install skills only from stable manifest (portable across machines)
