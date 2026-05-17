@@ -72,7 +72,7 @@ smoke-web:
 ## Guardrails
 
 - One artifact end-to-end: e2e and deploy both consume the artifact verify uploaded.
-- Default branch merge policy is part of the deploy surface. Prefer an organization ruleset that targets `~DEFAULT_BRANCH` and requires pull-request conversation resolution; when org rulesets are unavailable, add or update a repo-level rule without weakening existing approvals, status checks, signed-commit, or actor restrictions. A ruleset `pull_request` rule with `required_review_thread_resolution: true` may also require default-branch changes to go through PRs, which is usually appropriate for deployable services.
+- Default branch merge policy is part of the deploy surface. If direct pushes to `main` must remain allowed, prefer branch protection with only `required_conversation_resolution` enabled. Use organization or repository rulesets for conversation resolution only when making default-branch changes go through pull requests is intended. Preserve existing approvals, status checks, signed-commit, and actor restrictions when changing branch policy.
 - Deploy credentials are environment-scoped. Prefer OIDC or short-lived federation; use static tokens only when the provider has no supported federation path.
 - SST is a good default when the repo already uses it or wants app-owned infrastructure. Run it as the deploy layer behind the same Environment, OIDC, artifact provenance, concurrency, and separate no-credential smoke rules.
 - Repo-level secrets are bootstrap-only. Runtime and production deploy secrets live on GitHub Environments or the provider's secret system.
