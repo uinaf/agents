@@ -25,7 +25,7 @@ A separate `deploy.yml` (`workflow_dispatch`) may re-deploy an existing artifact
 ## Workflow
 
 1. Inspect the repo first: existing `.github/workflows/*`, environment names, deploy scripts, infra entrypoints, release dashboards, and recent failing runs. Preserve a proven workflow contract only when it already uses environment gates, OIDC or scoped credentials, immutable artifacts, and post-deploy proof.
-2. Confirm prerequisites: deploy branch, target environments, environment protection rules, OIDC trust policy or scoped environment credentials, artifact/image retention, and smoke endpoint.
+2. Confirm prerequisites: deploy branch, default-branch merge policy, target environments, environment protection rules, OIDC trust policy or scoped environment credentials, artifact/image retention, and smoke endpoint.
 3. Author `.github/workflows/main.yml` and optionally `.github/workflows/deploy.yml` per [references/workflows.md](references/workflows.md). Keep `changes -> verify -> e2e -> deploy -> smoke`; manual dispatch promotes existing verified artifacts/images.
 4. Stand up change detection: `dorny/paths-filter` pinned to a full SHA for simple per-app rules, or a graph-aware affected walker for monorepos. Output one boolean per deploy lane.
 5. Wire trust boundaries via [references/environments.md](references/environments.md) and [references/secrets.md](references/secrets.md): GitHub Environments hold deploy-scoped secrets/vars, OIDC handles cloud identity where available, and repo-level secrets remain bootstrap-only.
@@ -72,6 +72,7 @@ smoke-web:
 ## Guardrails
 
 - One artifact end-to-end: e2e and deploy both consume the artifact verify uploaded.
+- Default branch merge policy is part of the deploy surface. Prefer an organization ruleset that targets `~DEFAULT_BRANCH` and requires pull-request conversation resolution; when org rulesets are unavailable, add or update a repo-level rule without weakening existing approvals, status checks, signed-commit, or actor restrictions. A ruleset `pull_request` rule with `required_review_thread_resolution: true` may also require default-branch changes to go through PRs, which is usually appropriate for deployable services.
 - Deploy credentials are environment-scoped. Prefer OIDC or short-lived federation; use static tokens only when the provider has no supported federation path.
 - SST is a good default when the repo already uses it or wants app-owned infrastructure. Run it as the deploy layer behind the same Environment, OIDC, artifact provenance, concurrency, and separate no-credential smoke rules.
 - Repo-level secrets are bootstrap-only. Runtime and production deploy secrets live on GitHub Environments or the provider's secret system.
