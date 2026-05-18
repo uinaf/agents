@@ -39,6 +39,7 @@ steps:
 - Scope the provider trust policy to the repository, environment, branch or protected tag, and intended audience.
 - Use separate identities for staging and production.
 - Static provider tokens are a fallback, not the default. If required, store them on the GitHub Environment and document why OIDC is not available.
+- Cloudflare API tokens are static credentials unless a repo has a stronger federation path. Store them on `staging` or `production` GitHub Environments, not as repository-level secrets.
 
 ## SST
 
@@ -50,6 +51,8 @@ SST is a good deploy layer when the repo owns both app code and infrastructure. 
 
 - Run SST after the GitHub Environment is selected and OIDC/provider identity is available.
 - Map SST stages to GitHub Environments (`staging`, `production`, preview names) so secrets and approvals stay visible in GitHub.
+- Split SST app/state boundaries by environment when one deploy path could delete or mutate the other environment's resources. Make `prod` and `staging` explicit stages/projects.
+- Avoid one shared SST app with different behavior by branch unless state ownership, deletion policy, and provider resource names are proven isolated.
 - Keep runtime secrets in SST/provider secret stores or GitHub Environment secrets; do not pass them as CLI flags.
 - Prefer deploying the already verified build artifact or immutable image. If SST must build internally, document why the artifact pass-through rule does not fit and add an equivalent build provenance check.
 - Disable dependency/build caches in the credential-bearing SST deploy path unless the cache is scoped to the same trusted event class.
@@ -103,7 +106,9 @@ on:
 ```
 
 - Validate `inputs.ref`, `inputs.environment`, and `inputs.lane` in a secretless job.
-- Allow `main`, protected release tags, or exact SHAs with an existing verified artifact/image.
+- For staging app deploys, allow same-repo branches or full SHAs after resolving to a single SHA. For zone/domain/IaC changes, allow only default branch unless isolated staging state is proven.
+- For production, allow only the default branch or the current default-branch SHA.
+- Allow protected release tags only when the repo's deploy contract explicitly uses tag promotion.
 - Emit sanitized outputs and use only those outputs downstream.
 - Use the same deploy concurrency key as `main.yml`.
 - Load credentials only after validation and artifact provenance checks pass.

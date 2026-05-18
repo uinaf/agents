@@ -53,6 +53,88 @@ on:
 - Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or artifact/image lookup.
 - Do not use `pull_request_target` for any workflow that checks out, installs, builds, tests, packages, deploys, or otherwise executes project code. Keep fork and outsider code on `pull_request` with read-only credentials and no deploy secrets.
 
+## Standard hardening gates
+
+Run standard scanners before adding repo-specific workflow guard scripts:
+
+```yaml
+workflow-hardening:
+  runs-on: ubuntu-latest
+  permissions:
+    contents: read
+  steps:
+    - uses: actions/checkout@<full-sha> # v6.x.y
+    - run: actionlint
+    - uses: zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6
+      with:
+        advanced-security: false
+        annotations: true
+        min-severity: medium
+        min-confidence: medium
+```
+
+- Prefer `actionlint` for workflow syntax/expression checks and `zizmor` for GitHub Actions security issues.
+- Prefer scanner-backed checks over bespoke grep/awk scripts for shell injection, token exposure, dangerous triggers, and credential flow.
+- If GitHub Advanced Security is enabled, set `advanced-security: true` and keep `security-events: write`; otherwise use annotations and omit `security-events: write`.
+- Install `actionlint` through the repo's normal tool bootstrap or a pinned setup action; do not replace it with a hand-rolled YAML parser.
+
+## Manual staging deploy from PR branch
+
+Use this when humans need to exercise a same-repo PR branch in staging before merge.
+
+- The workflow file itself lives on the default branch.
+- Inputs accept a same-repo branch name or a full 40-character SHA.
+- Validate input in a secretless job before checkout and before any Environment credentials.
+- Resolve the input to one SHA once, emit that SHA as an output, and use only that output downstream.
+- App deploys may deploy the resolved branch SHA to staging.
+- Zone/domain/IaC changes only deploy from the default branch unless the repo has a proven isolated staging state boundary.
+- Production deploy accepts only the default branch name or the current default-branch SHA.
+
+```yaml
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        required: true
+        description: "Same-repo branch or full SHA"
+      environment:
+        type: choice
+        options: [staging, production]
+        required: true
+
+jobs:
+  validate-ref:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+      environment: ${{ steps.validate.outputs.environment }}
+    steps:
+      - uses: actions/checkout@<full-sha> # v6.x.y
+        with:
+          fetch-depth: 0
+      - id: validate
+        env:
+          INPUT_REF: ${{ inputs.ref }}
+          INPUT_ENVIRONMENT: ${{ inputs.environment }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          case "$INPUT_ENVIRONMENT" in staging|production) ;; *) exit 1 ;; esac
+          if [ "$INPUT_ENVIRONMENT" = production ] && [ "$INPUT_REF" != "$DEFAULT_BRANCH" ]; then
+            git rev-parse "$DEFAULT_BRANCH" | grep -qx "$INPUT_REF" || exit 1
+          fi
+          echo "environment=$INPUT_ENVIRONMENT" >> "$GITHUB_OUTPUT"
+      - id: resolve
+        env:
+          INPUT_REF: ${{ inputs.ref }}
+        run: |
+          git fetch origin "$INPUT_REF" --depth=1
+          sha="$(git rev-parse FETCH_HEAD)"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+```
+
 ## Concurrency
 
 Three different shapes, each tuned to the job's blast radius:
@@ -227,6 +309,26 @@ runs:
 - Pass `sst-config` explicitly per lane, for example `infra/web/sst.config.ts`.
 - Disable dependency and build caches in the credential-bearing deploy setup unless the cache is scoped to trusted deploy events.
 - Put smoke checks in a downstream job with only `contents: read`; assert cloud credentials are absent before Playwright or HTTP probes.
+- Make `prod` and `staging` explicit SST stages/projects. Avoid one shared app/state with branch-dependent behavior unless state ownership and deletion boundaries are proven.
+- When Cloudflare tokens are static, load them from the selected GitHub Environment and never from repository-level secrets.
+
+## Composite-action shell safety
+
+Never interpolate `${{ inputs.* }}` directly inside a `run:` block. Pass inputs through `env:` and let the shell quote normal variables:
+
+```yaml
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        DIST_DIR: ${{ inputs.dist-dir }}
+        PROJECT_NAME: ${{ inputs.project-name }}
+      run: |
+        wrangler pages deploy "$DIST_DIR" --project-name "$PROJECT_NAME"
+```
+
+`zizmor` catches this class of injection issue quickly; fix the shell shape instead of suppressing the finding.
 
 ## Bootstrap snippets
 

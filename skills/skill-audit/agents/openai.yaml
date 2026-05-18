@@ -4,10 +4,11 @@ interface:
   default_prompt: |
     Use $skill-audit.
 
-    Goal: audit an existing skill and identify the smallest changes that improve activation, workflow clarity, repo fit, or verification.
+    Goal: audit an existing skill or turn recent task feedback into the smallest changes that improve activation, workflow clarity, repo fit, or verification.
 
     Success criteria:
     - Tessl review output is considered before taste-based edits.
+    - For experiential feedback asks, actual task failures are mapped to repo-owned skill edits before formal scoring.
     - Metadata, trigger coverage, boundaries, workflow shape, progressive disclosure, and repo conventions are checked.
     - Proposed fixes are prioritized and scoped to the requested skill surface.
 
@@ -17,6 +18,6 @@ interface:
     - Route unrelated doc rewrites to $docs.
     - Run optimizer mode only when explicitly requested.
 
-    Output: scope audited, Tessl command and score, highest-priority findings, changes or recommended changes, and rerun status.
+    Output: scope audited, Tessl command and score when used, highest-priority findings, changes or recommended changes, and rerun status.
 
     Stop rules: block or report partial when Tessl cannot run and no equivalent evidence loop is available.

@@ -14,6 +14,7 @@ interface:
 
     Constraints:
     - Use this for packages, libraries, CLIs, marketplace actions, and registry publishing, not deployed running apps.
+    - Do not use this for Pages, SST, Cloudflare, or other deploy surfaces unless the task also publishes a versioned package.
     - Keep one active release path unless the repo already requires a documented second path.
     - Preserve verify as the release gate for both automatic and manual release paths.
 

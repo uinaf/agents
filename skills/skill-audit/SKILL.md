@@ -35,6 +35,15 @@ Audit a skill before calling it ready. Favor Tessl output, repo conventions, and
 
 ## Workflow
 
+### Quick experiential feedback mode
+
+Use this when the ask is "what did the skills fail to guide well during the last task?" rather than a formal skill audit.
+
+1. Skip Tessl unless the user asks for scoring or the proposed edits touch trigger text.
+2. Reconstruct the task failure from actual run evidence: wrong tool selected, bespoke script invented, missing hardening gate, unclear boundary, stale path, or excessive ceremony.
+3. Map each failure to the smallest repo-owned skill/doc update that would have changed agent behavior.
+4. Edit only those surfaces, then run the repo's normal skill review gate if available.
+
 ### 1. Run Tessl first
 
 Capture the score, summary, and concrete suggestions before proposing edits. Prefer per-skill `--json` when you need a narrow audit loop or structured output. If Tessl is missing, use `npx tessl ...` first or follow the official docs before continuing.

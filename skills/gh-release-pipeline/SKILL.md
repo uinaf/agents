@@ -7,6 +7,8 @@ description: "Set up or align a GitHub Actions release pipeline for a versioned 
 
 Push-to-main, semantic-release driven, self-bumping. Only the publish plumbing varies by target (npm, SwiftPM/CocoaPods, Go, Rust, GitHub Action, Homebrew tap). Rust uses `release-plz` in place of semantic-release; the pipeline shape is identical.
 
+Do not use this for Pages, SST, Cloudflare, or other running-app deploys unless the same change also publishes a versioned package. Use `gh-deploy-pipeline` for deploy surfaces.
+
 ## Pipeline Shape
 
 ```

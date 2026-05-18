@@ -27,13 +27,22 @@ A separate `deploy.yml` (`workflow_dispatch`) may re-deploy an existing artifact
 1. Inspect the repo first: existing `.github/workflows/*`, environment names, deploy scripts, infra entrypoints, release dashboards, and recent failing runs. Preserve a proven workflow contract only when it already uses environment gates, OIDC or scoped credentials, immutable artifacts, and post-deploy proof.
 2. Confirm prerequisites: deploy branch, default-branch merge policy, target environments, environment protection rules, OIDC trust policy or scoped environment credentials, artifact/image retention, and smoke endpoint.
 3. Author `.github/workflows/main.yml` and optionally `.github/workflows/deploy.yml` per [references/workflows.md](references/workflows.md). Keep `changes -> verify -> e2e -> deploy -> smoke`; manual dispatch promotes existing verified artifacts/images.
-4. Stand up change detection: `dorny/paths-filter` pinned to a full SHA for simple per-app rules, or a graph-aware affected walker for monorepos. Output one boolean per deploy lane.
-5. Wire trust boundaries via [references/environments.md](references/environments.md) and [references/secrets.md](references/secrets.md): GitHub Environments hold deploy-scoped secrets/vars, OIDC handles cloud identity where available, and repo-level secrets remain bootstrap-only.
-6. Keep deploy steps provider-thin. Prefer a repo-owned deploy layer such as SST, an IaC apply, release-environment promotion API, or small platform CLI wrapper only after credentials are loaded for the environment and the artifact provenance is checked.
-7. Set concurrency: cancellable for verify/e2e, non-cancellable for deploy. Group by `(environment, lane)` so a staging web deploy does not block production web, but two production web deploys serialize.
-8. Add a separate smoke job after deploy: hit the environment URL or health endpoint without cloud/deploy credentials and fail if it is not healthy. A green deploy that does not serve traffic is a failed deploy.
-9. Validate end-to-end: PR (verify only, no deploy) -> merge a lane-scoped change -> watch detect -> verify -> e2e -> deploy -> smoke -> summary. Confirm only the touched lane and intended environment ran.
-10. Cross-check [references/troubleshooting.md](references/troubleshooting.md) when a deploy is stuck, racing, or shipping the wrong artifact.
+4. Add the standard hardening stack before inventing bespoke checks: `actionlint` for syntax, `zizmor` for GitHub Actions security, and scanner-backed gates for secret/security checks. See [references/workflows.md](references/workflows.md).
+5. Stand up change detection: `dorny/paths-filter` pinned to a full SHA for simple per-app rules, or a graph-aware affected walker for monorepos. Output one boolean per deploy lane.
+6. Wire trust boundaries via [references/environments.md](references/environments.md) and [references/secrets.md](references/secrets.md): GitHub Environments hold deploy-scoped secrets/vars, OIDC handles cloud identity where available, and repo-level secrets remain bootstrap-only.
+7. Keep deploy steps provider-thin. Prefer a repo-owned deploy layer such as SST, an IaC apply, release-environment promotion API, or small platform CLI wrapper only after credentials are loaded for the environment and the artifact provenance is checked.
+8. Set concurrency: cancellable for verify/e2e, non-cancellable for deploy. Group by `(environment, lane)` so a staging web deploy does not block production web, but two production web deploys serialize.
+9. Add a separate smoke job after deploy: hit the environment URL or health endpoint without cloud/deploy credentials and fail if it is not healthy. A green deploy that does not serve traffic is a failed deploy.
+10. Validate end-to-end: PR (verify only, no deploy) -> merge a lane-scoped change -> watch detect -> verify -> e2e -> deploy -> smoke -> summary. Confirm only the touched lane and intended environment ran.
+11. Cross-check [references/troubleshooting.md](references/troubleshooting.md) when a deploy is stuck, racing, or shipping the wrong artifact.
+
+## Hardening Stack
+
+- Run `actionlint` for workflow syntax and expression mistakes.
+- Run `zizmor` for GitHub Actions security before writing custom grep, awk, or TypeScript workflow validators.
+- Prefer scanner-backed gates (`zizmor`, `actionlint`, gitleaks, TruffleHog, CodeQL, dependency scanners) over repo-specific guard scripts unless a scanner cannot express the risk.
+- Pin `zizmorcore/zizmor-action` by full SHA with a same-line version comment. Example: `zizmorcore/zizmor-action@5f14fd08f7cf1cb1609c1e344975f152c7ee938d # v0.5.6`.
+- For repos without GitHub Advanced Security, set `advanced-security: false`, `annotations: true`, and block on at least `min-severity: medium` plus `min-confidence: medium`.
 
 ## Minimal Anchor
 
@@ -75,6 +84,7 @@ smoke-web:
 - Default branch merge policy is part of the deploy surface. If direct pushes to `main` must remain allowed, prefer branch protection with only `required_conversation_resolution` enabled. Use organization or repository rulesets for conversation resolution only when making default-branch changes go through pull requests is intended. Preserve existing approvals, status checks, signed-commit, and actor restrictions when changing branch policy.
 - Deploy credentials are environment-scoped. Prefer OIDC or short-lived federation; use static tokens only when the provider has no supported federation path.
 - SST is a good default when the repo already uses it or wants app-owned infrastructure. Run it as the deploy layer behind the same Environment, OIDC, artifact provenance, concurrency, and separate no-credential smoke rules.
+- For Cloudflare/SST deployments with static Cloudflare tokens, keep tokens on the GitHub Environment and split `staging` and `production` stages/projects/state so one deploy path cannot delete or mutate the other environment's resources.
 - Repo-level secrets are bootstrap-only. Runtime and production deploy secrets live on GitHub Environments or the provider's secret system.
 - Deploy concurrency is non-cancellable per `(environment, lane)` and shared between `main.yml` and `deploy.yml`.
 - A deploy pipeline is not green until a separate read-only smoke job has hit the deployed environment.
