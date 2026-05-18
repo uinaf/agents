@@ -3,6 +3,7 @@ set -euo pipefail
 
 PRUNE=0
 SKILLS_CLI_VERSION="${SKILLS_CLI_VERSION:-1.5.6}"
+ALLOW_THIRD_PARTY_SKILLS="${ALLOW_THIRD_PARTY_SKILLS:-1}"
 for arg in "$@"; do
   case "$arg" in
     --prune)
@@ -79,9 +80,9 @@ if [ -f "$MANIFEST" ]; then
 
     jq -r '.skills[] | "\(.name) \(.source)"' "$MANIFEST" |
     while read -r name source; do
-      if [ "$source" != "uinaf/agents" ] && [ "${ALLOW_THIRD_PARTY_SKILLS:-0}" != "1" ]; then
-        echo "Skipping third-party skill by default: $name from $source"
-        echo "  Set ALLOW_THIRD_PARTY_SKILLS=1 to install non-uinaf sources intentionally."
+      if [ "$source" != "uinaf/agents" ] && [ "$ALLOW_THIRD_PARTY_SKILLS" != "1" ]; then
+        echo "Skipping third-party skill: $name from $source"
+        echo "  Set ALLOW_THIRD_PARTY_SKILLS=1 to install non-uinaf sources from the manifest."
         continue
       fi
       echo "Installing skill: $name from $source"
