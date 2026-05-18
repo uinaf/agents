@@ -1,6 +1,6 @@
 {
   "name": "uinaf/skill-audit",
-  "version": "0.1.10",
+  "version": "0.2.0",
   "private": false,
   "summary": "Audit existing skills with Tessl scoring, trigger-coverage checks, repo conventions, or quick experiential feedback from a recent task. Use when revising skills, triaging weak activation, or turning observed skill guidance failures into scoped repo edits.",
   "skills": {

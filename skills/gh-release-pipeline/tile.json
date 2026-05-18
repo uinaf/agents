@@ -1,6 +1,6 @@
 {
   "name": "uinaf/gh-release-pipeline",
-  "version": "0.1.17",
+  "version": "0.2.0",
   "private": false,
   "summary": "Set up or align a GitHub Actions release pipeline for a versioned package, library, CLI, or marketplace action. Use for registry/package publishes, not Pages/SST/Cloudflare running-app deploys unless also publishing a versioned artifact.",
   "skills": {

@@ -1,6 +1,6 @@
 {
   "name": "uinaf/gh-deploy-pipeline",
-  "version": "0.1.11",
+  "version": "0.2.0",
   "private": false,
   "summary": "Set up or align a GitHub Actions deploy pipeline for a running app or service, including verify-then-deploy shape, environment-scoped credentials, actionlint/zizmor hardening, manual staging deploys, and provider-thin SST/Cloudflare deploy boundaries.",
   "skills": {
