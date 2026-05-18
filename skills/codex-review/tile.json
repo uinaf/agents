@@ -1,6 +1,6 @@
 {
   "name": "uinaf/codex-review",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": false,
   "summary": "Run Codex's built-in `codex review` closeout: choose the target, filter findings, and rerun tests plus review until clean.",
   "skills": {
