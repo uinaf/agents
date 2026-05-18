@@ -62,3 +62,4 @@ jobs:
         uses: uinaf/tessl-publish-action@c886763f2a95d6971317fd4b8abe88679619ebad # v2.1.2
         with:
           review-threshold: "90"
+          commit-version-bumps: "false"
