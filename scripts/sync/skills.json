@@ -49,6 +49,14 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "tanstack-query",
+      "source": "tanstack-skills/tanstack-skills"
+    },
+    {
+      "name": "tanstack-start",
+      "source": "tanstack-skills/tanstack-skills"
+    },
+    {
       "name": "uinaf-design-system",
       "source": "uinaf/agents"
     },
