@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PRUNE=0
-SKILLS_CLI_VERSION="${SKILLS_CLI_VERSION:-1.5.6}"
+SKILLS_CLI_VERSION="${SKILLS_CLI_VERSION:-1.5.7}"
 ALLOW_THIRD_PARTY_SKILLS="${ALLOW_THIRD_PARTY_SKILLS:-1}"
 for arg in "$@"; do
   case "$arg" in

@@ -35,12 +35,12 @@ Plugins:
 Workflow step:
 
 ```yaml
-- uses: actions/setup-node@<full-sha> # v5.x.y
+- uses: actions/setup-node@<full-sha> # v6.x.y
   with:
     node-version-file: ".nvmrc"
     package-manager-cache: false
 - run: npm ci
-- uses: cycjimmy/semantic-release-action@<full-sha> # v4.x.y
+- uses: cycjimmy/semantic-release-action@<full-sha> # v6.x.y
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
@@ -90,7 +90,7 @@ Plugins (tag-only — no `@semantic-release/git`, no source bump):
 Two-step release job:
 
 ```yaml
-- uses: cycjimmy/semantic-release-action@<full-sha> # v4.x.y
+- uses: cycjimmy/semantic-release-action@<full-sha> # v6.x.y
   id: release
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -135,7 +135,7 @@ Two-step release job:
 
 ```yaml
 - uses: dtolnay/rust-toolchain@<full-sha> # stable
-- uses: cycjimmy/semantic-release-action@<full-sha> # v4.x.y
+- uses: cycjimmy/semantic-release-action@<full-sha> # v6.x.y
   id: release
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -161,7 +161,7 @@ When you do publish to crates.io, swap semantic-release for **[`release-plz`](ht
 
 ```yaml
 - uses: dtolnay/rust-toolchain@<full-sha> # stable
-- uses: MarcoIeni/release-plz-action@<full-sha> # v0.5.x
+- uses: release-plz/action@<full-sha> # v0.5.x
   env:
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
@@ -235,7 +235,7 @@ Use [`dawidd6/action-homebrew-bump-formula`](https://github.com/dawidd6/action-h
 
 ```yaml
 - if: steps.release.outputs.new_release_published == 'true'
-  uses: dawidd6/action-homebrew-bump-formula@<full-sha> # v5.x.y
+  uses: dawidd6/action-homebrew-bump-formula@<full-sha> # v7.x.y
   with:
     token: ${{ secrets.TAP_GITHUB_TOKEN }}
     tap: <org>/homebrew-tap
@@ -292,7 +292,7 @@ One semantic-release run per package, each with its own `.releaserc.json` and ta
 Workflow:
 
 ```yaml
-- uses: cycjimmy/semantic-release-action@<full-sha> # v4.x.y
+- uses: cycjimmy/semantic-release-action@<full-sha> # v6.x.y
   with:
     working_directory: packages/<package-name>
 ```

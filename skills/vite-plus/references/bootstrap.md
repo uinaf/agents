@@ -11,7 +11,7 @@ Vite+ does not support older upstream versions. Upgrade Vite and Vitest in the e
 
 ## New Repo
 
-1. Use `vp create` to scaffold the closest stock shape. `vp create` ships built-in templates (`vite:monorepo`, `vite:application`, `vite:library`, `vite:generator`) plus shorthand and remote sources.
+1. Use `vp create` to scaffold the closest stock shape. `vp create` ships built-in templates (`vite:monorepo`, `vite:application`, `vite:library`, `vite:generator`) plus shorthand and remote sources. Pass `--git` or `--no-git` explicitly in automation so the scaffold does not stop on the interactive Git prompt.
 2. Keep package manager and workspace settings consistent with the repo standard.
 3. Prefer `vp check`, `vp test`, and `vp build` or `vp pack` from day one.
 4. Let `vp create` own the first tooling pass when possible: recent Vite+ releases can migrate ESLint/Prettier-era defaults toward oxlint/oxfmt, select multiple editors, and write language-specific formatter overrides into editor settings.
@@ -33,4 +33,4 @@ Vite+ does not support older upstream versions. Upgrade Vite and Vitest in the e
 - Vite+ detects the package manager from the workspace in this order: `packageManager` in `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml`, `yarn.lock` / `.yarnrc.yml`, `package-lock.json`, `bun.lock` / `bun.lockb`, then a few config-only fallbacks. With none of those, `vp` falls back to `pnpm`.
 - `vp migrate` merges tool-specific config such as `.oxlintrc*`, `.oxfmtrc*`, and lint-staged config into `vite.config.ts`. Prefer that merge path before deleting old config files.
 - Prefer a single coherent migration over partial adoption that leaves scripts, imports, and CI out of sync.
-- Validate migrations with `vp env current`, `vp install`, `vp check`, `vp test`, and then `vp build` or `vp pack` as appropriate.
+- Validate migrations with `vp env current`, `vp install`, `vp check`, `vp test`, and then `vp build` or `vp pack` as appropriate. Run `vp env doctor` when Node, npm, package-manager shims, or managed-runtime behavior looks inconsistent.

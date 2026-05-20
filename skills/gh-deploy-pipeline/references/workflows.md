@@ -340,17 +340,17 @@ For a Vite+ workspace:
     version: ${{ env.VITE_PLUS_VERSION }}
     node-version-file: .node-version
     cache: true
-- run: vp env && vp install
+- run: vp env current
 ```
 
 For a plain pnpm + Node workspace:
 
 ```yaml
-- uses: actions/setup-node@<full-sha> # v5.x.y
+- uses: actions/setup-node@<full-sha> # v6.x.y
   with:
     node-version-file: .node-version
     cache: pnpm
-- uses: pnpm/action-setup@<full-sha> # v4.x.y
+- uses: pnpm/action-setup@<full-sha> # v6.x.y
   with: { run_install: false }
 - run: pnpm install --frozen-lockfile
 ```
@@ -358,13 +358,13 @@ For a plain pnpm + Node workspace:
 For a container build (api/backend lane), push to the repo's chosen registry with the narrowest write token or OIDC-supported identity available:
 
 ```yaml
-- uses: docker/setup-buildx-action@<full-sha> # v3.x.y
-- uses: docker/login-action@<full-sha> # v3.x.y
+- uses: docker/setup-buildx-action@<full-sha> # v4.x.y
+- uses: docker/login-action@<full-sha> # v4.x.y
   with:
     registry: ${{ vars.CONTAINER_REGISTRY }}
     username: ${{ vars.CONTAINER_REGISTRY_USER }}
     password: ${{ secrets.CONTAINER_REGISTRY_TOKEN }}
-- uses: docker/build-push-action@<full-sha> # v6.x.y
+- uses: docker/build-push-action@<full-sha> # v7.x.y
   with:
     context: .
     push: true

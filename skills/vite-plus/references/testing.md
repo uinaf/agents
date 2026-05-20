@@ -16,6 +16,7 @@ Use this reference when migrating tests to Vite+ native usage.
 - `vp test watch` enters watch mode.
 - `vp test run --coverage` runs once with coverage; `vp test run` is the explicit non-watch form for CI.
 - Additional Vitest flags can be passed through after the subcommand (e.g. `vp test run --reporter verbose`).
+- For browser-mode tests, keep the local Vite+ stack current before debugging browser failures. `vite-plus@0.1.22` bundles `vitest@4.1.6`, which includes the critical browser-mode security fix for GHSA-2h32-95rg-cppp.
 
 ## Configuration
 

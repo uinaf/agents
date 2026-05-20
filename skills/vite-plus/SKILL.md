@@ -11,7 +11,7 @@ Move a frontend repo closer to the stock Vite+ toolchain while preserving repo-s
 
 Default to this destination unless a repo-specific boundary clearly blocks it. If you keep an old command shape, document the reason.
 
-- CI uses `voidzero-dev/setup-vp`; the action owns Node and package-manager bootstrap, then runs `vp install`, `vp check`, `vp test`, `vp build`. In repos that pin GitHub Actions, pin `setup-vp` to a full commit SHA with a same-line exact version comment and let Dependabot maintain it
+- CI uses `voidzero-dev/setup-vp`; the action owns Node and package-manager bootstrap. Let its default `run-install: true` run `vp install`, then run `vp check`, `vp test`, and `vp build`; set `run-install: false` only when the workflow needs an explicit install step. In repos that pin GitHub Actions, pin `setup-vp` to a full commit SHA with a same-line exact version comment and let Dependabot maintain it
 - test files use `vite-plus/test` (and `vite-plus/test/browser/context` for browser mode)
 - scripts prefer `vp dev`, `vp test`, `vp test watch`, `vp test run --coverage`, `vp pack`, `vp build`, `vp preview`, `vp update`, and `vp run <script>` (or `vpr <script>`) over direct package-manager, raw Vitest, or tsdown wiring
 - hooks use `vp config`, `.vite-hooks`, and `vp staged` as the default hook stack
@@ -39,7 +39,7 @@ Concrete examples:
   with:
     node-version-file: ".node-version"
     cache: true
-- run: vp install
+- run: vp env current
 - run: vp check
 - run: vp test
 - run: vp build

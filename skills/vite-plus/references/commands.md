@@ -13,7 +13,7 @@ Use this reference before changing command invocations, package-manager usage, o
 
 ## Runtime and Package Manager
 
-- `vp env` owns Node.js version management. Use `vp env current` for verification and `vp env use` when a repo needs to set or switch Node versions.
+- `vp env` owns Node.js version management. Use `vp env current` for verification, `vp env use` when a repo needs to set or switch Node versions, and `vp env doctor` when managed Node/npm/package-manager behavior looks inconsistent.
 - `vp install` owns install/bootstrap. It detects the package manager from the repo; add Corepack or direct package-manager setup only for a proven repo exception.
 - `vp rebuild` rebuilds native modules after Node.js changes. It is shorthand for `vp pm rebuild`.
 

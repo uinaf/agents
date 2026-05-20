@@ -145,7 +145,7 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Us
 
 ```yaml
 # Node / TypeScript
-- uses: actions/setup-node@<full-sha> # v5.x.y
+- uses: actions/setup-node@<full-sha> # v6.x.y
   with: { node-version-file: ".nvmrc" }
 - run: npm ci
 ```
@@ -153,7 +153,7 @@ Pick one matching the repo's toolchain and place it after `actions/checkout`. Us
 ```yaml
 # Node via Vite+
 - uses: voidzero-dev/setup-vp@<full-sha> # v1.x.y
-  with: { node-version-file: ".node-version", cache: false }
+  with: { node-version-file: ".node-version", cache: false, run-install: false }
 - run: vp install
 ```
 
