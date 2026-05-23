@@ -40,7 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: release
-      deployment: false
     concurrency:
       group: publish-skills-${{ github.repository }}-main
       cancel-in-progress: false
