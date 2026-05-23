@@ -1,6 +1,6 @@
 # Reviewing
 
-Review existing code with independent lenses, then collapse the result into one evidence-backed verdict.
+Review existing code with independent subagent lenses, then collapse the result into one evidence-backed verdict.
 
 ## Sources
 
@@ -11,10 +11,11 @@ Review existing code with independent lenses, then collapse the result into one 
 ## Workflow
 
 1. Load the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, plus local review doctrine, when present
-2. Pick the smallest set of reviewer personas that can challenge the change from distinct angles
-3. Run personas independently when parallelism actually buys separation of concerns
-4. Refresh stale evidence before trusting it
-5. Merge findings into one prioritized verdict
+2. Spawn the mandatory default reviewer gang: general, tests, and silent-failures
+3. Add conditional reviewer subagents only when they add a distinct concern
+4. Run personas independently, preferably in parallel
+5. Refresh stale evidence before trusting it
+6. Merge findings into one prioritized verdict
 
 ## Freshness
 
@@ -51,7 +52,8 @@ Cached review artifacts, old screenshots, stale local build output, or a green C
 
 ## Anti-Patterns
 
-- Running every persona blindly on tiny diffs
+- Skipping the mandatory default gang
+- Adding conditional personas that repeat the default gang's concerns
 - Reporting stylistic nits as if they were defects
 - Treating screenshots or passing tests as a substitute for code reasoning
 - Treating local proof as live/deploy proof, or CI as a real-behavior proof lane

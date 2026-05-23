@@ -1,41 +1,36 @@
 ---
-name: review
-description: "Independently audit existing code, diffs, branches, or pull requests using concern-specific reviewer personas and evidence. Use when triaging risk in a PR, deciding whether a change is safe to ship, or following up after runtime proof to make the call the builder cannot make on their own work. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored."
+name: review-gang
+description: "Independently audit existing code, diffs, branches, or pull requests by spawning mandatory concern-specific reviewer subagents, then synthesizing their evidence into a ship decision. Use when triaging PR risk, deciding whether someone else's change is safe to ship, or following up after runtime proof. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored."
 ---
 
-# Review
+# Review Gang
 
-Independently audit existing code with concern-specific lenses and decide whether it is safe to ship. Review is the gate after runtime proof: the builder proves the change works on the real surface, then review decides whether the change is *good*.
+Independently audit existing code by spawning concern-specific reviewer subagents, then synthesize one evidence-backed ship decision.
 
-## Principles
+## Contract
 
-- Review is the independent decision layer for existing work; it can use any native review command or platform, but owns the verdict
-- Use parallel reviewer personas only when concerns are independent
+- Spawn reviewer personas as separate subagents every time; if subagents are unavailable, the review is `blocked` unless the user explicitly allows a sequential fallback
+- Always run the default gang: `general`, `tests`, and `silent-failures`
 - Load shared doctrine from the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules
 - Keep findings risk-focused, evidence-backed, severity-ordered, and free of low-value nits
-- Keep proof layers separate: diff inspection, focused regression tests, CI, runtime proof, and live/deploy evidence are not interchangeable
+- Block when missing context or proof prevents an honest verdict; otherwise name the unverified surface and adjust the verdict
 - Do not use this lane to self-check a change you just authored
-
-## Handoffs
-
-- Review is blocked when missing context or missing proof prevents an honest verdict; otherwise name the unverified surface and adjust the verdict.
-- Stale AGENTS.md, README, specs, or repo docs are documentation work unless they change the review verdict.
 
 ## Before You Start
 
 1. Define the scope: file, diff, branch, commit range, or PR
 2. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
 3. Confirm the reviewed base/head or live artifact is current; stale review artifacts are evidence to refresh, not evidence to trust
-4. Choose reviewer personas from [references/reviewer-selection.md](references/reviewer-selection.md)
-5. Decide which personas can run independently in parallel
+4. Spawn the mandatory default reviewer subagents from [references/reviewer-selection.md](references/reviewer-selection.md)
+5. Add conditional reviewer subagents when the change shape calls for them
 
-Default personas:
+Mandatory default gang:
 
 - `general`
 - `tests`
 - `silent-failures`
 
-Add conditional personas only when they earn their keep; use [references/reviewer-selection.md](references/reviewer-selection.md) for shortcuts and criteria.
+Add conditional personas only when they add a distinct concern; use [references/reviewer-selection.md](references/reviewer-selection.md) for shortcuts and criteria.
 
 ## Workflow
 
@@ -45,9 +40,9 @@ Review the requested code, but inspect adjacent behavior when the risk leaks pas
 
 Refresh the source of truth before judging branches or PRs: base branch, head SHA, diff, checks, and linked issue or specification when present.
 
-### 2. Run reviewer personas
+### 2. Spawn reviewer subagents
 
-Use parallel subagents when available. Keep each persona concern-focused and independent.
+Spawn one subagent per selected persona. Run them in parallel when the environment supports it, and keep each persona concern-focused and independent. Do not collapse the gang into one blended self-review pass.
 
 Concrete starting points:
 
@@ -83,12 +78,7 @@ Use those labels explicitly. Keep the verdict label exact and omit opener, close
 
 Prefer the active harness's best native review representation instead of a prose-heavy wall of text.
 
-Keep the final answer short:
-
-- Put detailed issue text, file references, and line numbers in native findings or the fallback findings list
-- Keep native finding details in the findings and keep the verdict block short
-- Keep the core verdict footer to 4 labeled lines or fewer after findings
-- Keep `unverified:` narrow and explicit about the proof layer that is missing
+Keep detailed issue text in native findings or fallback finding bullets. Keep the verdict footer to 4 labeled lines or fewer after findings.
 
 See [references/reviewing.md](references/reviewing.md) for stale evidence handling and presentation details.
 
@@ -104,5 +94,5 @@ Example:
 
 ## References
 
-- [references/reviewing.md](references/reviewing.md) — reviewer persona workflow, evidence expectations, and verdict synthesis
-- [references/reviewer-selection.md](references/reviewer-selection.md) — which reviewer personas to run for which change shapes
+- [references/reviewing.md](references/reviewing.md) — reviewer subagent workflow, evidence expectations, and verdict synthesis
+- [references/reviewer-selection.md](references/reviewer-selection.md) — mandatory and conditional reviewer subagents

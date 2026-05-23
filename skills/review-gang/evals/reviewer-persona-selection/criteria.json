@@ -1,11 +1,11 @@
 {
-  "context": "Tests whether the agent correctly selects reviewer personas for a refactor that touches types, error handling, dead code, and auth. The agent should apply the default personas plus relevant conditional ones, avoid spawning unnecessary personas, load the repo's AGENTS.md, and produce a well-structured output with verdict and evidence without a noisy footer.",
+  "context": "Tests whether the agent spawns the mandatory default reviewer gang for a refactor that touches types, error handling, dead code, and auth, adds relevant conditional personas, avoids unnecessary extra personas, loads the repo's AGENTS.md, and produces a well-structured output with verdict and evidence without a noisy footer.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Default personas used",
+      "name": "Default gang spawned",
       "max_score": 8,
-      "description": "The report mentions using at least two of the three default personas: general, tests, silent-failures"
+      "description": "The report mentions spawning all three default reviewer personas: general, tests, and silent-failures"
     },
     {
       "name": "Types persona included",
@@ -30,7 +30,7 @@
     {
       "name": "Personas listed in output",
       "max_score": 6,
-      "description": "The review report shows persona choice only when useful for the task or in compact metadata; it does not force persona details into the verdict footer"
+      "description": "The review report shows spawned personas in compact metadata or evidence, but does not force persona details into the verdict footer"
     },
     {
       "name": "Verdict present",

@@ -1,20 +1,23 @@
 interface:
-  display_name: "Review"
-  short_description: "Review existing code with concern-specific personas"
+  display_name: "Review Gang"
+  short_description: "Review existing code with mandatory reviewer subagents"
   default_prompt: |
-    Use $review.
+    Use $review-gang.
 
-    Goal: independently decide whether existing code, a diff, branch, or PR is safe to ship.
+    Goal: independently decide whether existing code, a diff, branch, or PR is safe to ship by spawning concern-specific reviewer subagents.
 
     Success criteria:
     - The reviewed scope is clear.
     - The reviewed base/head, artifact, or evidence source is current enough to support the verdict.
+    - The default reviewer gang is spawned: general, tests, and silent-failures.
+    - Conditional personas are spawned only when they add a distinct concern.
     - Findings are risk-focused, evidence-backed, and ordered by severity.
     - Unverified areas name the missing proof layer explicitly.
     - The verdict is exactly one of: ship it, needs review, blocked.
 
     Constraints:
     - Self-checks of your own completed change are verification work, not independent review.
+    - Do not collapse personas into one blended review pass; spawn subagents or block when subagents are unavailable and no fallback is approved.
     - Keep the review scoped to risks in the requested diff, branch, or PR.
     - Prefer the smallest evidence set that can change the verdict.
 

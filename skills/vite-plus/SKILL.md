@@ -35,31 +35,14 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 
 ## Tooling Source Of Truth
 
-Before changing CI, inspect existing workflow files and pick or preserve the canonical version owner:
+Before changing CI, preserve one canonical version owner:
 
-- **Node:** use a checked-in `.node-version`; use `node-version-file: ".node-version"` in `actions/setup-node` or `voidzero-dev/setup-vp`. Migrate alternate Node version-file conventions to `.node-version` instead of preserving them.
-- **pnpm/npm/yarn:** prefer `package.json#packageManager`; do not also hardcode `pnpm@...` in workflow YAML unless the action cannot read the package manager and the exception is documented
-- **Vite+:** prefer the exact `vite-plus` dependency or workspace catalog. If `setup-vp` needs an explicit `version`, derive it from `package.json` with `jq` instead of copying the literal:
+- Node: `.node-version`; wire it through `node-version-file: ".node-version"`
+- package manager: `package.json#packageManager`
+- Vite+: the `vite-plus` dependency or workspace catalog; when CI needs an explicit `version`, derive it from that source with a structured parser
+- workflow exceptions: document why the action cannot read the repo-owned source
 
-```yaml
-- name: Read Vite+ version
-  id: vite_plus
-  shell: bash
-  run: |
-    set -euo pipefail
-    version=$(jq -er '(.devDependencies["vite-plus"] // .dependencies["vite-plus"]) | sub("^[~^]"; "")' package.json)
-    echo "version=${version}" >> "$GITHUB_OUTPUT"
-
-- uses: voidzero-dev/setup-vp@<full-sha> # v1.x.y
-  with:
-    version: ${{ steps.vite_plus.outputs.version }}
-    node-version-file: ".node-version"
-    cache: true
-```
-
-If a workspace uses `catalog:` for `vite-plus`, keep the catalog as the source of truth and resolve it with a structured YAML-aware path or let `vp install` use the lockfile; do not paste the catalog value into each workflow.
-
-Concrete examples:
+Concrete shapes:
 
 ```yaml
 - uses: voidzero-dev/setup-vp@<full-sha> # v1.x.y

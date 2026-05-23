@@ -37,7 +37,7 @@ installer.
 
 ```bash
 ./scripts/skills/review.sh
-./scripts/skills/optimize.sh review
+./scripts/skills/optimize.sh review-gang
 ```
 
 The Tessl helper scripts pin the `tessl` CLI by default. Override with

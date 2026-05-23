@@ -10,11 +10,10 @@ Keep the repo legible to humans and agents.
 ## Principles
 
 - Docs rot silently — every code change is a possible doc change
-- Describe the current state, not the edit history; use before/after wording only when migration context helps the reader
-- Routing docs stay short; depth lives in `docs/`
-- No duplication when a pointer will do
-- Use repo-relative links for in-repo docs; external links are fine in sources and references
-- Keep current-state repo docs separate from agent work artifacts like plans, handoff prompts, specs, and decisions
+- Describe current state; keep history only in migration notes, changelogs, and decisions
+- Keep routing docs short and point to deeper docs instead of duplicating them
+- Use repo-relative links for in-repo docs
+- Keep repo docs, agent guidance, and work artifacts linked but distinct
 
 ## Handoffs
 
@@ -34,9 +33,9 @@ Check the files humans and agents actually rely on:
 - `docs/`
 - durable specs, active plans, runbooks, and decision docs
 
-Flag stale commands, dead paths, duplicated guidance, routing failures, and places where filenames or implementation order are leaking into the visible docs surface.
+Flag stale commands, dead paths, duplicate guidance, routing failures, and repo-internal details leaking into reader-facing docs.
 
-Before editing, classify the target: current-state repo docs for readers and contributors, agent guidance for future behavior, or agent work artifacts for planning, specs, decisions, and handoffs. Keep those surfaces linked but not blended.
+Before editing, classify the target as repo docs, agent guidance, or work artifacts such as plans, specs, decisions, and handoffs.
 
 Use the source-boundary table in [references/documentation.md](references/documentation.md) before writing cross-repo, private workspace, or local-machine facts into checked-in docs.
 
@@ -47,14 +46,14 @@ Keep top-level docs terse and navigational.
 - `AGENTS.md` should be a table of contents, not a wiki
 - If the repo uses `AGENTS.md`, make `CLAUDE.md` a symlink or `@AGENTS.md` import instead of maintaining a second authored file
 - `README.md` should lead with value, quick use, and links to deeper docs
-- Refresh `CONTRIBUTING.md` and `SECURITY.md` when they already exist, or when redistributing current content out of an overloaded `README.md`; do not invent baseline policy from scratch
-- For coordination or workspace repos, keep one canonical setup doc and let `README.md` point to it instead of repeating the full bootstrap flow inline
+- Refresh `CONTRIBUTING.md` and `SECURITY.md` when they already exist or when moving existing policy out of an overloaded `README.md`; do not invent baseline policy from scratch
+- For workspace repos, keep one canonical setup doc and let `README.md` point to it
 - Use the concrete top-level split and section order in [references/documentation.md](references/documentation.md)
-- Use reader-facing labels in routing lists: `Contributing`, `Release workflow`, `Architecture`, or `Agent guide`, not raw filenames unless the filename matters
+- Use reader-facing labels in routing lists; use raw filenames only when the filename matters
 
 ### 3. Update deep docs and specs
 
-Refresh the detailed documents that actually carry the knowledge.
+Refresh the detailed documents that carry the knowledge.
 
 - architecture and API docs
 - task guides and runbooks
@@ -62,9 +61,9 @@ Refresh the detailed documents that actually carry the knowledge.
 - tactical plans and handoff prompts only when future agents need them
 - readiness infrastructure docs after boot, smoke, observability, or isolation changes
 
-Write each updated section as the reader's current source of truth. Use "previously/now" or "before/after" framing only in migration notes, changelogs, and decision records.
+Write each updated section as the reader's current source of truth.
 
-When the user asks to save a durable rule, prompt, plan, or decision, choose the owning repo surface first: `docs/decisions/` for durable choices, `docs/specs/` for contracts, `docs/plans/` for tactical execution, and agent guidance only for behavior future agents must repeat. Do not fold tactical agent plans into `README.md`, `CONTRIBUTING.md`, or general architecture docs.
+When the user asks to save a durable rule, prompt, plan, or decision, choose the owning surface: `docs/decisions/`, `docs/specs/`, `docs/plans/`, or agent guidance for behavior future agents must repeat.
 
 For new features, use the directory layout and templates in [references/structuring.md](references/structuring.md) — specs, plans, and decisions each have their own shape.
 
@@ -73,9 +72,9 @@ For new features, use the directory layout and templates in [references/structur
 - deduplicate repeated facts
 - delete or archive stale docs
 - fix cross-links and moved paths
-- keep naming and commands consistent across files
-- keep one canonical home for setup or install commands in workspace-style repos, and replace copied command blocks elsewhere with short pointers
-- normalize visible labels, casing, and section order when the docs read like a file tree instead of a user guide. Link targets may be paths; visible link text should usually be the document title or reader-facing purpose
+- keep naming, labels, casing, commands, and section order consistent
+- keep one canonical home for setup or install commands and replace copied command blocks with pointers
+- prefer reader-facing link text over raw paths unless the path is the point
 
 Example — fixing a stale path after a rename:
 
@@ -87,7 +86,7 @@ Example — fixing a stale path after a rename:
 
 ### 5. Validate reality
 
-Verify prose against the repo. Check that commands, file paths, and entry points still match.
+Verify prose against the repo.
 
 Concrete checks:
 

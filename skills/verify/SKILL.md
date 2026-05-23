@@ -105,7 +105,7 @@ Example:
 - verdict: ready for review
 - evidence: retry tests covered success and failure paths; API retry smoke returned 200
 - unverified or gaps: none
-- next: review
+- next: review-gang
 ```
 
 ## References

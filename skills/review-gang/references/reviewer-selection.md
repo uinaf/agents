@@ -1,16 +1,16 @@
 # Reviewer Selection
 
-Pick the smallest set of independent reviewer personas that can actually challenge the change.
+Always spawn the default reviewer gang, then add only the conditional personas that can challenge the change from a distinct angle.
 
 ## Default Set
 
-Use these for most non-trivial reviews:
+Spawn these for every Review Gang run:
 
 - [reviewers/general.md](../reviewers/general.md)
 - [reviewers/tests.md](../reviewers/tests.md)
 - [reviewers/silent-failures.md](../reviewers/silent-failures.md)
 
-The silent-failures lens is especially important when the diff touches error handling, retries, fallbacks, validation, auth, external services, or user-facing failures.
+The default gang is mandatory even for small diffs. The silent-failures lens is especially important when the diff touches error handling, retries, fallbacks, validation, auth, external services, or user-facing failures.
 
 ## Add Conditional Personas
 
@@ -35,23 +35,23 @@ The silent-failures lens is especially important when the diff touches error han
 - large comment blocks were added
 - the change leans on comments to explain tricky behavior
 
-## Shape-Based Shortcuts
+## Shape-Based Add-Ons
 
 - **UI feature** → general + tests + silent-failures
 - **API / backend** → general + tests + silent-failures; add types for schema changes and cleanup for wide refactors
 - **State / migration / config** → general + tests + silent-failures; add types if invariants changed and cleanup if old paths may be left behind
-- **Refactor / cleanup** → general + cleanup; add tests or types only when behavior boundaries or invariants changed
-- **Doc-heavy change** → general + comments
-- **Tiny mechanical change** → general only, unless the change touches error handling or tests
+- **Refactor / cleanup** → default gang + cleanup; add types when invariants changed
+- **Doc-heavy change** → default gang + comments
+- **Tiny mechanical change** → default gang only, unless comments/types/cleanup add a distinct concern
 
-## Do Not Spawn Everything Blindly
+## Do Not Add Everything Blindly
 
-More personas are not always better.
+More conditional personas are not always better.
 
-Avoid reviewer spam when:
+Avoid conditional persona spam when:
 
 - the diff is tiny
 - personas would repeat the same concern
 - coordination overhead exceeds review value
 
-Every persona should contribute a distinct lens or evidence source.
+Every added persona should contribute a distinct lens or evidence source.

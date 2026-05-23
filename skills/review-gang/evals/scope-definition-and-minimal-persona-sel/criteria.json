@@ -1,11 +1,11 @@
 {
-  "context": "Tests whether the agent correctly applies minimal persona selection for a tiny documentation-only change, avoids reviewer spam, correctly applies the shape-based shortcut for doc-heavy changes, produces a valid verdict, and does not over-inflate minor findings into defects.",
+  "context": "Tests whether the agent still spawns the mandatory default reviewer gang for a tiny documentation-only change, avoids unnecessary conditional persona spam, adds the comments persona for doc-heavy risk, produces a valid verdict, and does not over-inflate minor findings into defects.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Minimal personas selected",
+      "name": "Default gang spawned",
       "max_score": 12,
-      "description": "The report uses only 1-2 personas, NOT all 6 personas — specifically avoids spawning silent-failures, types, and cleanup for this purely documentary change"
+      "description": "The report uses the mandatory default personas: general, tests, and silent-failures"
     },
     {
       "name": "General persona used",
@@ -18,9 +18,9 @@
       "description": "The report includes the comments reviewer persona (or equivalent documentation/docstring lens) — appropriate given docstring change"
     },
     {
-      "name": "Tests persona omitted",
+      "name": "Tests persona included",
       "max_score": 8,
-      "description": "The report does NOT apply a tests reviewer persona — no test coverage concern applies to a typo/docstring fix"
+      "description": "The report applies the tests reviewer persona as part of the mandatory default gang, while keeping any test-related conclusion brief for a doc-only change"
     },
     {
       "name": "Verdict present",
@@ -35,7 +35,7 @@
     {
       "name": "Personas listed in output",
       "max_score": 8,
-      "description": "The report shows persona choice only when useful for the task or in compact metadata; it does not force persona details into the verdict footer"
+      "description": "The report shows spawned personas in compact metadata or evidence; it does not force persona details into the verdict footer"
     },
     {
       "name": "No nit inflation",

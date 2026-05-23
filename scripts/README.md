@@ -18,7 +18,7 @@ latest.
 Useful direct invocations:
 
 ```bash
-npx tessl@0.79.1 skill review skills/review
+npx tessl@0.79.1 skill review skills/review-gang
 npx tessl@0.79.1 skill review --json --threshold 90 skills/verify
 ```
 
@@ -29,13 +29,13 @@ Use per-skill `--json` output directly with Tessl rather than `skills/review.sh`
 Apply Tessl's optimizer to one skill at a time:
 
 ```bash
-./scripts/skills/optimize.sh review
+./scripts/skills/optimize.sh review-gang
 ```
 
 Direct form:
 
 ```bash
-npx tessl@0.79.1 skill review --optimize --yes --max-iterations 1 skills/review
+npx tessl@0.79.1 skill review --optimize --yes --max-iterations 1 skills/review-gang
 ```
 
 ## Suggested workflow
