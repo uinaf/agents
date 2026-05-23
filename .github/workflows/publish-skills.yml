@@ -14,6 +14,7 @@ permissions:
 
 jobs:
   review:
+    if: ${{ github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]') }}
     runs-on: ubuntu-latest
     env:
       TESSL_AUTO_UPDATE_INTERVAL_MINUTES: "0"
@@ -35,18 +36,22 @@ jobs:
 
   publish:
     needs: review
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name != 'push' || !contains(github.event.head_commit.message, '[skip ci]')) }}
     runs-on: ubuntu-latest
     environment:
       name: release
       deployment: false
+    concurrency:
+      group: publish-skills-${{ github.repository }}-main
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          persist-credentials: true
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Set up Tessl
         uses: tesslio/setup-tessl@25ec223fc0da33b41b8044ff5ab2b85235f4f91e # v2
@@ -55,11 +60,13 @@ jobs:
 
       - name: Authorize version-bump pushes
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
         run: gh auth setup-git
 
       - name: Publish changed tiles
         uses: uinaf/tessl-publish-action@c886763f2a95d6971317fd4b8abe88679619ebad # v2.1.2
+        env:
+          GH_TOKEN: ${{ github.token }}
         with:
           review-threshold: "90"
-          commit-version-bumps: "false"
+          commit-version-bumps: "true"

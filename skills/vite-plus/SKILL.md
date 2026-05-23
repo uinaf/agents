@@ -12,7 +12,7 @@ Move a frontend repo closer to the stock Vite+ toolchain while preserving repo-s
 Default to this destination unless a repo-specific boundary clearly blocks it. If you keep an old command shape, document the reason.
 
 - CI uses `voidzero-dev/setup-vp`; the action owns Node and package-manager bootstrap. Let its default `run-install: true` run `vp install`, then run `vp check`, `vp test`, and `vp build`; set `run-install: false` only when the workflow needs an explicit install step. In repos that pin GitHub Actions, pin `setup-vp` to a full commit SHA with a same-line exact version comment and let Dependabot maintain it
-- Tooling versions have one checked-in source of truth. Node comes from `.node-version`/`.nvmrc`/`.tool-versions`; package-manager versions come from `package.json#packageManager`; Vite+ comes from the repo's `vite-plus` dependency or workspace catalog. Do not repeat Node, pnpm, or Vite+ literals in workflows when a source file can be read
+- Tooling versions have one checked-in source of truth. Node comes from `.node-version`; package-manager versions come from `package.json#packageManager`; Vite+ comes from the repo's `vite-plus` dependency or workspace catalog. Do not repeat Node, pnpm, or Vite+ literals in workflows when a source file can be read
 - test files use `vite-plus/test` (and `vite-plus/test/browser/context` for browser mode)
 - scripts prefer `vp dev`, `vp test`, `vp test watch`, `vp test run --coverage`, `vp pack`, `vp build`, `vp preview`, `vp update`, and `vp run <script>` (or `vpr <script>`) over direct package-manager, raw Vitest, or tsdown wiring
 - hooks use `vp config`, `.vite-hooks`, and `vp staged` as the default hook stack
@@ -37,7 +37,7 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 
 Before changing CI, inspect existing workflow files and pick or preserve the canonical version owner:
 
-- **Node:** prefer a checked-in `.node-version`; use `node-version-file: ".node-version"` in `actions/setup-node` or `voidzero-dev/setup-vp`. If the repo already uses `.nvmrc` or `.tool-versions` as the owner, either use that file directly when the action supports it or migrate deliberately to `.node-version`
+- **Node:** use a checked-in `.node-version`; use `node-version-file: ".node-version"` in `actions/setup-node` or `voidzero-dev/setup-vp`. Migrate alternate Node version-file conventions to `.node-version` instead of preserving them.
 - **pnpm/npm/yarn:** prefer `package.json#packageManager`; do not also hardcode `pnpm@...` in workflow YAML unless the action cannot read the package manager and the exception is documented
 - **Vite+:** prefer the exact `vite-plus` dependency or workspace catalog. If `setup-vp` needs an explicit `version`, derive it from `package.json` with `jq` instead of copying the literal:
 

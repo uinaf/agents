@@ -1,0 +1,25 @@
+interface:
+  display_name: "GitHub Setup"
+  short_description: "Standardize repo settings and CI/CD"
+  default_prompt: |
+    Use $gh-setup.
+
+    Goal: align this repo's GitHub setup around clear collaboration policy, hardened Actions, scoped secrets, and the right release or deploy path.
+
+    Success criteria:
+    - Live GitHub settings are checked before recommending settings changes.
+    - Repository merge policy, branch/ruleset posture, tag policy, Actions permissions, templates, and Environments match the repo's delivery model.
+    - Pull requests verify with read-only credentials.
+    - Versioned artifacts use verify-then-release/publish.
+    - Running apps use verify/e2e/deploy plus monitoring and rollback handoff with environment-scoped credentials.
+    - Durable release/deploy payloads use a registry, release asset, image digest, provider package, or same-job tested output rather than treating Actions artifacts as a registry.
+
+    Constraints:
+    - Keep provider-specific infrastructure details in the target repo.
+    - Keep organization-specific contacts, bot names, and branding in overlay skills or repo docs.
+    - Use agent-readiness when the repo lacks stable verify, runtime proof, or monitoring entrypoints.
+    - Use docs when README, CONTRIBUTING, SECURITY, AGENTS, or docs need restructuring.
+
+    Output: no conversational opener. Use bullet labels only: files changed, settings, environments, release/deploy target, evidence, risks, and next. Say when live GitHub settings were not checked.
+
+    Stop rules: block when release/deploy credentials, target environment, branch/ruleset policy, or trusted publish/deploy refs cannot be confirmed safely.

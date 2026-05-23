@@ -1,0 +1,86 @@
+{
+  "context": "Tests whether the agent follows the verify → e2e → deploy pipeline topology without collapsing stages, passes the same artifact through all stages without rebuilding, and hands off to real monitoring/rollback context instead of a cheap smoke job. Also checks artifact upload options and step summary.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "No rebuild in deploy",
+      "max_score": 10,
+      "description": "The deploy path consumes the exact payload produced by the verify/build path rather than running a build command itself (no `npm run build`, `pnpm run build`, etc. inside the deploy job)"
+    },
+    {
+      "name": "Exact payload tested in e2e",
+      "max_score": 9,
+      "description": "The e2e stage tests the exact deploy payload via same-job filesystem handoff, immutable release/registry/provider ref, or a documented same-run artifact handoff rather than running a fresh build"
+    },
+    {
+      "name": "Payload boundary justified",
+      "max_score": 7,
+      "description": "Uses the most durable available payload boundary (same-job static handoff, registry/release asset, image digest, provider-native package) or explicitly documents why a same-run GitHub Actions artifact is acceptable scratch storage"
+    },
+    {
+      "name": "Missing output fails",
+      "max_score": 7,
+      "description": "The workflow fails immediately if the build produces no deployable output, either via an explicit output-path assertion or artifact upload settings such as `if-no-files-found: error`"
+    },
+    {
+      "name": "Framework output covered",
+      "max_score": 6,
+      "description": "The chosen payload path includes framework output directories such as `.next/` or `.output/` when relevant, rather than accidentally deploying only a partial visible-file tree"
+    },
+    {
+      "name": "Lane-specific payload identity",
+      "max_score": 5,
+      "description": "The payload identity is lane-specific (e.g. `web-dist`, image digest output, provider package id, or release asset name) rather than a generic ambiguous name like `dist` or `build`"
+    },
+    {
+      "name": "Separate stages",
+      "max_score": 7,
+      "description": "Verify, e2e, and deploy are separate jobs, or the workflow explicitly uses the documented same-job static handoff exception and keeps build, e2e, credential loading, and deploy ordered in one trusted job"
+    },
+    {
+      "name": "Monitoring handoff present",
+      "max_score": 10,
+      "description": "The deploy output or follow-up summary links the deployed URL, monitoring dashboard, alert or synthetic-check coverage, deploy marker when available, and rollback runbook"
+    },
+    {
+      "name": "No cheap smoke substitute",
+      "max_score": 6,
+      "description": "The workflow does not add a shallow curl/wget/Playwright smoke job as the main post-deploy proof unless it is explicitly wired to the repo's real synthetic monitoring contract"
+    },
+    {
+      "name": "GITHUB_STEP_SUMMARY",
+      "max_score": 5,
+      "description": "A step in the deploy job writes to `$GITHUB_STEP_SUMMARY` including what was deployed and where (URL or environment)"
+    },
+    {
+      "name": "Deploy needs both verify and e2e",
+      "max_score": 5,
+      "description": "The deploy job declares `needs: [verify-<lane>, e2e-<lane>]` (or equivalent) to depend on both upstream jobs, unless using the documented same-job static handoff where deploy is gated after verify and e2e steps"
+    },
+    {
+      "name": "Post-deploy handoff has no deploy credentials",
+      "max_score": 3,
+      "description": "Any monitoring, notification, or incident handoff job is read-only and does not receive OIDC or provider deploy credentials"
+    },
+    {
+      "name": "Timeouts set",
+      "max_score": 5,
+      "description": "Non-trivial verify, e2e, deploy, and result jobs set explicit `timeout-minutes` values instead of relying on GitHub's long default"
+    },
+    {
+      "name": "Artifact exception hygiene",
+      "max_score": 5,
+      "description": "If Actions artifacts are used as same-run scratch storage, upload steps set `if-no-files-found: error`, `retention-days` between 1 and 3, lane-specific artifact names, and record the artifact digest"
+    },
+    {
+      "name": "Stable no-op result",
+      "max_score": 6,
+      "description": "The workflow avoids trigger-level path skips for required checks and uses an internal changes/no-op path plus a stable final result job for branch protection"
+    },
+    {
+      "name": "Matrix controls",
+      "max_score": 4,
+      "description": "Matrixed build/e2e jobs use `fail-fast: false` when full lane evidence matters and set `max-parallel` when external capacity or provider limits require it"
+    }
+  ]
+}

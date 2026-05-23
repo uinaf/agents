@@ -66,7 +66,7 @@ Stripe webhook signature verification key is stored in `STRIPE_WEBHOOK_SECRET`. 
 
 ## Getting Started
 
-Prerequisites: Node.js 20+, PostgreSQL 15+, Docker (optional)
+Prerequisites: Node.js 24.x LTS, PostgreSQL 15+, Docker (optional)
 
 1. Install dependencies: `npm install`
 2. Copy environment file: `cp .env.example .env`

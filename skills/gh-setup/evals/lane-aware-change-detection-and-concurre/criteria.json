@@ -1,0 +1,66 @@
+{
+  "context": "Tests whether the agent sets up lane-independent change detection that only builds/deploys affected apps, uses correct concurrency settings (non-cancellable deploy, cancellable verify/e2e, same group key across main.yml and deploy.yml), and uses the correct job condition syntax for deploy gates.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "paths-filter for detection",
+      "max_score": 8,
+      "description": "Uses dorny/paths-filter pinned to a full commit SHA with the current v4.0.1 version comment (not v2 or v3) to detect which lane changed"
+    },
+    {
+      "name": "Lockfile in filter",
+      "max_score": 8,
+      "description": "The paths-filter includes the package lockfile (package-lock.json, pnpm-lock.yaml, yarn.lock, or similar) in at least one lane's filter rules"
+    },
+    {
+      "name": "fetch-depth 0 on changes job",
+      "max_score": 9,
+      "description": "The changes/detect job's checkout step includes `fetch-depth: 0`"
+    },
+    {
+      "name": "Lane conditional build",
+      "max_score": 8,
+      "description": "Each verify/build job has an `if:` condition that gates it on the corresponding lane being detected as changed (referencing the changes job output)"
+    },
+    {
+      "name": "Deploy non-cancellable",
+      "max_score": 10,
+      "description": "The deploy job(s) include `concurrency: { cancel-in-progress: false }` (or equivalent)"
+    },
+    {
+      "name": "Verify/e2e cancellable",
+      "max_score": 8,
+      "description": "At least one verify or e2e job includes `concurrency: { cancel-in-progress: true }` (or equivalent)"
+    },
+    {
+      "name": "Concurrency group lane-scoped",
+      "max_score": 9,
+      "description": "The deploy concurrency group key is scoped to (environment, lane) — e.g. `deploy-production-web` — NOT scoped to `${{ github.ref }}`"
+    },
+    {
+      "name": "Shared concurrency key",
+      "max_score": 10,
+      "description": "The deploy concurrency group key in main.yml and in deploy.yml (or the manual re-deploy section) uses the same string value"
+    },
+    {
+      "name": "Explicit result check",
+      "max_score": 10,
+      "description": "Deploy job `if:` condition uses `needs.<job>.result == 'success'` (NOT `success()`) for each upstream dependency"
+    },
+    {
+      "name": "Manual deploy workflow",
+      "max_score": 8,
+      "description": "A separate workflow_dispatch workflow exists (deploy.yml or equivalent) for manually re-deploying a verified artifact or image for a validated ref without re-running verify"
+    },
+    {
+      "name": "validated redeploy ref",
+      "max_score": 8,
+      "description": "The manual deploy workflow validates the requested ref, passes it through env or outputs, and uses the validated value for checkout or artifact/image lookup rather than interpolating `inputs.ref` directly in shell"
+    },
+    {
+      "name": "Independent lane verification",
+      "max_score": 4,
+      "description": "The written explanation or workflow structure shows that a change to only one app does not trigger the build/deploy of the other app (each lane's jobs are gated independently)"
+    }
+  ]
+}

@@ -23,7 +23,7 @@ Prefer the documented Vite+ setup:
 | ----- | ------- |
 | `version` | Pin a specific Vite+ release. Defaults to latest; pin when CI must stay aligned with a chosen release. |
 | `node-version` | Node.js version to install via `vp env use`. |
-| `node-version-file` | Read the Node.js version from a file (`.node-version`, `.nvmrc`, `.tool-versions`, `package.json`, etc.). |
+| `node-version-file` | Read the Node.js version from `.node-version`. |
 | `working-directory` | Project root for path resolution and lockfile detection. |
 | `run-install` | Run `vp install` after setup. Boolean or YAML config; defaults to `true`. |
 | `cache` | Cache project dependencies. Auto-detects pnpm/npm/yarn/bun lockfiles. |
@@ -38,7 +38,7 @@ Prefer the documented Vite+ setup:
 - Prefer `vp config` when the repo wants stock hooks or agent integration instead of hand-rolled hook setup.
 - Prefer one repo-local verify entrypoint if CI needs extra repo-specific commands.
 - Keep release orchestration in GitHub Actions when the repo has npm, GitHub Release, binary, or Homebrew automation that goes beyond stock Vite+.
-- Vite+ can run repo scripts, but it does not make runtime-installed release plugins reproducible by itself. For semantic-release jobs, follow `gh-release-pipeline`: keep CI/CD-only plugins in the workflow's `extra_plugins` input with exact versions instead of adding release-only packages to repo `devDependencies`.
+- Vite+ can run repo scripts, but it does not make runtime-installed release plugins reproducible by itself. For semantic-release jobs, follow `gh-setup`: keep CI/CD-only plugins in the workflow's `extra_plugins` input with exact versions instead of adding release-only packages to repo `devDependencies`.
 - The `cache: true` setup shown here is for verify jobs. In secret-bearing release, publish, signing, or deploy jobs, disable or omit dependency caches and run a fresh `vp install`.
 - When CI behavior must stay aligned with a repo's chosen Vite+ release, pin the `setup-vp` action's `version` input explicitly. Treat the local `vite-plus` dependency version in `package.json` as separate from the action's runtime version.
 - For private registries, prefer the action's `NODE_AUTH_TOKEN` handling with repo `.npmrc` registry declarations. Use `registry-url` / `scope` when bypassing repo-level registry detection is intentional.

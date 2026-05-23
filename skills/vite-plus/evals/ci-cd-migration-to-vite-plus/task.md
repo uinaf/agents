@@ -31,7 +31,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: ".node-version"
 
       - name: Enable Corepack
         run: corepack enable
@@ -71,7 +71,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: ".node-version"
           registry-url: 'https://registry.npmjs.org'
 
       - name: Enable Corepack
@@ -118,3 +118,6 @@ jobs:
     "@vitest/coverage-v8": "^2.1.0"
   }
 }
+
+=============== FILE: .node-version ===============
+24
