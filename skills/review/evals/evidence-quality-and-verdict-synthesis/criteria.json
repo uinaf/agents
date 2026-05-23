@@ -55,7 +55,7 @@
     {
       "name": "Recommended follow-up",
       "max_score": 6,
-      "description": "The report recommends a specific follow-up from: implementation, verify, agent-readiness, or docs"
+      "description": "The report recommends a specific follow-up such as implementation, runtime verification, readiness setup, documentation cleanup, or none"
     },
     {
       "name": "No nit inflation",

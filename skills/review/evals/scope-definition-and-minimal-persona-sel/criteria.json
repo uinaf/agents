@@ -55,7 +55,7 @@
     {
       "name": "Recommended follow-up",
       "max_score": 10,
-      "description": "The report includes a recommended follow-up action from the allowed set: implementation, verify, agent-readiness, or docs"
+      "description": "The report includes a recommended follow-up action such as implementation, runtime verification, readiness setup, documentation cleanup, or none"
     },
     {
       "name": "Compact verdict block",
