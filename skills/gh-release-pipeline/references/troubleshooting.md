@@ -24,6 +24,12 @@ Common failure modes when standing up or operating this pipeline. Check here bef
 - Verify: action logs show "no GH token" or "ENEEDAUTH" near the publish step.
 - Fix: declare `GITHUB_TOKEN` on the semantic-release step. For npm, prefer trusted publishing: configure npm, grant `id-token: write`, and remove `NPM_TOKEN`; use a step-scoped `NPM_TOKEN` only when trusted publishing is unavailable.
 
+## Release published but deploy is blocked by artifact quota
+
+- Cause: the workflow publishes a real release artifact, then also uploads the same payload with `actions/upload-artifact` so a deploy job can download it. GitHub Actions artifact quota or retention can block deployment even though the release exists.
+- Verify: the deploy handoff uses `actions/upload-artifact` / `actions/download-artifact`, and the release already has a GitHub Release asset, package version, image digest, or provider-native package.
+- Fix: make deploy consume the durable release boundary directly. Download the GitHub Release asset, package registry package, image digest, or provider-native package, verify it, then promote it.
+
 ## Two releases racing produced duplicate tags or a dangling release
 
 - Cause: the release job's concurrency group is missing or has `cancel-in-progress: true`.

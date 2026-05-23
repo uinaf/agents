@@ -121,6 +121,12 @@ Use a `noreply.github.com` address or a dedicated bot account so bump commits ar
 - Regenerate or verify generated trees such as `Pods/`, `vendor/`, `dist/`, build directories, or packaged runtime bundles inside secret-bearing release jobs.
 - If a cache is unavoidable, namespace it by workflow, event/trust level, platform, and lockfile. Release jobs must consume only caches from the same trusted event class and must regenerate or verify generated trees before signing or publishing.
 
+## Release-to-deploy handoff
+
+- Prefer the published release boundary as the deploy input: GitHub Release asset, package registry version, container digest, or provider-native artifact.
+- Avoid `actions/upload-artifact` / `actions/download-artifact` as the bridge from release to deploy when the payload is already published somewhere durable. Actions artifacts are CI scratch storage with quota and retention failure modes.
+- If a deploy job downloads a GitHub Release asset, verify it before promotion with a checksum, archive integrity check, signature/provenance check, or target-specific validator.
+
 ## npm Supply-Chain Incident Checks
 
 - For active npm compromise response, scan manifests and lockfiles before installing. Look for affected versions from the advisory, unexpected git dependencies, malicious `optionalDependencies`, and package-root payloads such as `router_init.js`.

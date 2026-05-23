@@ -10,14 +10,20 @@ Common failure modes when standing up or operating a deploy pipeline. Check here
 
 ## E2E passed but production serves a different build
 
-- Cause: deploy rebuilt from source or checked out a newer ref instead of promoting the artifact verified by e2e.
-- Verify: compare artifact name, source SHA, producing workflow run, and deployed version in the deploy summary.
-- Fix: deploy must download the exact artifact or promote the immutable image produced by verify. No build commands in deploy jobs.
+- Cause: deploy rebuilt from source or checked out a newer ref instead of deploying the payload verified by e2e.
+- Verify: compare payload reference, source SHA, producing workflow run, checksum or digest, and deployed version in the deploy summary.
+- Fix: deploy must consume the exact verified payload reference: same-job build output, release asset, package version, provider-native package, or immutable image digest. No fresh build commands in deploy jobs unless the deploy platform is the builder and its provenance is recorded.
+
+## Deploy is blocked by Actions artifact quota
+
+- Cause: production deploy depends on `actions/upload-artifact` / `actions/download-artifact`, so repo or org artifact quota blocks deploy even though build and tests passed.
+- Verify: failing step says artifact storage quota was hit, or the workflow has an Actions artifact handoff that only exists to move deploy payloads between jobs.
+- Fix: remove the GitHub Actions artifact dependency. For same-run static deploys, build/test/deploy in one trusted environment-scoped job and keep smoke separate. For versioned releases, deploy from the GitHub Release asset, package registry, container digest, or provider-native package.
 
 ## Manual deploy ignores the requested ref safety checks
 
-- Cause: `inputs.ref` is passed directly to checkout, shell, artifact lookup, or image lookup in a secret-bearing job.
-- Fix: validate manual inputs in a secretless job, emit sanitized outputs, prove the artifact/image exists for that ref, then load environment credentials.
+- Cause: `inputs.ref` is passed directly to checkout, shell, payload lookup, or image lookup in a secret-bearing job.
+- Fix: validate manual inputs in a secretless job, emit sanitized outputs, prove the payload exists for that ref, then load environment credentials.
 
 ## Environment secret is unavailable
 
@@ -49,5 +55,5 @@ Common failure modes when standing up or operating a deploy pipeline. Check here
 
 ## Step summary is useless during incidents
 
-- Cause: the workflow logs details but does not write the human handoff artifact.
-- Fix: append a concise `$GITHUB_STEP_SUMMARY` with environment, lane, source commit, artifact/image identity, deploy URL, smoke result, and rollback pointer.
+- Cause: the workflow logs details but does not write a human-readable handoff summary.
+- Fix: append a concise `$GITHUB_STEP_SUMMARY` with environment, lane, source commit, payload identity, deploy URL, smoke result, and rollback pointer.

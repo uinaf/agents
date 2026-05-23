@@ -54,28 +54,25 @@ SST is a good deploy layer when the repo owns both app code and infrastructure. 
 - Split SST app/state boundaries by environment when one deploy path could delete or mutate the other environment's resources. Make `prod` and `staging` explicit stages/projects.
 - Avoid one shared SST app with different behavior by branch unless state ownership, deletion policy, and provider resource names are proven isolated.
 - Keep runtime secrets in SST/provider secret stores or GitHub Environment secrets; do not pass them as CLI flags.
-- Prefer deploying the already verified build artifact or immutable image. If SST must build internally, document why the artifact pass-through rule does not fit and add an equivalent build provenance check.
+- Prefer deploying the already verified payload: local build output from the same trusted job, a release asset, a package version, a provider-native package, or an immutable image. If SST must build internally, document why the payload pass-through rule does not fit and add an equivalent build provenance check.
 - Disable dependency/build caches in the credential-bearing SST deploy path unless the cache is scoped to the same trusted event class.
 - Smoke the deployed endpoint from a separate read-only job after `sst deploy`; the deploy command succeeding is not enough proof.
 - Add an assertion in the smoke job that cloud credential variables are absent before running browser or HTTP checks.
 
-## Artifact Promotion
+## Payload Promotion
 
-Deploy jobs promote an artifact or immutable image produced by verify:
+Deploy jobs promote the payload produced by verify:
 
 ```yaml
-- uses: actions/download-artifact@<full-sha> # v8.x.y
-  with:
-    name: web-dist
-    path: apps/web/dist
+- run: ./scripts/prepare-deploy-payload --ref "$VERIFIED_PAYLOAD_REF" --out apps/web/dist
 
-- run: ./scripts/deploy-web --artifact apps/web/dist --environment production
+- run: ./scripts/deploy-web --payload apps/web/dist --environment production
 ```
 
 - Do not rebuild in the deploy job.
 - Use immutable image digests or commit-SHA tags for containers; mutable tags are browsing hints only.
-- If a manual deploy promotes an older artifact or image, record source commit, producing workflow run, artifact name, and digest or checksum.
-- Verify artifact existence before loading deploy credentials.
+- If a manual deploy promotes an older payload, record source commit, producing workflow run, payload reference, and digest or checksum.
+- Verify payload existence before loading deploy credentials.
 
 ## Secrets
 
@@ -111,4 +108,4 @@ on:
 - Allow protected release tags only when the repo's deploy contract explicitly uses tag promotion.
 - Emit sanitized outputs and use only those outputs downstream.
 - Use the same deploy concurrency key as `main.yml`.
-- Load credentials only after validation and artifact provenance checks pass.
+- Load credentials only after validation and payload provenance checks pass.

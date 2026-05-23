@@ -10,7 +10,7 @@ Start by reading the repo's existing workflow/action files and any same-org repo
 .github/
 ├── workflows/
 │   ├── main.yml      # push to main → detect → verify → e2e → deploy → smoke
-│   ├── deploy.yml    # workflow_dispatch → re-deploy a verified artifact/image
+│   ├── deploy.yml    # workflow_dispatch -> re-deploy a verified payload ref
 │   └── verify.yml    # pull_request + merge_group → verify only (no deploy)
 └── actions/
     ├── setup-workspace/        # one place to bootstrap (Node, pnpm/vite+, cache)
@@ -19,7 +19,7 @@ Start by reading the repo's existing workflow/action files and any same-org repo
     └── smoke-<lane>/           # credential-free environment health check
 ```
 
-Composite actions can be useful for repo-owned deploy primitives, but do not turn this skill into a host cookbook. Keep provider mechanics in SST, scripts, infrastructure code, or a small local action whose inputs are artifact path, environment, lane, immutable version, and explicit deploy config path.
+Composite actions can be useful for repo-owned deploy primitives, but do not turn this skill into a host cookbook. Keep provider mechanics in SST, scripts, infrastructure code, or a small local action whose inputs are payload reference or path, environment, lane, immutable version, and explicit deploy config path.
 
 ## Triggers
 
@@ -47,10 +47,10 @@ on:
 - `merge_group:` covers the GitHub merge queue. Without it the queue blocks PRs that depend on green checks from this workflow.
 - `pull_request: { types: [...ready_for_review] }` keeps draft PRs out of CI but picks them up the moment they're marked ready.
 - Do **not** add `push:` to `verify.yml` — the verify gate runs inside `main.yml` for push events.
-- Secret-bearing manual deploys validate `inputs.ref`, `inputs.environment`, and `inputs.lane` in a secretless step before checkout or secret loading. Prefer `main`, protected release tags, or exact SHAs with a matching successful artifact/image.
+- Secret-bearing manual deploys validate `inputs.ref`, `inputs.environment`, and `inputs.lane` in a secretless step before checkout or secret loading. Prefer `main`, protected release tags, or exact SHAs with a matching durable payload.
 - Environment branch/tag rules constrain the workflow run ref; validate any separately checked-out `inputs.ref` as its own trust boundary.
-- Manual redeploys download an existing artifact or pull an image by immutable digest/SHA in the secret-bearing job.
-- Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or artifact/image lookup.
+- Manual redeploys consume an existing release asset, package version, provider package, or image by immutable digest/SHA in the secret-bearing job.
+- Pass manual inputs through `env:`, validate them, emit sanitized step outputs, and use those outputs for checkout or payload lookup.
 - Do not use `pull_request_target` for any workflow that checks out, installs, builds, tests, packages, deploys, or otherwise executes project code. Keep fork and outsider code on `pull_request` with read-only credentials and no deploy secrets.
 
 ## Standard hardening gates
@@ -156,7 +156,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 ```
 
-The deploy group must be **the same key in `main.yml` and `deploy.yml`**. That's how a manual re-deploy serializes against an in-flight push deploy. Mismatched keys → both run, and whichever finishes second wins on the host but loses on the artifact log.
+The deploy group must be **the same key in `main.yml` and `deploy.yml`**. That's how a manual re-deploy serializes against an in-flight push deploy. Mismatched keys -> both run, and whichever finishes second wins on the host but loses the provenance trail.
 
 ## Permissions
 
@@ -175,7 +175,7 @@ jobs:
 ```
 
 - `id-token: write` is required for OIDC-backed provider auth and keyless attestations.
-- Add registry-specific write permissions only when the verified build job pushes an image or release artifact to that registry.
+- Add registry-specific write permissions only when the verified build job publishes a release asset, package, provider package, or image to that registry.
 - Keep verify jobs read-only for pull requests.
 - Smoke jobs are read-only and should not receive OIDC or deploy-provider credentials.
 
@@ -228,37 +228,27 @@ Always include the lockfile and shared `packages/`. A dep bump must rebuild ever
 
 Turbo follows the `dependsOn` graph; it catches transitive changes that a flat path-filter misses. Pair it with a "force lanes if these CI/hosting paths changed" rule (e.g. `.github/workflows/**`, `Dockerfile`, `infrastructure/**`) so a CI-only change still runs the full lane.
 
-## Artifact pass-through
+## Payload pass-through
 
-The same artifact must flow `verify → e2e → deploy`. Upload once, download twice.
+The same deploy payload must flow `verify -> e2e -> deploy`. Prefer the most durable payload boundary the repo already owns: a container image digest, package/release asset, provider-native deployment package, or same-job filesystem handoff for simple static deploys.
 
-```yaml
-# verify-<lane>
-- uses: actions/upload-artifact@<full-sha> # v7.x.y
-  with:
-    name: <lane>-dist
-    path: apps/<lane>/dist
-    if-no-files-found: error
-    include-hidden-files: true   # next/_next/, vite ssr manifests, etc.
+Do not reflexively add `actions/upload-artifact` / `actions/download-artifact` between build and deploy. GitHub Actions artifacts are quota- and retention-coupled CI storage. They are acceptable only as same-run scratch handoff when quota/retention are understood, but they are a weak default for production deploy or release promotion when a registry, GitHub Release asset, image digest, or provider-native package exists.
 
-# e2e-<lane>, deploy-<lane>
-- uses: actions/download-artifact@<full-sha> # v8.x.y
-  with:
-    name: <lane>-dist
-    path: apps/<lane>/dist
-```
+For a simple static app where build, e2e, and deploy can safely share one trusted job, keep the payload on disk and deploy after tests. Preserve security by loading deploy credentials only in the environment-scoped job and keeping smoke in a downstream read-only job.
 
-- `if-no-files-found: error` catches a build that silently emits zero files into the wrong directory.
-- `include-hidden-files: true` is required for any framework that emits a leading-dot directory (`.next/`, `.output/`, `.amplify-artifacts/`).
-- Artifact names must be unique per lane (`web-dist`, `tv-dist`, `api-image-meta`); GitHub will not overwrite same-name artifacts within a run.
+Treat Actions artifacts as an exception, not the recipe. If a repo truly has no durable payload store and accepts same-run quota/retention coupling, document that tradeoff beside the workflow and keep artifact names unique per lane. Otherwise choose one of these shapes:
+
+- Same-job static handoff: build the static payload, run e2e against that local output, deploy from the same runner filesystem, then run smoke in a separate read-only job.
+- Release/registry handoff: publish the verified payload to a GitHub Release, package registry, provider package, or image registry, output its immutable ref, and have deploy consume that ref.
+- Provider-native handoff: ask the hosting provider to create a deployment package or deployment id, then promote that id through the environment.
 
 ## Caches
 
-- Caches speed dependency downloads and tool setup; they are not deployment artifacts.
-- Secret-bearing deploy and promotion jobs should prefer immutable artifacts or image digests produced by the verified trusted run over fresh package-manager cache restores.
+- Caches speed dependency downloads and tool setup; they are not deployment payloads.
+- Secret-bearing deploy and promotion jobs should prefer immutable payload refs produced by the verified trusted run over fresh package-manager cache restores.
 - Do not share package-manager caches between `pull_request` and privileged `push: main`, `workflow_dispatch`, or tag-driven jobs.
 - Rebuild or verify generated app output, package/vendor trees, container layers, and built bundles inside the trusted deploy path.
-- If deploy-time setup needs a cache, namespace by workflow, event/trust level, platform, and lockfile. Privileged jobs consume only caches from the same trusted event class. The deployed artifact still comes from the current verified artifact or immutable image digest.
+- If deploy-time setup needs a cache, namespace by workflow, event/trust level, platform, and lockfile. Privileged jobs consume only caches from the same trusted event class. The deployed payload still comes from the current verified payload ref.
 
 ## Job dependencies
 
@@ -281,8 +271,7 @@ For an SST-backed static or app surface, keep deploy and smoke separate:
 ```yaml
 # .github/actions/deploy-surface/action.yml
 inputs:
-  artifact-name: { required: true }
-  artifact-path: { required: true }
+  payload-path: { required: true }
   role-to-assume: { required: true }
   aws-region: { required: true }
   role-session-name: { required: true }
@@ -291,10 +280,10 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/download-artifact@<full-sha> # v8.x.y
-      with:
-        name: ${{ inputs.artifact-name }}
-        path: ${{ inputs.artifact-path }}
+    - shell: bash
+      env:
+        PAYLOAD_PATH: ${{ inputs.payload-path }}
+      run: test -d "$PAYLOAD_PATH"
     - uses: aws-actions/configure-aws-credentials@<full-sha> # v6.x.y
       with:
         role-to-assume: ${{ inputs.role-to-assume }}
@@ -306,6 +295,7 @@ runs:
       run: vp exec -- sst --config "${SST_CONFIG}" deploy --stage production
 ```
 
+- Prepare `payload-path` before calling the action. For a simple static surface this may be the same job's build output; for a versioned release it may be a checked, unpacked release asset.
 - Pass `sst-config` explicitly per lane, for example `infra/web/sst.config.ts`.
 - Disable dependency and build caches in the credential-bearing deploy setup unless the cache is scoped to trusted deploy events.
 - Put smoke checks in a downstream job with only `contents: read`; assert cloud credentials are absent before Playwright or HTTP probes.
@@ -379,7 +369,7 @@ Deploy jobs consume the resulting immutable image digest or commit-SHA tag. They
 
 ## Step summary
 
-End every deploy run with a `GITHUB_STEP_SUMMARY` block listing what shipped, which environment received it, where to inspect it, and which commit produced it. That is the artifact the on-call human reads when something is on fire, not the raw job log.
+End every deploy run with a `GITHUB_STEP_SUMMARY` block listing what shipped, which environment received it, where to inspect it, and which commit produced it. That summary is the human handoff during an incident, not the raw job log.
 
 ```yaml
 - run: |

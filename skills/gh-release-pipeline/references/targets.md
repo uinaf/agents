@@ -114,6 +114,7 @@ Two-step release job:
 - Add `id-token: write` and `attestations: write` to the job's `permissions:` for the attestation step.
 - `--clean` wipes `dist/` before building so a previous run cannot poison the new release.
 - Build and upload release artifacts from the release tag or verified release commit. If a workflow intentionally promotes an existing artifact, require recorded provenance: source commit, tag, build number/version, artifact digest, and producing workflow run.
+- If a later deploy job needs the released bits, download them from the published GitHub Release, registry, image digest, or provider-native package. Do not re-upload the release payload as a GitHub Actions artifact just to bridge release and deploy jobs.
 
 ## Rust
 
