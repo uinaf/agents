@@ -5,6 +5,8 @@ Documentation is part of the interface; optimize for scanability, rhythm, and vi
 
 ## Sources
 
+- OpenAI Codex AGENTS.md guide: https://developers.openai.com/codex/guides/agents-md
+- Claude Code memory guide: https://code.claude.com/docs/en/memory
 - OpenAI AGENTS.md findings: https://openai.com/index/harness-engineering/
 - Stripe scoped rules: https://stripe.dev/blog/minions-stripes-one-shot-end-to-end-coding-agents
 - ETH Zurich AGENTS.md study (auto-generated content hurts): https://arxiv.org/abs/2503.01298
@@ -35,6 +37,8 @@ OpenAI's finding: "We tried the big AGENTS.md. It failed." Context is scarce —
 - Include: boot command, test command, key conventions, pointers to detailed docs
 - Exclude: architecture tours, full API docs, every lint rule
 - Keep headings and bullets scannable. Prefer task-shaped labels like `Start here`, `Commands`, `Validation`, or `Repo rules` over headings that mirror internal filenames or implementation structure
+- Codex layers global, project, then nested `AGENTS.md` or `AGENTS.override.md`; closer files override broader guidance, so keep root guidance broad and put specialized rules near the code
+- Claude Code targets under 200 lines per `CLAUDE.md`; when a repo already uses `AGENTS.md`, use a symlink or `@AGENTS.md` import instead of duplicating content
 
 ### What belongs in AGENTS.md
 

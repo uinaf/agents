@@ -107,6 +107,13 @@ set -euo pipefail
 
 See [references/setup-patterns.md](references/setup-patterns.md) for e2e, observability, isolation, and containerized stack patterns.
 
+**Tooling sources** — when adding CI, hooks, or bootstrap scripts, keep tool versions in one checked-in owner:
+
+- Node in `.node-version`, `.nvmrc`, or `.tool-versions`; CI reads it with `node-version-file` when the action supports it
+- Package managers in `package.json#packageManager`; avoid separate `pnpm@...` or `corepack prepare ...@...` literals unless the repo cannot consume `packageManager`
+- Tool wrappers such as Vite+ in package metadata or a workspace catalog; if a workflow input needs the version, read it with a structured tool such as `jq` instead of copying the literal
+- GitHub Action SHA pins and same-line action version comments are not project tool versions; keep them explicit and Dependabot-managed
+
 ### 3. Improve
 
 Tighten weak or flaky layers:

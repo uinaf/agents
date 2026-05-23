@@ -44,7 +44,7 @@ Flag stale commands, dead paths, duplicated guidance, routing failures, and plac
 Keep top-level docs terse and navigational.
 
 - `AGENTS.md` should be a table of contents, not a wiki
-- If the repo uses `AGENTS.md`, keep `CLAUDE.md` at the same level as a symlink to `AGENTS.md` instead of maintaining a second authored file
+- If the repo uses `AGENTS.md`, make `CLAUDE.md` a symlink or `@AGENTS.md` import instead of maintaining a second authored file
 - `README.md` should lead with value and the fastest path to use the project
 - `CONTRIBUTING.md` should hold contributor setup, validation, and workflow
 - `SECURITY.md` should hold private-first vulnerability reporting guidance
@@ -81,8 +81,8 @@ Example — fixing a stale path after a rename:
 
 ```diff
  # AGENTS.md
--- Run `scripts/bootstrap.sh` to set up the dev environment.
-+- Run `scripts/setup.sh` to set up the dev environment.
+-- Run the old bootstrap command to set up the dev environment.
++- Run the current setup command to set up the dev environment.
 ```
 
 ### 5. Validate reality

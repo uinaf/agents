@@ -1,8 +1,10 @@
 # Skill Authoring Best Practices
 
-This reference distills two sources of guidance that commonly shape good skills:
+This reference distills the guidance that commonly shapes good skills:
 
+- [Claude Code memory guidance](https://code.claude.com/docs/en/memory)
 - [Claude skill authoring best practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+- [OpenAI Codex AGENTS.md guidance](https://developers.openai.com/codex/guides/agents-md)
 - source-repo conventions and contributor guidance, when present
 
 Use it when an audit finds weak activation, a bloated `SKILL.md`, or unclear workflow boundaries.
@@ -18,6 +20,7 @@ Use it when an audit finds weak activation, a bloated `SKILL.md`, or unclear wor
 
 - keep `SKILL.md` focused on the workflow, principles, boundaries, and routing
 - assume the model is already smart; spend tokens on repo-specific judgment
+- keep always-loaded guidance small and move repeatable task workflows into skills or scoped rules
 - match the level of instruction to the task:
   - high freedom for contextual judgment
   - medium freedom when a preferred pattern exists
@@ -30,6 +33,7 @@ Use it when an audit finds weak activation, a bloated `SKILL.md`, or unclear wor
 - keep references one hop away from `SKILL.md`
 - use scripts for repeated deterministic work instead of rewriting the same logic in prose
 - if a reference is not worth loading on demand, it probably does not belong in the skill
+- if a skill only repeats broad behavior rules, move that guidance to `AGENTS.md`, `CLAUDE.md`, or the owning repo docs instead
 
 ## Repo Conventions To Enforce
 

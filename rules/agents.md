@@ -6,10 +6,11 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 
 - Lead with the answer, then reasoning. Cite file paths, command output, errors
 - Keep replies compact. Use the minimum structure that makes the answer scannable; narrate routine steps or paste long logs only when the user asked
-- In replies and reports, link references when possible: PRs, issues, commits, docs, dashboards, and external resources should be Markdown links when the URL is known
+- Link known URLs as clickable Markdown, including PRs, issues, commits, docs, dashboards, localhost, LAN, Tailscale, preview, and dev-server URLs
 - In replies and reports, show commit links with the short hash label: `[abc1234](url)`. For PRs/issues, always link the number: `[#123](url)`. Add a title after it when useful
 - If an approach is weak, say so and propose a better one
-- Fix only what was asked. Flag related issues, wait for approval before expanding scope
+- Fix only what was asked: every changed line should trace to the request; mention unrelated cleanup instead of doing it
+- Treat install, sync, and update requests as additive by default; do not remove, prune, or uninstall extras unless explicitly asked
 - Keep repo boundaries strict. Do not encode facts about unrelated repos, orgs, clients, local machine inventory, or private workflows into checked-in docs, scripts, config, or examples unless they are explicitly part of this repo's contract
 - If instructions are unclear, contradictory, or have multiple plausible interpretations, ask before guessing
 - When rules conflict: safety/correctness > explicit user constraints > style/tone
@@ -20,14 +21,12 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 
 ### Plan before code
 
-A task is non-trivial if it touches multiple files, changes a public contract, touches persistence/external I/O, or needs new tests or migrations. Trivial tasks skip planning.
-
-For non-trivial tasks, before writing code:
+Trivial tasks skip planning. For non-trivial tasks (multiple files, public contracts, persistence/external I/O, tests, or migrations), before code:
 
 1. Read the current code, docs, and contracts you'll touch
-2. Confirm what changes, what must NOT change, and what "done" looks like. When repo boundaries or ownership are unclear, ask before writing local or cross-repo facts into checked-in files
+2. Confirm changes, non-goals, and "done"; ask before writing local-machine or cross-repo facts into checked-in files
 3. Write a short plan: what, where, why, verification, non-goals
-4. If the plan has unresolvable ambiguities or breaks mid-flight, stop and surface the decision point
+4. Stop on unresolved ambiguity or a mid-flight broken plan
 
 ### Verification
 
@@ -50,11 +49,9 @@ For non-trivial tasks, before writing code:
 
 ### Keep docs alive
 
-Doc drift degrades every future agent's performance. Update docs as part of the work, not after.
+Doc drift degrades future agents. Update docs with the work.
 
-- After implementing a feature, check whether `AGENTS.md`, `README`, or architecture docs need updates
-- After renaming, moving, or deleting code, grep docs for stale references
-- After a design decision, record it before moving on
+- Update `AGENTS.md`, `README`, architecture docs, or decisions when features, renames, moves, deletes, or designs change them; grep for stale references
 - Write docs in current-state form. Prefer "the system does X" over "we changed X from Y"; keep before/after history only when migration context is needed
 - Treat local discovery as evidence, not repo policy. If a fact comes from the user's machine, another checkout, or a one-off installed tool, keep it in the reply unless the user explicitly asks to make it part of the repo. When in doubt, ask before writing it into checked-in files
 - If it is not in the repo, it does not exist to the next agent
@@ -73,6 +70,7 @@ Reproduce the failure, find the root cause with evidence, and fix the root cause
 - Mocked tests as verification. They often pass by construction and prove little
 - Infinite retry loops. Cap CI rounds and surface the real blocker
 - All-agentic pipelines. Deterministic checks belong in scripts, hooks, and CI
+- Speculative flexibility: unrequested configurability, abstraction, or error handling
 
 ---
 
@@ -84,8 +82,7 @@ Reproduce the failure, find the root cause with evidence, and fix the root cause
 - Follow repo conventions and existing dependencies before inventing new patterns or adding packages
 - Benchmark hot paths and performance-sensitive changes with before/after numbers
 - Keep docs command-derived: no volatile metrics, absolute filesystem paths, `file://`, or editor URIs
-- Do not author or recommend unsafe-typed source files, scripts, configs, or examples when a type-safe option exists. This includes `.js`, `.mjs`, `.cjs`, ad hoc `.py` scripts, and other dynamically typed escape hatches. Default to TypeScript or another statically typed language, use the repo's existing typed tooling, and require explicit approval for exceptions. Small repo-standard shell scripts are acceptable for bootstrap, sync, or glue tasks when they stay simple and deterministic
-- Prefer type-safe TypeScript models over escape hatches such as `as`, non-null `!`, `unknown as T`, and double assertions; use an escape hatch only with explicit approval
+- Do not author or recommend unsafe-typed source files, scripts, configs, examples, or assertions when a type-safe option exists. Default to TypeScript or repo static tooling; require explicit approval for `.js`, `.mjs`, `.cjs`, ad hoc `.py`, `as`, non-null `!`, `unknown as T`, and double assertions. Simple deterministic shell glue is okay
 - Keep linters, type checks, tests, and hooks enabled; fix the root cause
 - Treat errors as typed, contextful, and recoverable where possible; redact secrets before logging or surfacing errors
 - Schema/state changes must be forward-compatible with a documented rollback path; flag irreversible migrations before running them

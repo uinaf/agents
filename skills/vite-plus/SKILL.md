@@ -12,6 +12,7 @@ Move a frontend repo closer to the stock Vite+ toolchain while preserving repo-s
 Default to this destination unless a repo-specific boundary clearly blocks it. If you keep an old command shape, document the reason.
 
 - CI uses `voidzero-dev/setup-vp`; the action owns Node and package-manager bootstrap. Let its default `run-install: true` run `vp install`, then run `vp check`, `vp test`, and `vp build`; set `run-install: false` only when the workflow needs an explicit install step. In repos that pin GitHub Actions, pin `setup-vp` to a full commit SHA with a same-line exact version comment and let Dependabot maintain it
+- Tooling versions have one checked-in source of truth. Node comes from `.node-version`/`.nvmrc`/`.tool-versions`; package-manager versions come from `package.json#packageManager`; Vite+ comes from the repo's `vite-plus` dependency or workspace catalog. Do not repeat Node, pnpm, or Vite+ literals in workflows when a source file can be read
 - test files use `vite-plus/test` (and `vite-plus/test/browser/context` for browser mode)
 - scripts prefer `vp dev`, `vp test`, `vp test watch`, `vp test run --coverage`, `vp pack`, `vp build`, `vp preview`, `vp update`, and `vp run <script>` (or `vpr <script>`) over direct package-manager, raw Vitest, or tsdown wiring
 - hooks use `vp config`, `.vite-hooks`, and `vp staged` as the default hook stack
@@ -30,7 +31,33 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 8. Check [references/commands.md](references/commands.md) before changing command invocations. Load [references/known-issues.md](references/known-issues.md) only on unexpected behavior or when upgrading Vite+.
 9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace. Verify jobs may use Vite+ dependency caches; secret-bearing release, publish, signing, and deploy jobs disable dependency caches and run fresh installs.
 10. To adopt a newer Vite+ release: `vp upgrade` (global), then `vp update vite-plus @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` (project). Confirm with `vp outdated`.
-11. End-to-end validation: `vp env current && vp install && vp check && vp test`, then verify `vp build` or `vp pack` artifacts, `vp preview` where applicable, `vp test run --coverage`, and `vp staged` on a staged change.
+11. End-to-end validation: `vp install && vp check && vp test`, then verify `vp build` or `vp pack` artifacts, `vp preview` where applicable, `vp test run --coverage`, and `vp staged` on a staged change.
+
+## Tooling Source Of Truth
+
+Before changing CI, inspect existing workflow files and pick or preserve the canonical version owner:
+
+- **Node:** prefer a checked-in `.node-version`; use `node-version-file: ".node-version"` in `actions/setup-node` or `voidzero-dev/setup-vp`. If the repo already uses `.nvmrc` or `.tool-versions` as the owner, either use that file directly when the action supports it or migrate deliberately to `.node-version`
+- **pnpm/npm/yarn:** prefer `package.json#packageManager`; do not also hardcode `pnpm@...` in workflow YAML unless the action cannot read the package manager and the exception is documented
+- **Vite+:** prefer the exact `vite-plus` dependency or workspace catalog. If `setup-vp` needs an explicit `version`, derive it from `package.json` with `jq` instead of copying the literal:
+
+```yaml
+- name: Read Vite+ version
+  id: vite_plus
+  shell: bash
+  run: |
+    set -euo pipefail
+    version=$(jq -er '(.devDependencies["vite-plus"] // .dependencies["vite-plus"]) | sub("^[~^]"; "")' package.json)
+    echo "version=${version}" >> "$GITHUB_OUTPUT"
+
+- uses: voidzero-dev/setup-vp@<full-sha> # v1.x.y
+  with:
+    version: ${{ steps.vite_plus.outputs.version }}
+    node-version-file: ".node-version"
+    cache: true
+```
+
+If a workspace uses `catalog:` for `vite-plus`, keep the catalog as the source of truth and resolve it with a structured YAML-aware path or let `vp install` use the lockfile; do not paste the catalog value into each workflow.
 
 Concrete examples:
 
@@ -39,7 +66,6 @@ Concrete examples:
   with:
     node-version-file: ".node-version"
     cache: true
-- run: vp env current
 - run: vp check
 - run: vp test
 - run: vp build
@@ -70,6 +96,7 @@ export default defineConfig({
 
 - Prefer `vp create` / `vp migrate --agent <name> --editor <name>` over hand-rolling agent or editor config.
 - Preserve working release workflows, binary packaging, and publish steps while migrating the surrounding Vite+ flow.
+- After editing workflows, grep for duplicated tooling literals such as `node-version:`, `pnpm@`, `corepack prepare`, and inline `version: "0.`. Keep action pins separate: GitHub Action SHAs and their same-line version comments are allowed because they identify the action, not the project toolchain.
 - If `vp check` is not running type-aware lint or type checks, confirm `lint.options.typeAware` and `lint.options.typeCheck` in `vite.config.ts`, and check for `compilerOptions.baseUrl` in `tsconfig.json` — `tsgolint` does not support `baseUrl` and Vite+ silently skips type-aware checks when it is present.
 
 ## Known Caveats
