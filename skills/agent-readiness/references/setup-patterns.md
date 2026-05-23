@@ -20,6 +20,7 @@ Concrete patterns for building each readiness layer. Substitute your project's a
 - [Observability](#observability)
 - [Seed Data / Fixtures](#seed-data--fixtures)
 - [Per-Worktree Isolation](#per-worktree-isolation)
+- [Unattended Run Constraints](#unattended-run-constraints)
 - [Deterministic vs Agentic Split](#deterministic-vs-agentic-split)
 - [Retry Caps](#retry-caps)
 
@@ -197,6 +198,20 @@ docker compose up -d --wait
 ```
 
 Rules: no hardcoded ports, each worktree gets its own Docker Compose project, tear down after completion.
+
+## Unattended Run Constraints
+
+Agent-ready checks should keep working after the user closes a terminal, browser tab, or laptop. Prefer scripts, CI jobs, or remote runners with explicit timeouts, cleanup, and artifact paths.
+
+Minimum useful contract:
+
+- `timeout` or CI job timeout limits wall-clock time
+- logs and screenshots land under a checked or documented artifact directory
+- cleanup runs on success and failure
+- expensive paths document their resource class, parallelism, or expected runtime
+- credentials are scoped to the task and enforced by the runtime environment
+
+Avoid verification paths that require clicking dashboards, approving prompts mid-run, or watching a local session stay alive.
 
 ## Deterministic vs Agentic Split
 

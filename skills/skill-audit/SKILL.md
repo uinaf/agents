@@ -19,9 +19,9 @@ Audit a skill before calling it ready. Favor Tessl output, repo conventions, and
 
 ## Handoffs
 
-- Need to update AGENTS, README, or other repo docs beyond the skill surface -> use `docs`
-- Need to prove a product or code change works on real surfaces -> use `verify`
-- Need to review general code or a PR instead of a skill package -> use `review`
+- Updating AGENTS, README, or other repo docs beyond the skill surface is documentation work.
+- Proving a product or code change works on real surfaces is runtime verification work.
+- Reviewing general code or a PR instead of a skill package is outside this skill's scope.
 
 ## Before You Start
 

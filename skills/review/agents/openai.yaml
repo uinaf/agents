@@ -13,7 +13,7 @@ interface:
     - The verdict is exactly one of: ship it, needs review, blocked.
 
     Constraints:
-    - Route self-checks of your own completed change to $verify.
+    - Self-checks of your own completed change are verification work, not independent review.
     - Keep the review scoped to risks in the requested diff, branch, or PR.
     - Prefer the smallest evidence set that can change the verdict.
 

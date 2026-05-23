@@ -17,8 +17,8 @@ interface:
     Constraints:
     - Keep provider-specific infrastructure details in the target repo.
     - Keep organization-specific contacts, bot names, and branding in overlay skills or repo docs.
-    - Use agent-readiness when the repo lacks stable verify, runtime proof, or monitoring entrypoints.
-    - Use docs when README, CONTRIBUTING, SECURITY, AGENTS, or docs need restructuring.
+    - Pause GitHub wiring when the repo lacks stable verify, runtime proof, or monitoring entrypoints.
+    - Keep README, CONTRIBUTING, SECURITY, AGENTS, and docs aligned when setup changes affect them.
 
     Output: no conversational opener. Use bullet labels only: files changed, settings, environments, release/deploy target, evidence, risks, and next. Say when live GitHub settings were not checked.
 

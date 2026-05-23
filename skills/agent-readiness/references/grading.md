@@ -27,15 +27,19 @@ Grade a project's readiness for autonomous agent work from F to A. Mechanical cr
 - Smoke tests run in CI on every push/PR
 - Git hooks enforce at least lint + smoke before push
 - Structured logs or health endpoints exist
+- Verification writes inspectable artifacts or logs in predictable paths
+- Long-running checks have explicit timeout, cleanup, and resource bounds
 - Agent can produce evidence for most changes
 
 ### A — Excellent
 - All of B, plus:
 - Per-worktree or per-container isolation (parallel agents don't collide)
+- Agent runs are independent of a developer's live terminal, browser tab, or laptop session
 - Custom lint rules with agent-readable error messages that teach how to fix
 - Seed data / fixture scripts for reproducible test state
 - E2e tests cover error paths and edge cases, not just happy paths
 - CI runs full integration suite
+- Permissions are enforced by infrastructure (sandbox, CI environment, scoped tokens), not runtime prompt approval
 - Agent rarely needs human QA
 
 ## Example Output
@@ -57,4 +61,5 @@ Grade a project's readiness for autonomous agent work from F to A. Mechanical cr
 - A test suite requiring manual setup to run = grade D, not C
 - Mocked unit tests count zero toward testability — detect via mock imports at test file level
 - Grade each dimension independently (bootable / testable / observable / verifiable), take the lowest as overall grade
+- Treat user-session dependence, dashboard-only verification, unbounded cost, or prompt-only permissions as explicit autonomy gaps
 - Cite specific files, commands, or configs as evidence for each grade

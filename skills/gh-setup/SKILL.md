@@ -25,8 +25,8 @@ This skill owns GitHub policy and workflow shape. It does not own product archit
    - **Versioned artifact**: package, library, CLI, GitHub Action, Homebrew-published binary, or registry publish -> read [release workflows](references/release-workflows.md) and [release targets](references/release-targets.md).
    - **Running app or service**: Pages, Cloudflare, SST, container, static app, backend, or hosted service -> read [deploy workflows](references/deploy-workflows.md), [deploy environments](references/deploy-environments.md), and [deploy secrets](references/deploy-secrets.md).
    - **Both**: publish the durable artifact first, then deploy from that published boundary. Read both release and deploy references.
-4. Use repo-local commands as the source of truth. If a release repo lacks stable verify/package proof, or a deploy repo lacks stable verify, e2e, monitoring, or rollback hooks, hand off to `agent-readiness` before wiring fragile CI around it.
-5. Keep docs current with the setup. Use `docs` when `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, or `docs/` need reshaping after GitHub changes.
+4. Use repo-local commands as the source of truth. If a release repo lacks stable verify/package proof, or a deploy repo lacks stable verify, e2e, monitoring, or rollback hooks, pause GitHub wiring until the repo has durable readiness proof.
+5. Keep `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, and `docs/` current when GitHub changes affect contributor or operator workflows.
 
 ## Baseline Shape
 

@@ -1,28 +1,28 @@
 ---
 name: verify
-description: "Self-check your own completed change before handing off to `review` — the pre-review sanity pass. Use when you want to check your work, run checks, validate changes, make sure a change is ready, test it end-to-end, run repo guardrails (lint, typecheck, tests, build), exercise the real surface with evidence, and catch obvious self-correctable issues. Produces a `ready for review` / `needs more work` / `blocked` verdict — never a ship decision. If the repo cannot be booted or exercised reliably, hand off to `agent-readiness`. If auditing someone else's diff, branch, or PR, use `review` instead."
+description: "Self-check your own completed change before independent review — the pre-review sanity pass. Use when you want to check your work, run checks, validate changes, make sure a change is ready, test it end-to-end, run repo guardrails (lint, typecheck, tests, build), exercise the real surface with evidence, and catch obvious self-correctable issues. Produces a `ready for review` / `needs more work` / `blocked` verdict — never a ship decision. Do not use when the repo cannot be booted or exercised reliably, or when auditing someone else's diff, branch, or PR."
 ---
 
 # Verify
 
-Self-check your own completed change before handing it off to `review`. Verify proves the change boots, passes guardrails, and survives the real surface — it is not a substitute for independent review.
+Self-check your own completed change before independent review. Verify proves the change boots, passes guardrails, and survives the real surface; it is not a ship decision.
 
 ## Principles
 
-- Verify is the builder's gate before review; it does not replace review
+- Verify is the builder's gate before independent review; it does not replace it
 - The builder does not grade their own work in the same context — switch into a fresh evaluator context or separate subagent first
 - Run repo guardrails first, then hit the real surface
 - Prefer smoke, integration, contract, or e2e proof over unit tests that mock most of the behavior under test
-- Self-correct obvious issues you spot while exercising the change; leave the rigorous code-shape pass to `review`
+- Self-correct obvious issues you spot while exercising the change; leave rigorous code-shape judgment to an independent review pass
 - Load shared doctrine from the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules before judging the result
-- If the infrastructure is too weak to verify reliably, stop and hand off to `agent-readiness`
+- If the infrastructure is too weak to verify reliably, stop and report the readiness gap.
 
 ## Handoffs
 
-- Verification passed → hand off to `review` for the independent ship decision
-- No stable boot / smoke / interact path, or infrastructure too weak to trust → use `agent-readiness`
-- Auditing existing code, a diff, branch, or PR you did not author → use `review`
-- Main problem is stale AGENTS.md, README, specs, or repo docs → use `docs`
+- Verification passed → report readiness for independent review.
+- No stable boot, smoke, or interaction path means the repo needs readiness setup before verification can be trusted.
+- Auditing existing code, a diff, branch, or PR you did not author is independent review work.
+- Stale AGENTS.md, README, specs, or repo docs are documentation work unless they block verification.
 
 ## Before You Start
 
@@ -57,7 +57,7 @@ While exercising the change, fix anything cheap and obvious that you spot:
 - An `any`, unsafe `as`, or non-null assertion you can replace with a real type in seconds
 - A failure path that swallows errors silently when a one-line `throw` makes the diagnostic useful
 
-Keep this as a self-check pass. Route substantive code-shape concerns (architecture mismatches, broader duplication, error-classification redesigns) to `review`. Use [references/simplification.md](references/simplification.md) as a short self-check.
+Keep this as a self-check pass. Leave substantive code-shape concerns (architecture mismatches, broader duplication, error-classification redesigns) for independent review. Use [references/simplification.md](references/simplification.md) as a short self-check.
 
 ### 4. Probe adjacent risk
 
@@ -72,9 +72,9 @@ Produce one clear outcome:
 
 - `ready for review` — guardrails green, real surface confirmed, no obvious self-correctable issues left
 - `needs more work` — the change is not ready to be reviewed; specific issues to address are listed
-- `blocked` — verification cannot proceed, usually because infrastructure is too weak (hand off to `agent-readiness`)
+- `blocked` — verification cannot proceed, usually because infrastructure is too weak
 
-Verify reports readiness for review. The independent ship decision belongs to `review`.
+Verify reports readiness for review. The independent ship decision belongs to a separate review pass.
 
 ## Output
 
@@ -84,7 +84,7 @@ After verification, report in this compact bullet shape:
 - `- evidence:` concise explanations of what checks proved, not full commands
 - `- fixed during verify:` only if self-corrections happened
 - `- unverified or gaps:` readiness gaps, doc drift, or `none`
-- `- next:` `review`, `agent-readiness`, `docs`, or more implementation
+- `- next:` independent review, readiness setup, documentation cleanup, more implementation, or `none`
 
 Keep the final answer short:
 

@@ -15,7 +15,7 @@ interface:
 
     Constraints:
     - Treat review output as advisory.
-    - Use $review for ordinary review verdicts.
+    - Ordinary review verdicts are outside this closeout helper.
     - Do not push just to review.
     - Use `$HOME/.agents/skills/codex-review/scripts/codex-review` when the helper is installed globally.
 

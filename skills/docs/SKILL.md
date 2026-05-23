@@ -1,6 +1,6 @@
 ---
 name: docs
-description: "Update repo documentation and agent-facing guidance such as AGENTS.md, README.md, docs/, specs, plans, and runbooks. Use when code, skill, or infrastructure changes risk doc drift or when documentation needs cleanup or restructuring. Do not use for code review, runtime verification, or `agent-readiness` setup."
+description: "Update repo documentation and agent-facing guidance such as AGENTS.md, README.md, docs/, specs, plans, and runbooks. Use when code, skill, or infrastructure changes risk doc drift or when documentation needs cleanup or restructuring. Do not use for code review, runtime verification, or boot/readiness infrastructure setup."
 ---
 
 # Docs
@@ -19,9 +19,9 @@ Keep the repo legible to humans and agents.
 
 ## Handoffs
 
-- Missing boot, smoke, e2e, logs, or agent-readiness infrastructure → use `agent-readiness`
-- Need to judge existing code, a diff, branch, or PR with evidence → use `review`
-- Need to validate your own completed change on the real surface → use `verify`
+- Missing boot, smoke, e2e, logs, or readiness infrastructure is setup work, not docs work.
+- Judging existing code, a diff, branch, or PR with evidence is review work, not docs work.
+- Validating a completed change on the real surface is runtime verification, not docs work.
 
 ## Workflow
 
@@ -62,7 +62,7 @@ Refresh the detailed documents that actually carry the knowledge.
 - architecture and API docs
 - task guides and runbooks
 - feature specs, plans, and decision records
-- readiness infrastructure docs after agent-readiness changes
+- readiness infrastructure docs after boot, smoke, observability, or isolation changes
 
 Write each updated section as the reader's current source of truth. Use "previously/now" or "before/after" framing only in migration notes, changelogs, and decision records.
 
@@ -103,7 +103,7 @@ After docs work, report a compact docs footer:
 - verified: command names or path checks, not output logs
 - removed or rewritten: only if stale or duplicated docs changed
 - gaps: remaining doc gaps, or `none`
-- next: `agent-readiness`, `review`, `verify`, or `none`
+- next: readiness setup, independent review, runtime verification, or `none`
 
 Keep the footer to 5 labeled lines or fewer. List changed files once.
 

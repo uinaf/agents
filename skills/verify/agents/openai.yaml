@@ -13,10 +13,10 @@ interface:
     - The verdict is exactly one of: ready for review, needs more work, blocked.
 
     Constraints:
-    - Report readiness for review; route ship decisions to $review.
-    - Route reviews of someone else's code to $review.
+    - Report readiness for review; ship decisions are out of scope.
+    - Reviews of someone else's code are out of scope.
     - Mark checks that could not run as unverified or blocked.
 
     Output: no conversational opener. Use bullet labels only: verdict, evidence, fixed during verify when any, unverified gaps, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 
-    Stop rules: hand off to $agent-readiness when the repo cannot be booted or exercised reliably; otherwise name the best check run and any gap.
+    Stop rules: report blocked when the repo cannot be booted or exercised reliably; otherwise name the best check run and any gap.

@@ -52,7 +52,7 @@ For each meaningful finding:
 
 For the overall verification:
 
-- verdict: `ready for review` / `needs more work` / `blocked` (`review` owns the `ship it` call)
+- verdict: `ready for review` / `needs more work` / `blocked` (independent review owns the `ship it` call)
 - change verified
 - surfaces exercised
 - evidence summary: what passed or failed, not a raw command list unless reproduction requires it

@@ -12,9 +12,9 @@ interface:
     - The repo has a clear next verification path.
 
     Constraints:
-    - Route existing-diff ship readiness to $review.
-    - Route validation of your own product change to $verify.
-    - Route documentation-only cleanup to $docs.
+    - Existing-diff ship decisions are out of scope.
+    - Product-change validation is runtime verification work.
+    - Documentation-only cleanup is out of scope.
 
     Output: no conversational opener. Use bullet labels only: grade, evidence, files changed, remaining gaps, and next. Summarize passing checks by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

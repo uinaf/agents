@@ -9,9 +9,9 @@ Make a repo ready for autonomous agent work by adding mechanical proof: boot scr
 
 ## Boundaries
 
-- Existing code, diff, branch, or PR review → `review`
-- Your own completed product change → `verify`
-- AGENTS.md, README.md, specs, or repo docs → `docs`
+- Existing code, diff, branch, or PR review is out of scope.
+- Completed product changes need their own runtime proof pass.
+- AGENTS.md, README.md, specs, or repo docs are documentation work unless they support readiness infrastructure.
 - Mock-only tests, docs-only cleanup, and builder self-evaluation are not readiness proof.
 
 ## The 7-Layer Stack
@@ -49,6 +49,16 @@ For each, report:
 - gap: what is missing
 
 Use [references/grading.md](references/grading.md). Lowest dimension sets the overall grade.
+
+Also scan for autonomy constraints that decide whether verification can run unattended:
+
+- **session independence** — checks run after terminals, browsers, or laptops close
+- **explicit state** — logs, artifacts, and scratch output land in predictable paths
+- **resource bounds** — wall-clock limits, cost-sensitive jobs, and cleanup are explicit
+- **bounded permissions** — sandbox, CI, OIDC, or scoped credentials enforce limits
+- **direct interfaces** — CLI, HTTP, or file contracts exist for dashboard-only flows
+
+If these are not needed for the current task, keep them as remaining gaps instead of expanding the scope.
 
 Example output:
 
@@ -124,10 +134,10 @@ Tighten weak or flaky layers:
 - add logs and health signals agents can query
 - make parallel work safe when agent collisions are real
 
-### 4. Hand Off
+### 4. Stop
 
-When the repo reaches C+ and can be judged honestly, hand off to `verify` or `review`.
-If changes created doc drift, hand off to `docs`.
+When the repo reaches C+ and can be judged honestly, stop readiness work and report the next natural phase.
+If changes created doc drift, report the documentation gap instead of expanding the scope.
 
 ## Output
 
@@ -137,7 +147,7 @@ After readiness work, report in this compact bullet shape:
 - `- evidence:` concise explanations of what readiness checks proved
 - `- files changed:` changed readiness files
 - `- remaining gaps:` highest-impact gaps only, or `none`
-- `- next:` `verify`, `review`, `docs`, or human review
+- `- next:` runtime proof, independent review, documentation cleanup, human review, or `none`
 
 Keep details compact:
 

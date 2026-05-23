@@ -12,9 +12,9 @@ interface:
     - Stale, duplicated, or misleading guidance is removed or replaced.
 
     Constraints:
-    - Route code-review requests to $review.
-    - Route runtime-verification requests to $verify.
-    - Route missing readiness infrastructure to $agent-readiness.
+    - Code-review requests are out of scope.
+    - Runtime-verification requests are out of scope.
+    - Missing readiness infrastructure is setup work, not docs work.
 
     Output: list files updated, verification performed, removed or rewritten stale material, gaps, and next step.
 

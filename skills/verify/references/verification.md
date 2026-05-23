@@ -24,7 +24,7 @@ Prove your own changes work on real surfaces. Independent ship decisions belong 
 
 ## Before You Start
 
-1. Check readiness grade: C+ = proceed. D/F = invoke `agent-readiness` setup first
+1. Check readiness grade: C+ = proceed. D/F = add readiness setup first
 2. Can you boot the app?
 3. Can you interact with it? (Playwright CLI for UI, curl for APIs, CLI invocation)
 4. Can you verify your own work from a fresh evaluator context or separate subagent?

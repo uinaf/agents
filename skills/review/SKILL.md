@@ -1,11 +1,11 @@
 ---
 name: review
-description: "Independently audit existing code, diffs, branches, or pull requests using concern-specific reviewer personas and evidence. Use when triaging risk in a PR, deciding whether a change is safe to ship, or following up on a `verify` pass to make the call the builder cannot make on their own work. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored; use `verify` for that."
+description: "Independently audit existing code, diffs, branches, or pull requests using concern-specific reviewer personas and evidence. Use when triaging risk in a PR, deciding whether a change is safe to ship, or following up after runtime proof to make the call the builder cannot make on their own work. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored."
 ---
 
 # Review
 
-Independently audit existing code with concern-specific lenses and decide whether it is safe to ship. Review is the gate after `verify` — the builder proves the change works on the real surface, then review decides whether the change is *good*.
+Independently audit existing code with concern-specific lenses and decide whether it is safe to ship. Review is the gate after runtime proof: the builder proves the change works on the real surface, then review decides whether the change is *good*.
 
 ## Principles
 
@@ -15,13 +15,13 @@ Independently audit existing code with concern-specific lenses and decide whethe
 - Keep the final verdict tied to concrete evidence, not reviewer instinct alone
 - Keep findings risk-focused and filter low-value nits
 - Track reviewer personas internally; include them visibly only when asked or when the harness has compact metadata
-- If runtime proof for your own completed change is the goal, hand off to `verify`
+- If runtime proof for your own completed change is the goal, stop and run a verification pass first.
 
 ## Handoffs
 
-- Self-checking a change you just authored, before handing it off for review → use `verify`
-- Review is blocked because the repo cannot be booted or exercised reliably → use `agent-readiness`
-- Main problem is stale AGENTS.md, README, specs, or repo docs → use `docs`
+- Self-checking a change you just authored before independent review is verification work.
+- Review is blocked when the repo cannot be booted or exercised reliably; report the readiness gap.
+- Stale AGENTS.md, README, specs, or repo docs are documentation work unless they change the review verdict.
 
 ## Before You Start
 
@@ -85,7 +85,7 @@ After review, report in this compact bullet shape:
 - `- verdict:` exactly one of `ship it`, `needs review`, or `blocked`
 - `- evidence:` concise explanations of what checks proved, not full commands
 - `- unverified:` residual risk, readiness gaps, or `none`
-- `- next:` one of `implementation`, `verify`, `agent-readiness`, or `docs`
+- `- next:` one of `implementation`, runtime verification, readiness setup, documentation cleanup, or `none`
 - `- notes:` only for out-of-scope repo state the user must act on
 
 Use those labels explicitly. Keep the verdict label exact and omit opener, closer, apology, status preface, or conversational recap.
