@@ -9,7 +9,7 @@
       "source": "uinaf/agents"
     },
     {
-      "name": "codex-review",
+      "name": "autoreview",
       "source": "uinaf/agents"
     },
     {

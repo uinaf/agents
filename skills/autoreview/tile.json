@@ -1,0 +1,11 @@
+{
+  "name": "uinaf/autoreview",
+  "version": "0.3.0",
+  "private": false,
+  "summary": "Run structured Codex/Claude autoreview closeout: choose the target, collect schema-validated findings, and rerun tests plus review until clean.",
+  "skills": {
+    "autoreview": {
+      "path": "SKILL.md"
+    }
+  }
+}
