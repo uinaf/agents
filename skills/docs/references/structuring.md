@@ -1,6 +1,6 @@
 # Structuring
 
-Lightweight file shapes for specs, plans, and decisions. Templates, not ceremony.
+Lightweight file shapes for agent work artifacts: specs, plans, and decisions. Templates, not ceremony.
 
 ## Directory Layout
 
@@ -10,6 +10,10 @@ docs/
 ├── plans/           # HOW + WHEN — tactical, deleted when done
 └── decisions/       # WHY we chose X — ADR-lite
 ```
+
+These directories are not a replacement for reader-facing docs like `README.md`,
+`CONTRIBUTING.md`, architecture docs, or runbooks. Link them from routing docs when
+useful, but keep tactical planning out of the general documentation surface.
 
 ## Specs
 
@@ -47,6 +51,10 @@ Write → review → agree → implement. Update only when requirements change, 
 ## Plans
 
 Tactical execution strategy. Evolves during implementation. Delete when implemented — the branch/PR tells the story.
+
+Plans are agent coordination artifacts, not public docs. Keep them narrow, link the
+owning spec when there is one, and remove them once the work lands unless the repo
+explicitly uses plans as an active backlog.
 
 ### Template
 

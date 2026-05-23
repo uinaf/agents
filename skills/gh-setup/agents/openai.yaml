@@ -9,6 +9,7 @@ interface:
     Success criteria:
     - Live GitHub settings are checked before recommending settings changes.
     - Repository merge policy, branch/ruleset posture, tag policy, Actions permissions, templates, and Environments match the repo's delivery model.
+    - Baseline PR, issue, contributor, and security policy files exist only when they serve the repo's collaboration model.
     - Pull requests verify with read-only credentials.
     - Versioned artifacts use verify-then-release/publish.
     - Running apps use verify/e2e/deploy plus monitoring and rollback handoff with environment-scoped credentials.

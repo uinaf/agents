@@ -23,6 +23,8 @@ Documentation is part of the interface; optimize for scanability, rhythm, and vi
 - [SECURITY.md](#securitymd)
 - [Docs Section](#docs-section)
 - [Architecture Docs](#architecture-docs)
+- [Repo Docs vs Agent Work Artifacts](#repo-docs-vs-agent-work-artifacts)
+- [Source Boundaries](#source-boundaries)
 - [Hygiene](#hygiene)
 - [Keep Docs Alive](#keep-docs-alive)
 
@@ -106,6 +108,11 @@ Use a small default top-level set with one responsibility per file:
 
 Split the four responsibilities across focused docs unless the repo is tiny enough that one file is clearer.
 
+Use this split to clean up current docs, redistribute content from an overloaded
+README, or keep existing files accurate. Creating baseline contributor,
+security, issue, and pull request templates from scratch is repository
+governance setup, because those files encode collaboration policy.
+
 General doc-surface rules:
 
 - Visible labels should describe purpose, not filenames. Prefer `Contributing`, `Release workflow`, or `Architecture` over `CONTRIBUTING.md` or `docs/RELEASE.md`
@@ -164,6 +171,10 @@ Guidance:
 
 ## CONTRIBUTING.md
 
+Use this section when updating an existing contributor guide or moving current
+contributor instructions out of an overloaded README. If the repo has no
+contributor policy yet, flag the gap instead of inventing one from scratch.
+
 Use this default order unless the repo gives you a strong reason not to:
 
 1. **Setup**
@@ -183,6 +194,10 @@ Guidance:
 - Keep visible labels and headings contributor-facing rather than file-oriented here too. For example, prefer `Pull request expectations` over a heading or bullet that just echoes a filename
 
 ## SECURITY.md
+
+Use this section when updating an existing security policy or moving current
+vulnerability-reporting instructions out of an overloaded README. If the repo
+has no private reporting route, flag the gap instead of guessing one.
 
 Keep it short and private-first.
 
@@ -216,8 +231,49 @@ When `README.md` has a `Docs` section, keep it compact and canonical.
 ## Architecture Docs
 
 - `docs/ARCHITECTURE.md` — diagram-first system view and important boundaries
-- `docs/*.md` — task-specific references (API, deployment, guides, decisions)
-- `docs/plans/*.md` — one plan per feature with goal, design, tasks, validation hooks
+- task-specific current-state references such as API, deployment, operations, and guides
+- decision docs when the architectural boundary depends on why a choice was made
+
+## Repo Docs vs Agent Work Artifacts
+
+Do not treat every markdown file as the same kind of documentation.
+
+Repo docs describe the current project for readers, users, and contributors:
+
+- `README.md`, `CONTRIBUTING.md`, `SECURITY.md`
+- architecture, API, deployment, operations, and runbook docs
+- setup and validation commands that are true for this repo now
+
+Agent work artifacts coordinate how agents change the repo:
+
+- `AGENTS.md` and scoped agent guidance for repeated behavior
+- `docs/specs/` for durable behavioral contracts
+- `docs/decisions/` for durable choices and trade-offs
+- `docs/plans/` for tactical execution that should disappear when done
+- handoff prompts only when they help future agents resume work
+
+Keep the layers connected with short links. Do not pour implementation plans, prompt text, or unfinished reasoning into reader-facing docs. Promote an artifact into general docs only after it becomes a stable contract the repo owns.
+
+## Source Boundaries
+
+Documentation should capture contracts the target repo owns.
+
+Use this quick table before writing:
+
+| Source | Doc action |
+|---|---|
+| Target repo file, config, or script | Write the current contract and verify the path or command |
+| Upstream product/API docs | Link or cite the upstream source |
+| Another repo in the workspace | Link the owner or phrase the dependency generically |
+| Local machine, private workspace, credential, account state, host, or one-off installed tool | Keep it in the work report unless the user explicitly makes it repo policy |
+| User asks to save a recurring rule, prompt, decision, or plan | Put it in the owning durable surface instead of leaving it in chat |
+
+Good durable homes:
+
+- `docs/decisions/` for why a choice was made
+- `docs/specs/` for long-lived behavioral contracts
+- `docs/plans/` for tactical execution that can be deleted when done
+- `AGENTS.md` or scoped agent guidance for behavior future agents must repeat
 
 ## Hygiene
 
@@ -232,10 +288,11 @@ Run periodically or after a burst of changes:
 7. **Structure**: file growing past ~80 lines of prose → split detail into `references/`, keep parent as routing layer
 8. **Staleness**: delete or archive docs for removed features, finished plans, superseded decisions
 9. **Symlinks over copies**: two files need identical content → symlink them
+10. **Ownership**: fact belongs to another repo, private workspace, or local machine → keep it out, link the owner, or make the wording generic
 
 ## Keep Docs Alive
 
 - After implementing a feature → check if AGENTS.md, README, or architecture docs need updating
 - After renaming/moving/deleting code → grep docs for stale references
-- After a design decision → record it in a decision doc or plan before moving on
+- After a design decision → record it in a decision doc before moving on
 - Treat doc drift the same as test failure — it degrades every future agent's performance

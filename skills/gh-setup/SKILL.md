@@ -9,6 +9,8 @@ Make GitHub the boring, enforceable shell around a repo: settings, templates, Ac
 
 This skill owns GitHub policy and workflow shape. It does not own product architecture, provider-specific infrastructure internals, app security review, or repo boot/readiness setup.
 
+It also owns baseline existence and template shape for GitHub-facing collaboration files such as PR templates, issue templates, `SECURITY.md`, and `CONTRIBUTING.md`.
+
 ## Start Here
 
 1. Inspect the repo before changing policy:
@@ -21,6 +23,11 @@ This skill owns GitHub policy and workflow shape. It does not own product archit
    - `docs/`
    - package, build, release, deploy, and verify scripts
 2. Check live GitHub settings before recommending changes: default branch, merge methods, branch/ruleset policy, Actions permissions, allowed GitHub Actions, Environments, Environment protection rules, secrets/vars locations, protected tags, and allowed push actors.
+   Useful probes:
+   - `gh repo view --json defaultBranchRef,mergeCommitAllowed,rebaseMergeAllowed,squashMergeAllowed,deleteBranchOnMerge`
+   - `gh api repos/{owner}/{repo}/actions/permissions`
+   - `gh api repos/{owner}/{repo}/environments`
+   - `gh api repos/{owner}/{repo}/rulesets`
 3. Classify the repo:
    - **Versioned artifact**: package, library, CLI, GitHub Action, Homebrew-published binary, or registry publish -> read [release workflows](references/release-workflows.md) and [release targets](references/release-targets.md).
    - **Running app or service**: Pages, Cloudflare, SST, container, static app, backend, or hosted service -> read [deploy workflows](references/deploy-workflows.md), [deploy environments](references/deploy-environments.md), and [deploy secrets](references/deploy-secrets.md).
@@ -59,6 +66,7 @@ Default posture:
 
 - PR templates should ask for summary, changed surfaces, risks, verification, and complexity.
 - `SECURITY.md` should be private-first and avoid public issue reporting for vulnerabilities.
+- `CONTRIBUTING.md` should describe contributor setup, validation, and PR workflow only when the repo accepts outside or cross-team contributions.
 - Issue templates should exist only when they improve triage; avoid checklist theater.
 - Keep durable workflow detail in docs, not copied across README, CONTRIBUTING, templates, and agent guidance.
 
@@ -126,3 +134,13 @@ Report the setup compactly:
 - remaining risks or blockers
 
 If live GitHub settings were not checked, say so. Do not present inferred settings as confirmed.
+
+Example:
+
+```text
+files changed: .github/workflows/release.yml, SECURITY.md
+settings: live rulesets not checked; require manual confirmation
+target: npm package release from verified main
+evidence: actionlint, npm test
+risks: publish token environment still needs maintainer update
+```

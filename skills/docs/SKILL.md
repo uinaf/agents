@@ -1,6 +1,6 @@
 ---
 name: docs
-description: "Update repo documentation and agent-facing guidance such as AGENTS.md, README.md, docs/, specs, plans, and runbooks. Use when code, skill, or infrastructure changes risk doc drift or when documentation needs cleanup or restructuring. Do not use for code review, runtime verification, or boot/readiness infrastructure setup."
+description: "Update repo documentation and durable agent-facing artifacts such as AGENTS.md, README.md, docs/, specs, plans, decisions, and runbooks. Use when code, skill, or infrastructure changes risk doc drift or when documentation needs cleanup or restructuring. Do not use for code review, runtime verification, or boot/readiness infrastructure setup."
 ---
 
 # Docs
@@ -10,18 +10,15 @@ Keep the repo legible to humans and agents.
 ## Principles
 
 - Docs rot silently — every code change is a possible doc change
-- Documentation is part of the interface; optimize for scanability, rhythm, and visual clarity, not just correctness
 - Describe the current state, not the edit history; use before/after wording only when migration context helps the reader
 - Routing docs stay short; depth lives in `docs/`
 - No duplication when a pointer will do
 - Use repo-relative links for in-repo docs; external links are fine in sources and references
-- Doc drift is a real failure, not polish debt
+- Keep current-state repo docs separate from agent work artifacts like plans, handoff prompts, specs, and decisions
 
 ## Handoffs
 
-- Missing boot, smoke, e2e, logs, or readiness infrastructure is setup work, not docs work.
-- Judging existing code, a diff, branch, or PR with evidence is review work, not docs work.
-- Validating a completed change on the real surface is runtime verification, not docs work.
+Not docs work: boot/readiness setup; baseline PR, issue, contributor, or security policy templates; independent code review; runtime verification.
 
 ## Workflow
 
@@ -35,9 +32,13 @@ Check the files humans and agents actually rely on:
 - `CONTRIBUTING.md`
 - `SECURITY.md`
 - `docs/`
-- plans, specs, runbooks, decision docs
+- durable specs, active plans, runbooks, and decision docs
 
 Flag stale commands, dead paths, duplicated guidance, routing failures, and places where filenames or implementation order are leaking into the visible docs surface.
+
+Before editing, classify the target: current-state repo docs for readers and contributors, agent guidance for future behavior, or agent work artifacts for planning, specs, decisions, and handoffs. Keep those surfaces linked but not blended.
+
+Use the source-boundary table in [references/documentation.md](references/documentation.md) before writing cross-repo, private workspace, or local-machine facts into checked-in docs.
 
 ### 2. Update routing docs
 
@@ -45,15 +46,11 @@ Keep top-level docs terse and navigational.
 
 - `AGENTS.md` should be a table of contents, not a wiki
 - If the repo uses `AGENTS.md`, make `CLAUDE.md` a symlink or `@AGENTS.md` import instead of maintaining a second authored file
-- `README.md` should lead with value and the fastest path to use the project
-- `CONTRIBUTING.md` should hold contributor setup, validation, and workflow
-- `SECURITY.md` should hold private-first vulnerability reporting guidance
-- Push detail downward instead of bloating top-level files
+- `README.md` should lead with value, quick use, and links to deeper docs
+- Refresh `CONTRIBUTING.md` and `SECURITY.md` when they already exist, or when redistributing current content out of an overloaded `README.md`; do not invent baseline policy from scratch
 - For coordination or workspace repos, keep one canonical setup doc and let `README.md` point to it instead of repeating the full bootstrap flow inline
 - Use the concrete top-level split and section order in [references/documentation.md](references/documentation.md)
-- Keep visible docs copy human-facing and task-ordered; let the reference file own the detailed labeling and scannability rules
-- Use document titles or purpose labels in routing/index lists. Prefer `Contributing`, `Release workflow`, `Architecture`, or `Agent guide` over visible labels like `CONTRIBUTING.md`, `docs/RELEASE.md`, or `AGENTS.md`
-- Prefer terse routing over narrative sprawl, for example `README.md` should link to deeper docs instead of re-explaining them inline
+- Use reader-facing labels in routing lists: `Contributing`, `Release workflow`, `Architecture`, or `Agent guide`, not raw filenames unless the filename matters
 
 ### 3. Update deep docs and specs
 
@@ -61,10 +58,13 @@ Refresh the detailed documents that actually carry the knowledge.
 
 - architecture and API docs
 - task guides and runbooks
-- feature specs, plans, and decision records
+- durable feature specs and decision records
+- tactical plans and handoff prompts only when future agents need them
 - readiness infrastructure docs after boot, smoke, observability, or isolation changes
 
 Write each updated section as the reader's current source of truth. Use "previously/now" or "before/after" framing only in migration notes, changelogs, and decision records.
+
+When the user asks to save a durable rule, prompt, plan, or decision, choose the owning repo surface first: `docs/decisions/` for durable choices, `docs/specs/` for contracts, `docs/plans/` for tactical execution, and agent guidance only for behavior future agents must repeat. Do not fold tactical agent plans into `README.md`, `CONTRIBUTING.md`, or general architecture docs.
 
 For new features, use the directory layout and templates in [references/structuring.md](references/structuring.md) — specs, plans, and decisions each have their own shape.
 
@@ -92,8 +92,10 @@ Verify prose against the repo. Check that commands, file paths, and entry points
 Concrete checks:
 
 - `rg -n "old/path|stale-command" AGENTS.md CLAUDE.md README.md docs/` when paths or commands moved
+- `rg -n "<new command|new path|decision keyword>" AGENTS.md CLAUDE.md README.md docs/` to find duplicate or conflicting homes
 - `test -e <path-from-docs>` before keeping a file reference
 - `test ! -e AGENTS.md || { test -L CLAUDE.md && test "$(readlink CLAUDE.md)" = "AGENTS.md"; }` when normalizing agent entrypoints
+- for claims sourced from outside the repo, cite or verify the upstream source before making the claim durable
 
 ## Output
 

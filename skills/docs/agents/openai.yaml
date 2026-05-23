@@ -10,6 +10,8 @@ interface:
     - Touched docs match the current repo, commands, paths, and contracts.
     - Top-level routing docs stay short; deeper detail lives in the right doc.
     - Stale, duplicated, or misleading guidance is removed or replaced.
+    - Private, local-machine, or cross-repo facts are not promoted into checked-in docs unless the target repo owns them.
+    - Baseline contributor/security policy templates are not invented from scratch during docs cleanup.
 
     Constraints:
     - Code-review requests are out of scope.

@@ -1,6 +1,10 @@
 # Templates
 
-Use this reference when creating or aligning GitHub-facing templates and contributor policy docs.
+Use this reference when deciding whether to create or align GitHub-facing templates and contributor policy docs.
+
+This reference owns baseline existence and shape. General docs cleanup may keep
+these files accurate, but the decision to introduce them should follow the
+repo's collaboration model.
 
 ## Pull Request Template
 
