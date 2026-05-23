@@ -49,6 +49,6 @@ The workflow still references the token as `${{ secrets.TESSL_TOKEN }}`; GitHub 
 ## Local checks
 
 ```bash
-npx tessl tile lint skills/review
-npx tessl tile publish --dry-run skills/review
+npx tessl tile lint skills/review-gang
+npx tessl tile publish --dry-run skills/review-gang
 ```

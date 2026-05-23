@@ -11,7 +11,7 @@ fi
 
 skill_name="$1"
 shift
-tessl_version="${TESSL_CLI_VERSION:-0.79.1}"
+tessl_version="${TESSL_CLI_VERSION:-0.80.0}"
 
 skill_dir="skills/$skill_name"
 

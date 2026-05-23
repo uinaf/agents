@@ -18,8 +18,8 @@ latest.
 Useful direct invocations:
 
 ```bash
-npx tessl@0.79.1 skill review skills/review-gang
-npx tessl@0.79.1 skill review --json --threshold 90 skills/verify
+npx tessl@0.80.0 skill review skills/review-gang
+npx tessl@0.80.0 skill review --json --threshold 90 skills/verify
 ```
 
 Use per-skill `--json` output directly with Tessl rather than `skills/review.sh`, because the batch wrapper emits one review per skill.
@@ -35,7 +35,7 @@ Apply Tessl's optimizer to one skill at a time:
 Direct form:
 
 ```bash
-npx tessl@0.79.1 skill review --optimize --yes --max-iterations 1 skills/review-gang
+npx tessl@0.80.0 skill review --optimize --yes --max-iterations 1 skills/review-gang
 ```
 
 ## Suggested workflow
