@@ -12,6 +12,7 @@ Self-check your own completed change before independent review. Verify proves th
 - Verify is the builder's gate before independent review; it does not replace it
 - The builder does not grade their own work in the same context — switch into a fresh evaluator context or separate subagent first
 - Run repo guardrails first, then hit the real surface
+- Keep proof layers separate: local guardrails, focused regression checks, real-surface runtime proof, CI, and live/deploy evidence are related but not interchangeable
 - Prefer smoke, integration, contract, or e2e proof over unit tests that mock most of the behavior under test
 - Self-correct obvious issues you spot while exercising the change; leave rigorous code-shape judgment to an independent review pass
 - Load shared doctrine from the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules before judging the result
@@ -30,13 +31,15 @@ Self-check your own completed change before independent review. Verify proves th
 2. Switch into an independent evaluator context before judging your own work
 3. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
 4. Confirm you can boot and interact with the real surface
-5. Pick the smallest check set that can disprove the change honestly
+5. Define the proof boundary: what local, CI, live, or provider-specific claim you are actually verifying
+6. Pick the smallest check set that can disprove the change honestly
 
 ## Workflow
 
 ### 1. Run deterministic guardrails first
 
 - Prefer the repo's built-in entrypoint: `make verify`, `just verify`, `pnpm test`, `cargo test`, or the nearest targeted equivalent
+- During iteration, run targeted checks to avoid context flooding; before handoff, run the canonical local gate when it exists and is feasible
 - When choosing tests, prefer the strongest cheap proof available: smoke, integration, contract, or e2e checks beat mock-heavy unit suites that mainly replay implementation details
 - Swallow boring success output and surface only failures, anomalies, and exact commands
 
@@ -46,6 +49,7 @@ Self-check your own completed change before independent review. Verify proves th
 - API → hit the local endpoint with a real request such as `curl http://127.0.0.1:3000/health`
 - CLI → run the shipped command such as `node dist/cli.js --help` or the repo's packaged entrypoint
 - state/config → verify round trips, restart behavior, and config boot paths
+- deploy/live wiring → prove the actual configured surface when required; do not imply production readiness from a local build alone
 
 Follow [references/evidence-rules.md](references/evidence-rules.md) when collecting proof.
 
@@ -74,7 +78,7 @@ Produce one clear outcome:
 - `needs more work` — the change is not ready to be reviewed; specific issues to address are listed
 - `blocked` — verification cannot proceed, usually because infrastructure is too weak
 
-Verify reports readiness for review. The independent ship decision belongs to a separate review pass.
+Verify reports readiness for review. If a requested proof surface was unavailable, name that boundary explicitly instead of substituting a weaker check. The independent ship decision belongs to a separate review pass.
 
 ## Output
 

@@ -16,6 +16,7 @@ Prove your own changes work on real surfaces. Independent ship decisions belong 
 ## Contents
 
 - [Before You Start](#before-you-start)
+- [Proof Boundary](#proof-boundary)
 - [Checks](#checks)
 - [Evaluator Pattern](#evaluator-pattern)
 - [Check Selection](#check-selection)
@@ -29,6 +30,20 @@ Prove your own changes work on real surfaces. Independent ship decisions belong 
 3. Can you interact with it? (Playwright CLI for UI, curl for APIs, CLI invocation)
 4. Can you verify your own work from a fresh evaluator context or separate subagent?
 5. If not, flag it as a readiness gap and define the durable check the repo needs
+
+## Proof Boundary
+
+Name the claim before choosing checks:
+
+- **local health** — dependencies install, guardrails pass, the app or package boots locally
+- **focused regression** — the changed behavior and at least one relevant failure path are exercised
+- **real surface** — shipped CLI, browser flow, API endpoint, worker, device, or simulator was actually used
+- **CI status** — the repo's configured remote checks passed on the relevant commit
+- **deploy/live status** — the deployed or configured production-like surface is the one being exercised
+
+Do not let one layer imply another. A green build does not prove the browser flow. A local smoke does not prove deploy wiring. A CI board does not prove the preferred provider, device, account state, or live endpoint unless that exact surface was checked.
+
+When the requested proof surface is unavailable, report the best evidence you gathered and the missing boundary plainly.
 
 ## Checks
 
@@ -73,6 +88,7 @@ Prove your own changes work on real surfaces. Independent ship decisions belong 
 ### CI Integration
 - If the project has CI, push and wait for results before declaring done
 - CI failures after verify = verify missed something. Investigate
+- If CI is green but a separate live/deploy/provider check is required, keep that as a separate unverified or failing surface
 
 ### Smell Test
 - Check outputs look plausible to a human

@@ -28,16 +28,19 @@ Prefer reproducible proof:
 4. **Name the exact surface exercised**
    - page, endpoint, command, state transition, config path
 
-5. **For error-handling findings, capture the surfaced failure**
+5. **Separate proof layers**
+   - distinguish local guardrails, focused regression checks, real-surface proof, CI, and live/deploy evidence
+
+6. **For error-handling findings, capture the surfaced failure**
    - include the actual error text, code/classification, and whether the message helps the user recover
 
-6. **Flag unverified claims honestly**
+7. **Flag unverified claims honestly**
    - if you could not hit the real surface, say `unverified` and why
 
-7. **Summarize logs by signal**
+8. **Summarize logs by signal**
    - quote only the relevant lines or summarize with exact pointers
 
-8. **Keep final evidence human-readable**
+9. **Keep final evidence human-readable**
    - in the final footer, summarize passing checks by intent and result; include full commands only for failures, reproduction, or when asked
 
 ## Minimum Output Shape

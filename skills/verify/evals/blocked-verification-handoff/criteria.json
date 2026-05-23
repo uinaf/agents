@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether verify refuses to call a change ready when the repo has no reliable boot/test/runtime surface, reports exact attempted commands, and hands off to agent-readiness instead of pretending static inspection is proof.",
+  "context": "Tests whether verify refuses to call a change ready when the repo has no reliable boot/test/runtime surface, reports exact attempted commands, and recommends readiness setup instead of pretending static inspection is proof.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -28,9 +28,9 @@
       "description": "The report names the missing readiness pieces, such as lockfile/install path, test script, boot command, smoke check, or service entrypoint"
     },
     {
-      "name": "agent-readiness handoff",
+      "name": "Readiness follow-up",
       "max_score": 14,
-      "description": "The recommended follow-up is `agent-readiness` or an equivalent readiness-building task before review"
+      "description": "The recommended follow-up is a readiness-building task before review, such as adding a lockfile/install path, test script, boot command, smoke check, or service entrypoint"
     },
     {
       "name": "Surfaces not exercised honestly",
