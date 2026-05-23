@@ -19,13 +19,14 @@ Grade a project's readiness for autonomous agent work from F to A. Mechanical cr
 - App boots with one command
 - At least one smoke test confirms app is alive (health endpoint, home page, `--version`)
 - At least one test hits a real running process — even a single curl check counts
+- A local verification command exists or the missing command is the main verifiability gap
 - Agent can verify *some* things but has blind spots
 
 ### B — Solid
 - All of C, plus:
 - E2e tests cover key user flows on real surfaces (Playwright for UI, API round-trips, golden files for CLIs)
 - Smoke tests run in CI on every push/PR
-- Git hooks enforce at least lint + smoke before push
+- Git hooks enforce the local verification command or the same lint + smoke checks before push
 - Structured logs or health endpoints exist
 - Verification writes inspectable artifacts or logs in predictable paths
 - Long-running checks have explicit timeout, cleanup, and resource bounds
@@ -59,6 +60,7 @@ Grade a project's readiness for autonomous agent work from F to A. Mechanical cr
 
 - Grade based on what an agent can actually use, not what exists in theory
 - A test suite requiring manual setup to run = grade D, not C
+- CI-only checks without a local command agents can run before push are a verifiability gap
 - Mocked unit tests count zero toward testability — detect via mock imports at test file level
 - Grade each dimension independently (bootable / testable / observable / verifiable), take the lowest as overall grade
 - Treat user-session dependence, dashboard-only verification, unbounded cost, or prompt-only permissions as explicit autonomy gaps

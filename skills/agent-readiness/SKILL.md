@@ -20,7 +20,7 @@ Make a repo ready for autonomous agent work by adding mechanical proof: boot scr
 2. **Smoke** — a fast proof the app is alive
 3. **Interact** — agent can exercise the real surface
 4. **E2e** — key user flows work end to end
-5. **Enforce** — hooks, CI gates, lint rules, or mechanical checks
+5. **Enforce** — one local gate plus hooks, CI gates, lint rules, or mechanical checks
 6. **Observe** — logs, health endpoints, traces, machine-readable signals
 7. **Isolate** — worktrees or containers do not collide
 
@@ -50,15 +50,7 @@ For each, report:
 
 Use [references/grading.md](references/grading.md). Lowest dimension sets the overall grade.
 
-Also scan for autonomy constraints that decide whether verification can run unattended:
-
-- **session independence** — checks run after terminals, browsers, or laptops close
-- **explicit state** — logs, artifacts, and scratch output land in predictable paths
-- **resource bounds** — wall-clock limits, cost-sensitive jobs, and cleanup are explicit
-- **bounded permissions** — sandbox, CI, OIDC, or scoped credentials enforce limits
-- **direct interfaces** — CLI, HTTP, or file contracts exist for dashboard-only flows
-
-If these are not needed for the current task, keep them as remaining gaps instead of expanding the scope.
+Also scan unattended-run constraints: session independence, explicit artifact paths, resource bounds, infrastructure-enforced permissions, and direct CLI/HTTP/file interfaces for dashboard-only flows. If these are not needed for the current task, keep them as remaining gaps instead of expanding the scope.
 
 Example output:
 
@@ -78,58 +70,18 @@ Build missing layers in this order:
 
 Each step should be independently useful. Stop once the repo is reliably verifiable.
 
+Prioritize one canonical local gate (`make verify`, `just verify`, `./scripts/verify.sh`, or equivalent) that agents can run before push. It should mirror meaningful CI checks enough to catch routine failures without opening a dashboard.
+
 When readiness work includes agent entrypoints, keep `AGENTS.md` as the canonical authored guide and place `CLAUDE.md` beside it as a symlink to `AGENTS.md` rather than maintaining two separate guidance files.
 
-**Boot** — create a single-command entry point:
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-<your-boot-command> &
-APP_PID=$!
-for i in $(seq 1 30); do
-  curl -sf http://localhost:${PORT:-3000}/health > /dev/null 2>&1 && break
-  sleep 1
-done
-curl -sf http://localhost:${PORT:-3000}/health > /dev/null 2>&1 || {
-  echo "ERROR: App failed to start"; kill $APP_PID 2>/dev/null; exit 1
-}
-echo "App is ready"
-```
-
-**Smoke** — fast proof the app is alive (< 5 seconds):
-
-```bash
-curl -sf http://localhost:3000/health | jq .   # HTTP service
-./dist/my-cli --version                         # CLI tool
-npx playwright test smoke.spec.ts               # UI app
-```
-
-**Enforce** — pre-push hook to catch failures before CI:
-
-```bash
-#!/usr/bin/env bash
-# .git-hooks/pre-push
-set -euo pipefail
-<your-lint-command>
-<your-smoke-command>
-```
-
-See [references/setup-patterns.md](references/setup-patterns.md) for e2e, observability, isolation, and containerized stack patterns.
-
-**Tooling sources** — when adding CI, hooks, or bootstrap scripts, keep tool versions in one checked-in owner:
-
-- Node in `.node-version`; CI reads it with `node-version-file` when the action supports it
-- Package managers in `package.json#packageManager`; avoid separate `pnpm@...` or `corepack prepare ...@...` literals unless the repo cannot consume `packageManager`
-- Tool wrappers such as Vite+ in package metadata or a workspace catalog; if a workflow input needs the version, read it with a structured tool such as `jq` instead of copying the literal
-- GitHub Action SHA pins and same-line action version comments are not project tool versions; keep them explicit and Dependabot-managed
+See [references/setup-patterns.md](references/setup-patterns.md) for local gates, boot scripts, e2e, observability, isolation, containerized stacks, and tooling-version ownership.
 
 ### 3. Improve
 
 Tighten weak or flaky layers:
 
 - remove mock-only confidence theater
-- replace one-off checks with reusable scripts or hooks
+- replace one-off checks with a canonical local gate, then reuse it from hooks and CI
 - add dead-code or unused-symbol enforcement where the stack supports it
 - add logs and health signals agents can query
 - make parallel work safe when agent collisions are real
@@ -160,5 +112,5 @@ Keep details compact:
 ## References
 
 - [references/grading.md](references/grading.md) — agent-readiness grading scale with mechanical criteria
-- [references/setup-patterns.md](references/setup-patterns.md) — boot, smoke, e2e, observability, and isolation patterns
+- [references/setup-patterns.md](references/setup-patterns.md) — local gates, boot, smoke, e2e, observability, and isolation patterns
 - [references/industry-examples.md](references/industry-examples.md) — external patterns and justification for readiness investment

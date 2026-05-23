@@ -16,7 +16,9 @@ Concrete patterns for building each readiness layer. Substitute your project's a
 - [Containerized Stacks](#containerized-stacks)
 - [Smoke Tests](#smoke-tests)
 - [E2e Tests](#e2e-tests)
+- [Canonical Local Gate](#canonical-local-gate)
 - [Mechanical Enforcement](#mechanical-enforcement)
+- [Tool Version Ownership](#tool-version-ownership)
 - [Observability](#observability)
 - [Seed Data / Fixtures](#seed-data--fixtures)
 - [Per-Worktree Isolation](#per-worktree-isolation)
@@ -83,6 +85,10 @@ curl -sf http://localhost:3000/health | jq .
 
 # UI app (Playwright)
 npx playwright test smoke.spec.ts
+
+# Static/deploy-only repo
+test -f dist/index.html
+wrangler deploy --dry-run
 ```
 
 ## E2e Tests
@@ -96,6 +102,37 @@ Key user flows on the real running app.
 
 Prefer these over large suites of unit tests that mock the seam under change. For agent verification, one honest integration or e2e check is usually worth more than many self-verifying mocked tests.
 
+## Canonical Local Gate
+
+Every repo should expose one checked-in command an agent can run before push. It should be fast enough for normal iteration and close enough to CI to catch routine failures locally.
+
+Good command shapes:
+
+```bash
+make verify
+just verify
+./scripts/verify.sh
+pnpm verify
+cargo xtask verify
+go run ./cmd/verify
+```
+
+Default contents:
+
+- lint, format check, typecheck, or static analysis
+- build or package check when the repo ships an artifact
+- smoke or integration proof that exercises a real process or real built output
+- secret scan or dependency audit when the repo handles credentials or release infrastructure
+
+If full CI is slow, split the contract:
+
+```bash
+make verify          # normal pre-push gate
+make verify-full     # slower full suite for release or risky work
+```
+
+CI and hooks should call the same local gate when practical. If CI cannot call it directly, document the equivalence so agents can trust local proof before opening a PR.
+
 ## Mechanical Enforcement
 
 ### Git Hooks
@@ -104,8 +141,7 @@ Prefer these over large suites of unit tests that mock the seam under change. Fo
 # .git-hooks/pre-push
 #!/usr/bin/env bash
 set -euo pipefail
-<your-lint-command>
-<your-smoke-command>
+<your-local-gate-command>
 ```
 
 Wire: `git config core.hooksPath .git-hooks`
@@ -159,6 +195,15 @@ Prefer mechanical checks for error-handling hygiene when the stack supports them
 - no broad catch-and-ignore handlers
 - stable error codes or tagged variants for public interfaces
 - user-facing error text that suggests a recovery step when one exists
+
+## Tool Version Ownership
+
+When adding CI, hooks, or bootstrap scripts, keep tool versions in one checked-in owner:
+
+- Node in `.node-version`; CI reads it with `node-version-file` when the action supports it
+- Package managers in `package.json#packageManager`; avoid separate `pnpm@...` or `corepack prepare ...@...` literals unless the repo cannot consume `packageManager`
+- Tool wrappers in package metadata or a workspace catalog; if workflow input needs the version, read it with a structured tool such as `jq` instead of copying the literal
+- GitHub Action SHA pins and same-line action version comments are not project tool versions; keep them explicit and Dependabot-managed
 
 ## Observability
 

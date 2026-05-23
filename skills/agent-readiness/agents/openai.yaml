@@ -9,6 +9,7 @@ interface:
     Success criteria:
     - Current boot, smoke, test, observability, and isolation gaps are identified from repo evidence.
     - Missing readiness layers are added or improved only when they are needed for reliable verification.
+    - A canonical local gate exists or is named as the highest-impact gap.
     - The repo has a clear next verification path.
 
     Constraints:
