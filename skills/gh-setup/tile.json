@@ -1,0 +1,11 @@
+{
+  "name": "uinaf/gh-setup",
+  "version": "0.1.0",
+  "private": false,
+  "summary": "Set up or align GitHub repo settings, branch/ruleset policy, templates, Actions hardening, Environments, release workflows, and deploy workflows for continuously publishable or deployable repositories.",
+  "skills": {
+    "gh-setup": {
+      "path": "SKILL.md"
+    }
+  }
+}

@@ -25,11 +25,7 @@
       "source": "emilkowalski/skill"
     },
     {
-      "name": "gh-deploy-pipeline",
-      "source": "uinaf/agents"
-    },
-    {
-      "name": "gh-release-pipeline",
+      "name": "gh-setup",
       "source": "uinaf/agents"
     },
     {
@@ -55,10 +51,6 @@
     {
       "name": "tanstack-start",
       "source": "tanstack-skills/tanstack-skills"
-    },
-    {
-      "name": "uinaf-design-system",
-      "source": "uinaf/agents"
     },
     {
       "name": "vercel-react-best-practices",

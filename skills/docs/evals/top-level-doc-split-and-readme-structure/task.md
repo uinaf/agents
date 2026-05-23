@@ -104,7 +104,7 @@ All errors go through `src/errors.ts`. The `GrokError` class carries an exit cod
 
 ## Development Setup
 
-Prerequisites: Node.js 18+, npm 9+
+Prerequisites: Node.js 24.x LTS, npm 11+
 
 1. Clone the repo:
    ```bash
