@@ -11,7 +11,6 @@ Independently audit existing code by spawning concern-specific reviewer subagent
 
 - Spawn reviewer personas as separate subagents every time; if subagents are unavailable, the review is `blocked` unless the user explicitly allows a sequential fallback
 - Always run the default gang: `general`, `tests`, and `silent-failures`
-- Load shared doctrine from the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules
 - Keep findings risk-focused, evidence-backed, severity-ordered, and free of low-value nits
 - Block when missing context or proof prevents an honest verdict; otherwise name the unverified surface and adjust the verdict
 - Do not use this lane to self-check a change you just authored
@@ -23,12 +22,6 @@ Independently audit existing code by spawning concern-specific reviewer subagent
 3. Confirm the reviewed base/head or live artifact is current; stale review artifacts are evidence to refresh, not evidence to trust
 4. Spawn the mandatory default reviewer subagents from [references/reviewer-selection.md](references/reviewer-selection.md)
 5. Add conditional reviewer subagents when the change shape calls for them
-
-Mandatory default gang:
-
-- `general`
-- `tests`
-- `silent-failures`
 
 Add conditional personas only when they add a distinct concern; use [references/reviewer-selection.md](references/reviewer-selection.md) for shortcuts and criteria.
 
@@ -43,6 +36,14 @@ Refresh the source of truth before judging branches or PRs: base branch, head SH
 ### 2. Spawn reviewer subagents
 
 Spawn one subagent per selected persona. Run them in parallel when the environment supports it, and keep each persona concern-focused and independent. Do not collapse the gang into one blended self-review pass.
+
+Use this prompt shape for each subagent, filling in the persona and scope:
+
+```text
+You are the <persona> reviewer. Read the target repo guidance, then review only <scope> against your persona concerns from skills/review-gang/reviewers/<persona>.md.
+
+Return only material findings with file/line evidence, severity, confidence, and the proof or missing proof that changes the verdict. If you find nothing material, say "none" and name any residual unverified surface.
+```
 
 Concrete starting points:
 
