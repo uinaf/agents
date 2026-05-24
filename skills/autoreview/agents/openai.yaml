@@ -17,6 +17,6 @@ interface:
     - Treat review output as advisory.
     - Ordinary review verdicts are outside this closeout helper.
     - Do not push just to review.
-    - Use the bundled `scripts/autoreview` helper.
+    - Resolve the bundled helper from the skill directory; do not look for `scripts/autoreview` in the target repo.
 
     Output: compact closeout with command used, proof run, findings accepted/rejected, and the final clean review result or conscious rejection.

@@ -28,12 +28,27 @@ Use when:
 
 For upstream provenance, use [references/upstream.md](references/upstream.md).
 
+## Helper Path
+
+Resolve the helper from this skill directory before choosing a target, and keep
+your shell cwd in the git repo being reviewed:
+
+```bash
+SKILL_DIR="<directory containing this SKILL.md>"
+AUTOREVIEW="$SKILL_DIR/scripts/autoreview"
+"$AUTOREVIEW" --help
+```
+
+Do not look for or create `scripts/autoreview` in the target repo. The target
+repo only supplies the git diff; the executable helper is bundled with this
+skill.
+
 ## Pick Target
 
 Dirty local work:
 
 ```bash
-scripts/autoreview --mode local
+"$AUTOREVIEW" --mode local
 ```
 
 Use this only when the patch is actually unstaged/staged/untracked. For committed,
@@ -42,26 +57,26 @@ pushed, or PR work, point the helper at the commit or branch diff instead.
 Branch/PR work:
 
 ```bash
-scripts/autoreview --mode branch --base origin/main
+"$AUTOREVIEW" --mode branch --base origin/main
 ```
 
 Optional review context is first-class:
 
 ```bash
-scripts/autoreview --mode branch --base origin/main --prompt-file /tmp/review-notes.md --dataset /tmp/evidence.json
+"$AUTOREVIEW" --mode branch --base origin/main --prompt-file /tmp/review-notes.md --dataset /tmp/evidence.json
 ```
 
 If an open PR exists, use its actual base:
 
 ```bash
 base=$(gh pr view --json baseRefName --jq .baseRefName)
-scripts/autoreview --mode branch --base "origin/$base"
+"$AUTOREVIEW" --mode branch --base "origin/$base"
 ```
 
 Committed single change:
 
 ```bash
-scripts/autoreview --mode commit --commit HEAD
+"$AUTOREVIEW" --mode commit --commit HEAD
 ```
 
 Use commit review for already-landed or already-pushed work on `main`. For a
@@ -72,7 +87,7 @@ small stack, review each commit explicitly or review the branch before merging.
 Format first if formatting can change line locations. Then it is OK to run tests and review in parallel:
 
 ```bash
-scripts/autoreview --parallel-tests "<focused test command>"
+"$AUTOREVIEW" --parallel-tests "<focused test command>"
 ```
 
 If tests or review lead to code edits, rerun the affected tests and structured review once more.
@@ -80,10 +95,6 @@ If tests or review lead to code edits, rerun the affected tests and structured r
 ## Helper
 
 Bundled helper: [scripts/autoreview](scripts/autoreview)
-
-```bash
-scripts/autoreview --help
-```
 
 Use `--help` for flags. Codex is the default engine, and Claude is supported.
 The helper validates structured output,
