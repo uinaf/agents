@@ -8,6 +8,7 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 - Keep replies compact. Use the minimum structure that makes the answer scannable; narrate routine steps or paste long logs only when the user asked
 - Link known URLs as clickable Markdown, including PRs, issues, commits, docs, dashboards, localhost, LAN, Tailscale, preview, and dev-server URLs
 - In replies and reports, show commit links with the short hash label: `[abc1234](url)`. For PRs/issues, always link the number: `[#123](url)`. Add a title after it when useful
+- In shared/public reports, including PR/MR bodies, issues, comments, and release notes, do not leak local machine details: no absolute filesystem roots, usernames, hostnames, private workspace routes, or full local script paths. Use repo-relative paths, tool names, and concise check summaries; redact local prefixes from commands when the exact invocation matters
 - If an approach is weak, say so and propose a better one
 - Fix only what was asked: every changed line should trace to the request; mention unrelated cleanup instead of doing it
 - Treat install, sync, and update requests as additive by default; do not remove, prune, or uninstall extras unless explicitly asked
@@ -115,5 +116,5 @@ Reproduce the failure, find the root cause with evidence, and fix the root cause
 
 - Changed lists files or surfaces with intent, not a noisy commit log
 - Risks names what could regress and what reviewers should verify
-- Verification is compact: list only the meaningful local, CI, preview, or live proof; include command dumps, repeated green checks, and raw logs only when they explain a risk or failure
+- Verification is compact: list only the meaningful local, CI, preview, or live proof, using repo-relative commands or check names instead of local script routes. Include command dumps, repeated green checks, and raw logs only when they explain a risk or failure, and redact local machine details first
 - Complexity is reduced, neutral, or increased; justify increased complexity
