@@ -29,6 +29,10 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "react-ban-use-effect",
+      "source": "uinaf/agents"
+    },
+    {
       "name": "react-doctor",
       "source": "millionco/react-doctor"
     },
