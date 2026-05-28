@@ -1,0 +1,20 @@
+interface:
+  display_name: "React Ban useEffect"
+  short_description: "Replace direct useEffect in React"
+  default_prompt: |
+    Use $react-ban-use-effect.
+
+    Goal: write, refactor, or review React code without direct useEffect.
+
+    Success criteria:
+    - Direct useEffect calls in the touched surface are removed or flagged.
+    - Each effect is classified by intent before replacement.
+    - Derived state, data fetching, user actions, resets, and mount-only sync use the repo's existing patterns.
+    - Any useMountEffect escape hatch is narrow and tied to an external system.
+
+    Constraints:
+    - Do not add a new data-fetching dependency without approval.
+    - Do not rewrite unrelated legacy effect usage.
+    - Preserve repo lint, hooks, data, and component conventions.
+
+    Output: lead with changed or reviewed behavior, then evidence. Include any remaining direct effect as an explicit exception or blocker.

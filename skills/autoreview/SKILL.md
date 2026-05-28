@@ -26,7 +26,7 @@ Use when:
 - Route security-audit suppression closeout through [references/troubleshooting.md](references/troubleshooting.md).
 - Do not push just to review. Push only when the user requested push/ship/PR update.
 
-For upstream provenance, use [references/upstream.md](references/upstream.md).
+For upstream provenance and uinaf tailoring notes, use [references/upstream.md](references/upstream.md).
 
 ## Helper Path
 
