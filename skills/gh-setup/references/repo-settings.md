@@ -40,11 +40,28 @@ Baseline checks:
 - `main` should block force pushes and branch deletion.
 - Required status checks should match the repo's real verify workflow.
 - Required conversation resolution is useful even when direct pushes to `main` remain allowed.
+- Require signed commits on protected/default branches unless release, deploy,
+  or merge automation has a documented incompatible path.
 - Merge queue requires workflows to include `merge_group` for required checks.
 - Release bump commits need an actor that branch rules allow. When branch push restrictions are not enabled, workflow `GITHUB_TOKEN` writeback is acceptable for low-risk repos. When branch push restrictions are required, use a narrowly scoped GitHub App release actor that branch rules or rulesets explicitly allow.
 - If a ruleset requires pull requests on `main`, automated push-back release jobs will fail unless the actor is exempted or the release tool opens PRs.
 
 Branch protection with only conversation resolution is often a better fit than a full PR-required ruleset when maintainers intentionally keep direct pushes available.
+
+### Signed Commits
+
+Prefer signed-commit enforcement on protected/default branches. Use an
+organization ruleset for repo families when available; otherwise use repo-level
+rulesets or branch protection. Before enabling it, check release bump commits,
+deploy writebacks, merge automation, bot actors, and direct-push flows. Every
+protected-branch writer must sign commits or move to pull requests.
+
+If enforcement is unavailable because of visibility, plan, or permissions,
+record a settings gap or blocker. Public repos can usually use signed-commit
+protection on GitHub's free surface; private/internal repos and organization
+rulesets may be plan-gated. Treat ruleset `403` responses such as `Upgrade to
+GitHub Pro or make this repository public to enable this feature` as unconfirmed
+policy state, not proof that no ruleset exists.
 
 ## Tag Policy
 

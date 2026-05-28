@@ -55,6 +55,7 @@ Default posture:
 - Prefer squash merge for small and medium repos unless the repo has a clear history-preservation reason.
 - Disable merge methods the repo does not intentionally support.
 - Preserve existing approval, status-check, signed-commit, actor, and tag restrictions unless the user explicitly asks to change them.
+- Prefer signed-commit requirements on protected/default branches when the plan and automation path support them.
 - If direct pushes to `main` must remain allowed, prefer branch protection with conversation resolution rather than forcing all default-branch changes through PRs by accident.
 - For release bump commits, verify the token actor is allowed by branch/ruleset policy before relying on bot metadata.
 
