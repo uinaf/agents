@@ -21,7 +21,7 @@ The following files are provided as inputs. Extract them before beginning.
 
 - All authentication errors must return HTTP 401 with a JSON body containing `error` and `message` fields.
 - Never log raw JWT payloads.
-- Use `zod` for all runtime validation of external inputs.
+- Prefer `valibot` for new runtime validation of external inputs unless the repo already standardizes on `zod`.
 - Integration tests must cover all authentication failure paths.
 
 =============== FILE: repo/src/auth/middleware.ts ===============

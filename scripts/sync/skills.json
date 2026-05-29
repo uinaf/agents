@@ -49,6 +49,10 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "tanstack-form",
+      "source": "tanstack-skills/tanstack-skills"
+    },
+    {
       "name": "tanstack-query",
       "source": "tanstack-skills/tanstack-skills"
     },

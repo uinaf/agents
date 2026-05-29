@@ -10,7 +10,7 @@
     {
       "name": "Types persona included",
       "max_score": 10,
-      "description": "The report mentions using the types reviewer persona (or equivalent type-safety lens) — appropriate given the new AuthToken/zod schema introduction"
+      "description": "The report mentions using the types reviewer persona (or equivalent type-safety lens) — appropriate given the new AuthToken/runtime schema introduction"
     },
     {
       "name": "Cleanup persona included",
@@ -25,7 +25,7 @@
     {
       "name": "Repo guidance loaded",
       "max_score": 10,
-      "description": "The report references or incorporates at least one rule from AGENTS.md (e.g. zod requirement, logging prohibition, 401 JSON shape, integration test requirement)"
+      "description": "The report references or incorporates at least one rule from AGENTS.md (e.g. Valibot preference, logging prohibition, 401 JSON shape, integration test requirement)"
     },
     {
       "name": "Personas listed in output",
