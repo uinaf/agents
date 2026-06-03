@@ -20,14 +20,9 @@ cd agents
 ./scripts/sync/sync.sh
 ```
 
-Sync is additive by default. To remove globally installed skills that are not listed in `scripts/sync/skills.json`, run:
-
-```bash
-./scripts/sync/sync.sh --prune
-```
-
-Third-party skill sources listed in the manifest sync by default. Set
-`ALLOW_THIRD_PARTY_SKILLS=0` to skip non-`uinaf/agents` skills for a local run.
+Sync is additive and manifest-driven. It installs every skill listed in
+`scripts/sync/skills.json` for the supported agents installed on the machine,
+and does not remove globally installed skills that are outside the manifest.
 
 The sync script pins the `skills` CLI by default. Override with
 `SKILLS_CLI_VERSION=<version>` only when intentionally testing or rotating the

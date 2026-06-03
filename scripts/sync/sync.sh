@@ -1,27 +1,12 @@
 #!/bin/bash
 set -euo pipefail
 
-PRUNE=0
 SKILLS_CLI_VERSION="${SKILLS_CLI_VERSION:-1.5.7}"
-ALLOW_THIRD_PARTY_SKILLS="${ALLOW_THIRD_PARTY_SKILLS:-1}"
-for arg in "$@"; do
-  case "$arg" in
-    --prune)
-      PRUNE=1
-      ;;
-    -h|--help)
-      echo "Usage: $0 [--prune]"
-      echo
-      echo "  --prune  Remove globally installed skills from manifest-managed sources that are not listed in scripts/sync/skills.json."
-      exit 0
-      ;;
-    *)
-      echo "Unknown argument: $arg" >&2
-      echo "Usage: $0 [--prune]" >&2
-      exit 2
-      ;;
-  esac
-done
+
+if [ "$#" -gt 0 ]; then
+  echo "Usage: $0" >&2
+  exit 2
+fi
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_DIR="$(git -C "$SCRIPT_DIR" rev-parse --show-toplevel)"
@@ -80,40 +65,9 @@ if [ -f "$MANIFEST" ]; then
 
     jq -r '.skills[] | "\(.name) \(.source)"' "$MANIFEST" |
     while read -r name source; do
-      if [ "$source" != "uinaf/agents" ] && [ "$ALLOW_THIRD_PARTY_SKILLS" != "1" ]; then
-        echo "Skipping third-party skill: $name from $source"
-        echo "  Set ALLOW_THIRD_PARTY_SKILLS=1 to install non-uinaf sources from the manifest."
-        continue
-      fi
       echo "Installing skill: $name from $source"
       npx "skills@$SKILLS_CLI_VERSION" add "$source" -g -y -a "${SKILL_AGENTS[@]}" -s "$name" </dev/null 2>/dev/null || echo "  Failed: $name"
     done
-
-    if [ "$PRUNE" -eq 1 ]; then
-      LOCKFILE="$HOME/.agents/.skill-lock.json"
-      if [ -f "$LOCKFILE" ]; then
-        echo "Pruning skills from manifest-managed sources missing from manifest"
-        jq -r \
-          --argjson manifest "$(jq -c '[.skills[].name]' "$MANIFEST")" \
-          --argjson manifest_sources "$(jq -c '[.skills[].source] | unique' "$MANIFEST")" \
-          '
-          (.skills // {}) | to_entries[]
-          | select(.value.source as $source | $manifest_sources | index($source))
-          | select(.key as $name | $manifest | index($name) | not)
-          | .key
-          ' \
-          "$LOCKFILE" |
-        while read -r skill_name; do
-          [ -n "$skill_name" ] || continue
-          echo "Removing stale skill: $skill_name"
-          npx "skills@$SKILLS_CLI_VERSION" remove "$skill_name" -g -y </dev/null 2>/dev/null || echo "  Failed to remove: $skill_name"
-        done
-      else
-        echo "No global skill lockfile found; skipping prune"
-      fi
-    else
-      echo "Skipping prune. Use --prune to remove skills missing from manifest."
-    fi
   fi
 else
   echo "No skills manifest found at $MANIFEST"
