@@ -1,6 +1,6 @@
 {
   "name": "uinaf/review-gang",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": false,
   "summary": "Review existing code, diffs, branches, or pull requests by spawning mandatory concern-specific reviewer subagents, then synthesize a ship-it / needs-review / blocked verdict.",
   "skills": {

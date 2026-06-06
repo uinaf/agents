@@ -5,7 +5,7 @@
     {
       "name": "Default gang spawned",
       "max_score": 12,
-      "description": "The report uses the mandatory default personas: general, tests, and silent-failures"
+      "description": "The report uses the mandatory default personas: general, tests, silent-failures, and code-shape"
     },
     {
       "name": "General persona used",
@@ -21,6 +21,11 @@
       "name": "Tests persona included",
       "max_score": 8,
       "description": "The report applies the tests reviewer persona as part of the mandatory default gang, while keeping any test-related conclusion brief for a doc-only change"
+    },
+    {
+      "name": "Code-shape persona included",
+      "max_score": 8,
+      "description": "The report applies the code-shape reviewer persona as part of the mandatory default gang, while keeping any architecture/modularity conclusion brief for a doc-only change"
     },
     {
       "name": "Verdict present",

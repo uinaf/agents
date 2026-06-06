@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent produces an evidence-backed review report with correct verdict shape, ordered findings, explicit unverified markers, file references with line numbers, and incorporates repo guidance from CLAUDE.md. Also tests mandatory default reviewer gang spawning plus silent-failures and cleanup persona application.",
+  "context": "Tests whether the agent produces an evidence-backed review report with correct verdict shape, ordered findings, explicit unverified markers, file references with line numbers, and incorporates repo guidance from CLAUDE.md. Also tests mandatory default reviewer gang spawning, including code-shape and silent-failures, plus cleanup persona application.",
   "type": "weighted_checklist",
   "checklist": [
     {

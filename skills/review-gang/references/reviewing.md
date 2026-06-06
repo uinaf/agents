@@ -11,7 +11,7 @@ Review existing code with independent subagent lenses, then collapse the result 
 ## Workflow
 
 1. Load the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, plus local review doctrine, when present
-2. Spawn the mandatory default reviewer gang: general, tests, and silent-failures
+2. Spawn the mandatory default reviewer gang: general, tests, silent-failures, and code-shape
 3. Add conditional reviewer subagents only when they add a distinct concern
 4. Run personas independently, preferably in parallel
 5. Refresh stale evidence before trusting it

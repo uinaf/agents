@@ -9,8 +9,9 @@ Spawn these for every Review Gang run:
 - [reviewers/general.md](../reviewers/general.md)
 - [reviewers/tests.md](../reviewers/tests.md)
 - [reviewers/silent-failures.md](../reviewers/silent-failures.md)
+- [reviewers/code-shape.md](../reviewers/code-shape.md)
 
-The default gang is mandatory even for small diffs. The silent-failures lens is especially important when the diff touches error handling, retries, fallbacks, validation, auth, external services, or user-facing failures.
+The default gang is mandatory even for small diffs. The silent-failures lens is especially important when the diff touches error handling, retries, fallbacks, validation, auth, external services, or user-facing failures. The code-shape lens keeps module boundaries, single source of truth, and maintainability risk visible without turning cleanup into a style pass.
 
 ## Add Conditional Personas
 
@@ -37,9 +38,9 @@ The default gang is mandatory even for small diffs. The silent-failures lens is 
 
 ## Shape-Based Add-Ons
 
-- **UI feature** → general + tests + silent-failures
-- **API / backend** → general + tests + silent-failures; add types for schema changes and cleanup for wide refactors
-- **State / migration / config** → general + tests + silent-failures; add types if invariants changed and cleanup if old paths may be left behind
+- **UI feature** → default gang
+- **API / backend** → default gang; add types for schema changes and cleanup for wide refactors
+- **State / migration / config** → default gang; add types if invariants changed and cleanup if old paths may be left behind
 - **Refactor / cleanup** → default gang + cleanup; add types when invariants changed
 - **Doc-heavy change** → default gang + comments
 - **Tiny mechanical change** → default gang only, unless comments/types/cleanup add a distinct concern

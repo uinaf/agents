@@ -5,7 +5,7 @@
     {
       "name": "Default gang spawned",
       "max_score": 8,
-      "description": "The report mentions spawning all three default reviewer personas: general, tests, and silent-failures"
+      "description": "The report mentions spawning all four default reviewer personas: general, tests, silent-failures, and code-shape"
     },
     {
       "name": "Types persona included",

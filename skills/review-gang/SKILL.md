@@ -10,7 +10,7 @@ Independently audit existing code by spawning concern-specific reviewer subagent
 ## Contract
 
 - Spawn reviewer personas as separate subagents every time; if subagents are unavailable, the review is `blocked` unless the user explicitly allows a sequential fallback
-- Always run the default gang: `general`, `tests`, and `silent-failures`
+- Always run the default gang: `general`, `tests`, `silent-failures`, and `code-shape`
 - Keep findings risk-focused, evidence-backed, severity-ordered, and free of low-value nits
 - Block when missing context or proof prevents an honest verdict; otherwise name the unverified surface and adjust the verdict
 - Do not use this lane to self-check a change you just authored

@@ -9,7 +9,7 @@ interface:
     Success criteria:
     - The reviewed scope is clear.
     - The reviewed base/head, artifact, or evidence source is current enough to support the verdict.
-    - The default reviewer gang is spawned: general, tests, and silent-failures.
+    - The default reviewer gang is spawned: general, tests, silent-failures, and code-shape.
     - Conditional personas are spawned only when they add a distinct concern.
     - Findings are risk-focused, evidence-backed, and ordered by severity.
     - Unverified areas name the missing proof layer explicitly.
