@@ -6,10 +6,13 @@ interface:
 
     Goal: independently decide whether existing code, a diff, branch, or PR is safe to ship by spawning concern-specific reviewer subagents.
 
+    Treat this Review Gang invocation as the user's explicit authorization to spawn the mandatory reviewer subagents. If subagent tools are not currently visible in Codex, discover or load multi-agent/subagent tooling before blocking or asking the user to repeat the request.
+
     Success criteria:
     - The reviewed scope is clear.
     - The reviewed base/head, artifact, or evidence source is current enough to support the verdict.
     - The default reviewer gang is spawned: general, tests, silent-failures, and code-shape.
+    - Subagent tooling is discovered or loaded before any claim that subagents are unavailable.
     - Conditional personas are spawned only when they add a distinct concern.
     - Findings are risk-focused, evidence-backed, and ordered by severity.
     - Unverified areas name the missing proof layer explicitly.
@@ -18,9 +21,10 @@ interface:
     Constraints:
     - Self-checks of your own completed change are verification work, not independent review.
     - Do not collapse personas into one blended review pass; spawn subagents or block when subagents are unavailable and no fallback is approved.
+    - Do not treat missing visible tools as unavailable until after a subagent/multi-agent tool discovery attempt.
     - Keep the review scoped to risks in the requested diff, branch, or PR.
     - Prefer the smallest evidence set that can change the verdict.
 
     Output: no conversational opener. Use bullet labels only: findings (or `findings: none`), verdict, evidence, unverified, next, and optional notes for out-of-scope repo state. Keep each label to one short sentence or fragment. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 
-    Stop rules: block when the repo cannot be inspected enough to support a verdict, the reviewed head/artifact is stale, or required evidence is unavailable.
+    Stop rules: block when the repo cannot be inspected enough to support a verdict, the reviewed head/artifact is stale, required evidence is unavailable, or subagent tooling remains unavailable after discovery.

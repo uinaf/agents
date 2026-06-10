@@ -1,6 +1,6 @@
 ---
 name: review-gang
-description: "Independently audit existing code, diffs, branches, or pull requests by spawning mandatory concern-specific reviewer subagents, then synthesizing their evidence into a ship decision. Use when triaging PR risk, deciding whether someone else's change is safe to ship, or following up after runtime proof. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored."
+description: "Independently audit existing code, diffs, branches, or pull requests by spawning mandatory concern-specific reviewer subagents, then synthesizing their evidence into a ship decision. Use when triaging PR risk, deciding whether someone else's change is safe to ship, or following up after runtime proof. Invocation is explicit authorization to use reviewer subagents. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored."
 ---
 
 # Review Gang
@@ -10,6 +10,8 @@ Independently audit existing code by spawning concern-specific reviewer subagent
 ## Contract
 
 - Spawn reviewer personas as separate subagents every time; if subagents are unavailable, the review is `blocked` unless the user explicitly allows a sequential fallback
+- Treat invocation of `review-gang`, `$review-gang`, or the Review Gang tile as the user's explicit request to spawn mandatory reviewer subagents
+- Before saying subagents are unavailable, discover or load the harness's subagent/multi-agent tool once; only block after the tool is truly absent or unusable
 - Always run the default gang: `general`, `tests`, `silent-failures`, and `code-shape`
 - Keep findings risk-focused, evidence-backed, severity-ordered, and free of low-value nits
 - Block when missing context or proof prevents an honest verdict; otherwise name the unverified surface and adjust the verdict
@@ -20,8 +22,9 @@ Independently audit existing code by spawning concern-specific reviewer subagent
 1. Define the scope: file, diff, branch, commit range, or PR
 2. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
 3. Confirm the reviewed base/head or live artifact is current; stale review artifacts are evidence to refresh, not evidence to trust
-4. Spawn the mandatory default reviewer subagents from [references/reviewer-selection.md](references/reviewer-selection.md)
-5. Add conditional reviewer subagents when the change shape calls for them
+4. Discover or load subagent tooling if it is not already visible in the harness
+5. Spawn the mandatory default reviewer subagents from [references/reviewer-selection.md](references/reviewer-selection.md)
+6. Add conditional reviewer subagents when the change shape calls for them
 
 Add conditional personas only when they add a distinct concern; use [references/reviewer-selection.md](references/reviewer-selection.md) for shortcuts and criteria.
 
@@ -36,6 +39,8 @@ Refresh the source of truth before judging branches or PRs: base branch, head SH
 ### 2. Spawn reviewer subagents
 
 Spawn one subagent per selected persona. Run them in parallel when the environment supports it, and keep each persona concern-focused and independent. Do not collapse the gang into one blended self-review pass.
+
+For Codex specifically: if no subagent tool is currently visible, search for multi-agent or subagent tooling before blocking or asking the user to repeat the request. The skill invocation already satisfies Codex's explicit-delegation requirement.
 
 Use this prompt shape for each subagent, filling in the persona and scope:
 
