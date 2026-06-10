@@ -9,6 +9,8 @@ interface:
     Success criteria:
     - The review target is correct: dirty local work, branch/PR base, or single commit.
     - Use Codex by default; use Claude when requested.
+    - Let long reviews continue while heartbeat/progress output is advancing.
+    - Use review panels only when explicitly requested or when risk justifies the extra spend.
     - Findings are verified against real code before any fix is accepted.
     - Focused tests or proof are rerun after review-triggered code changes.
     - The final report names the review command, proof run, accepted/rejected findings, and clean result.
@@ -18,5 +20,6 @@ interface:
     - Ordinary review verdicts are outside this closeout helper.
     - Do not push just to review.
     - Resolve the bundled helper from the skill directory; do not look for `scripts/autoreview` in the target repo.
+    - Keep OpenClaw's upstream helper behavior unless this repo has a packaging-only reason to differ.
 
     Output: compact closeout with command used, proof run, findings accepted/rejected, and the final clean review result or conscious rejection.

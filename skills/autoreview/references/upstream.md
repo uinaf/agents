@@ -1,13 +1,12 @@
 # Upstream
 
-This skill credits Peter Steinberger's agent scripts as upstream inspiration.
+This skill tracks OpenClaw's shared agent-skills repo as its canonical upstream.
 
-- Source: https://github.com/steipete/agent-scripts/tree/main/skills/autoreview
-- Rename commit: https://github.com/steipete/agent-scripts/commit/e6d810d5fe11c931f09e2bdd9b1d9da74fffd634
-- Applied upstream commit: `e6d810d`
-- License: [../LICENSE.upstream](../LICENSE.upstream)
+- Source: https://github.com/openclaw/agent-skills/tree/main/skills/autoreview
+- Applied upstream commit: `3446a70`
 
-This repo's version is tailored and structured for `uinaf/agents`: it preserves
-the upstream helper's engine support, uses the `autoreview` skill name directly,
-adds repo-specific closeout and rerun rules, and avoids old `codex-review`
-compatibility shims when borrowing upstream ideas.
+This repo's version keeps `uinaf/agents` packaging files such as `tile.json`,
+`agents/openai.yaml`, and this provenance note around the upstream skill core.
+When borrowing future updates, prefer copying OpenClaw's `SKILL.md` and bundled
+helper scripts first, then reapply only packaging metadata that belongs to this
+repo.
