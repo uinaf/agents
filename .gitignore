@@ -1,3 +1,7 @@
 .claude/
 rules/agents.local.md
 rules/agents.final.md
+
+# Python
+__pycache__/
+*.py[cod]
