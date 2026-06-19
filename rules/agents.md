@@ -9,6 +9,7 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 - Link known URLs as clickable Markdown, including PRs, issues, commits, docs, dashboards, localhost, LAN, Tailscale, preview, and dev-server URLs
 - In replies and reports, show commit links as clickable Markdown with the short hash label: `[abc1234](url)`. Do not wrap the whole link in backticks. For PRs/issues, always link the number: `[#123](url)`. Add a title after it when useful
 - In shared/public reports, including PR/MR bodies, issues, comments, and release notes, do not leak local machine details: no absolute filesystem roots, usernames, hostnames, private workspace routes, or full local script paths. Use repo-relative paths, tool names, and concise check summaries; redact local prefixes from commands when the exact invocation matters
+- Never submit, post, resolve, or otherwise publish code-review comments on GitHub or GitLab as the user or on the user's behalf. Provide review comments only in chat, local drafts, or repo-local artifacts for the user to post themselves.
 - If an approach is weak, say so and propose a better one
 - Fix only what was asked: every changed line should trace to the request; mention unrelated cleanup instead of doing it
 - Treat install, sync, and update requests as additive by default; do not remove, prune, or uninstall extras unless explicitly asked
