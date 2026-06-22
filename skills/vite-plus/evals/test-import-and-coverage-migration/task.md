@@ -17,6 +17,8 @@ Produce:
 
 The following files are provided as inputs. Extract them before beginning.
 
+Assume this repo is upgrading to `vite-plus@0.2.1`, whose bundled upstream Vitest version is `4.1.9`.
+
 =============== FILE: package.json ===============
 {
   "name": "@acme/parser",
@@ -29,7 +31,7 @@ The following files are provided as inputs. Extract them before beginning.
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "vite-plus": "^1.0.0",
+    "vite-plus": "0.2.1",
     "vitest": "^2.1.0",
     "@vitest/coverage-v8": "^2.1.0",
     "typescript": "^5.4.0"

@@ -38,9 +38,9 @@
       "description": "The output does NOT recommend running tests via `pnpm test`, `npm test`, or `yarn test` in updated scripts or documentation"
     },
     {
-      "name": "Coverage-v8 caveat documented",
+      "name": "Coverage dependency kept aligned",
       "max_score": 10,
-      "description": "The output notes or acknowledges that mixed-version warnings from `@vitest/coverage-v8` are a known Vite+ limitation (not a repo bug), in migration notes or comments"
+      "description": "If coverage uses `@vitest/coverage-v8`, the output keeps it on the same upstream Vitest version bundled by the installed Vite+ release and avoids introducing duplicate Vitest versions"
     }
   ]
 }

@@ -46,7 +46,8 @@ Use this reference before changing command invocations, package-manager usage, o
 
 - Use `vp upgrade` to update the global `vp` binary on the machine.
 - Use `vp update vite-plus` to move the local `vite-plus` package forward in a repo.
-- Vite+ aliases `vite` and `vitest` to `npm:@voidzero-dev/vite-plus-core@latest` and `npm:@voidzero-dev/vite-plus-test@latest`. `vp update vite-plus` does not re-resolve those aliases — update them explicitly with `vp update @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` so the lockfile fully re-resolves the Vite+ stack.
+- Keep the package-manager `vite` alias mapped to the matching `npm:@voidzero-dev/vite-plus-core@<version>`. `vp update vite-plus` does not necessarily re-resolve that alias, so update `@voidzero-dev/vite-plus-core` explicitly when moving releases.
+- For Vite+ 0.2.x and newer, remove the old `@voidzero-dev/vite-plus-test` alias/wrapper instead of updating it. `vp test` uses upstream Vitest through `vite-plus`; direct `vitest` and `@vitest/*` packages are only for repos that use upstream Vitest APIs, coverage/UI packages, or browser providers directly.
 - Use `vp outdated` to confirm whether any Vite+ packages remain behind the intended release.
 
 ## Validation Path

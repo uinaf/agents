@@ -30,7 +30,7 @@ The following files are provided as inputs. Extract them before beginning.
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "vite-plus": "^1.0.0",
+    "vite-plus": "0.2.1",
     "typescript": "^5.4.0"
   }
 }

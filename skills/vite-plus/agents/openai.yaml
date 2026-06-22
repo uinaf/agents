@@ -13,7 +13,8 @@ interface:
 
     Constraints:
     - Preserve working release or packaging logic while aligning the surrounding workflow.
-    - Surface unsupported Vite or Vitest versions as blockers before migration.
+    - Surface unsupported Vite or direct Vitest ecosystem versions as blockers before migration.
+    - Treat the removed `@voidzero-dev/vite-plus-test` wrapper as upgrade cleanup, not something to preserve.
     - Inspect local guidance files before changing workflows.
 
     Output: no conversational opener. Use bullet labels only: files changed, Vite+ shape, evidence, exceptions, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.

@@ -23,8 +23,10 @@ Some package managers (notably bun, sometimes npm) install two physical copies o
 - Keep the legacy `vitest` invocation for Workers packages until the upstream fix lands.
 - Tracking: [voidzero-dev/vite-plus#1076](https://github.com/voidzero-dev/vite-plus/issues/1076).
 
-## `@vitest/coverage-v8` mixed-version warnings
+## Vite+ 0.2.x Vitest wrapper removal
 
-Adding `@vitest/coverage-v8` to a Vite+ project can still produce a mixed-version warning during `vp test run --coverage`, even in a fresh stock scaffold.
+Vite+ 0.2.x removed `@voidzero-dev/vite-plus-test` and runs upstream Vitest directly.
 
-- Treat as a known Vite+ limitation. Verify the same warning reproduces in a fresh stock scaffold before calling it a repo bug.
+- On 0.1.x to 0.2.x upgrades, delete the wrapper from package manifests, lockfiles, catalogs, overrides, resolutions, and peer-tweak rules.
+- Plain node-mode tests should not add a direct `vitest` dependency; direct Vitest users and browser-mode projects may still need pinned upstream Vitest packages that match the bundled version.
+- If browser tests fail with `vitest/internal/browser` resolution errors under pnpm, add direct `vitest` in the package that runs browser tests at the bundled version, then reinstall cleanly if stale peer variants remain.

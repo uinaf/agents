@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly configures a TypeScript library for packaging using Vite+ conventions: using vp pack, placing pack config in vite.config.ts, using vp staged for hooks, adding pnpm overrides, and updating contributor docs.",
+  "context": "Tests whether the agent correctly configures a TypeScript library for packaging using Vite+ conventions: using vp pack, placing pack config in vite.config.ts, using vp staged for hooks, adding the required Vite core override, and updating contributor docs.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -28,9 +28,9 @@
       "description": "The output does NOT add `husky`, `lint-staged`, or `.husky/` configuration for pre-commit hooks"
     },
     {
-      "name": "pnpm overrides for vite and vitest",
+      "name": "pnpm override for Vite core",
       "max_score": 15,
-      "description": "The `package.json` includes a `pnpm.overrides` block (or equivalent) that adds overrides for the Vite+ wrapped `vite` and `vitest` packages"
+      "description": "The package-manager override/resolution/catalog keeps `vite` mapped to the matching `npm:@voidzero-dev/vite-plus-core@<version>`; it does not add the removed `@voidzero-dev/vite-plus-test` wrapper for node-mode-only tests"
     },
     {
       "name": "No direct pnpm/npm/yarn commands",

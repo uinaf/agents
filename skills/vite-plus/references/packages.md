@@ -10,16 +10,16 @@ Use this reference for standalone package repos adopting Vite+.
 
 ## Aliased Dependencies
 
-- `pnpm` repos should add overrides for Vite+ wrapped `vite` and `vitest`:
+- `pnpm` repos should keep the `vite` override pointed at Vite+ core:
 
   ```yaml
   # pnpm-workspace.yaml
   overrides:
-    vite: npm:@voidzero-dev/vite-plus-core@latest
-    vitest: npm:@voidzero-dev/vite-plus-test@latest
+    vite: npm:@voidzero-dev/vite-plus-core@<matching-vite-plus-version>
   ```
 
 - `npm` projects use `overrides` in `package.json`; Yarn projects use `resolutions`.
+- In Vite+ 0.2.x and newer, do not alias `vitest` to `@voidzero-dev/vite-plus-test`; that wrapper was removed. Plain node-mode tests should not list `vitest` directly. Keep or add direct upstream `vitest` / `@vitest/*` dependencies only for direct Vitest API usage, coverage/UI packages, or browser-mode requirements.
 
 ## Notes
 

@@ -36,9 +36,8 @@ The following files are provided as inputs. Extract them before beginning.
     "verify": "pnpm -r run verify"
   },
   "devDependencies": {
-    "vite-plus": "^1.2.0",
-    "@voidzero-dev/vite-plus-core": "^1.2.0",
-    "@voidzero-dev/vite-plus-test": "^1.2.0"
+    "vite-plus": "0.2.1",
+    "@voidzero-dev/vite-plus-core": "0.2.1"
   }
 }
 
@@ -48,8 +47,7 @@ packages:
   - 'apps/*'
 
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.1
 
 =============== FILE: packages/luminary-ui/package.json ===============
 {
@@ -71,7 +69,7 @@ overrides:
     "check": "vp check"
   },
   "devDependencies": {
-    "vite-plus": "^1.2.0",
+    "vite-plus": "0.2.1",
     "typescript": "^5.4.0"
   }
 }
@@ -90,7 +88,7 @@ overrides:
     "@luminary/ui": "workspace:*"
   },
   "devDependencies": {
-    "vite-plus": "^1.2.0"
+    "vite-plus": "0.2.1"
   }
 }
 

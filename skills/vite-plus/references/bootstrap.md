@@ -5,9 +5,9 @@ Use this reference when starting a new repo on Vite+ or converting an existing o
 ## Prerequisites
 
 - Vite 8 or newer.
-- Vitest 4.1 or newer.
+- Vitest 4.1 or newer only when the repo directly depends on `vitest` or `@vitest/*`.
 
-Vite+ does not support older upstream versions. Upgrade Vite and Vitest in the existing project first if needed.
+Vite+ does not support older upstream versions. In Vite+ 0.2.x and newer, node-mode tests normally get upstream Vitest transitively through `vite-plus`; upgrade direct Vitest ecosystem dependencies only when the project actually uses them.
 
 ## New Repo
 
@@ -27,6 +27,7 @@ Vite+ does not support older upstream versions. Upgrade Vite and Vitest in the e
 5. Reconcile generated files with the repo's real guardrails and release flow instead of assuming stock output is final.
 6. Keep useful generated agent guidance, but merge it into the repo's real guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules instead of accepting generic Vite+ boilerplate unchanged.
 7. Treat the machine-global `vp` binary and the repo-local `vite-plus` package as separate upgrade surfaces. `vp upgrade` updates the global CLI, while project dependencies should move with `vp update ...` inside the repo.
+8. For 0.1.x to 0.2.x upgrades, do not trust `vp migrate` as the only step. Remove `@voidzero-dev/vite-plus-test`, keep only the `vite` -> `@voidzero-dev/vite-plus-core` alias, and classify any direct Vitest, coverage, UI, or browser-provider usage before deciding which upstream Vitest packages must remain direct dependencies.
 
 ## Notes
 

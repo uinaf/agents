@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly handles a Vite+ version upgrade by distinguishing between the global CLI upgrade surface and the project-local upgrade surface, explicitly updating the Vite+ core and test aliases that are NOT automatically re-resolved by a simple package update, and performing the correct end-to-end validation sequence.",
+  "context": "Tests whether the agent correctly handles a Vite+ version upgrade by distinguishing between the global CLI upgrade surface and the project-local upgrade surface, explicitly updating the Vite+ core alias, removing the obsolete test wrapper, classifying direct Vitest usage, and performing the correct end-to-end validation sequence.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -23,33 +23,38 @@
       "description": "The procedure explicitly updates `@voidzero-dev/vite-plus-core` with `vp update @voidzero-dev/vite-plus-core` (or combined with other packages) — NOT relying on `vp update vite-plus` alone to re-resolve this alias"
     },
     {
-      "name": "Explicit test alias update",
+      "name": "Removed obsolete test wrapper",
       "max_score": 15,
-      "description": "The procedure explicitly updates `@voidzero-dev/vite-plus-test` with `vp update @voidzero-dev/vite-plus-test` (or combined) — NOT relying on `vp update vite-plus` alone to re-resolve this alias"
+      "description": "The procedure removes `@voidzero-dev/vite-plus-test` from dependencies, overrides/catalogs/resolutions, source references, and lockfile state instead of updating the removed wrapper"
     },
     {
       "name": "vp outdated for verification",
-      "max_score": 12,
+      "max_score": 10,
       "description": "The procedure uses `vp outdated` to confirm that all Vite+ packages are now at the intended release (not `npm outdated`, `pnpm outdated`, or omitted entirely)"
     },
     {
-      "name": "vp env current in validation",
+      "name": "Direct Vitest usage classified",
       "max_score": 8,
+      "description": "The upgrade distinguishes node-mode-only projects from projects that directly use `vitest`, `@vitest/*`, coverage/UI packages, or browser providers, and only keeps direct upstream Vitest dependencies for the latter"
+    },
+    {
+      "name": "vp env current in validation",
+      "max_score": 6,
       "description": "The end-to-end validation sequence includes `vp env current` as the first check"
     },
     {
       "name": "Full validation sequence",
-      "max_score": 10,
+      "max_score": 9,
       "description": "The validation sequence includes all of: `vp install`, `vp check`, and `vp test` (in addition to `vp env current`)"
     },
     {
       "name": "Build validation included",
-      "max_score": 5,
+      "max_score": 4,
       "description": "The validation sequence includes `vp build` or `vp pack` (as appropriate for the project type) to verify build artifacts after the upgrade"
     },
     {
       "name": "No direct package manager for Vite+ packages",
-      "max_score": 5,
+      "max_score": 3,
       "description": "The upgrade steps do NOT use `npm install`, `pnpm update`, `yarn upgrade`, or other direct package-manager commands for the Vite+ packages — all updates go through `vp update`"
     }
   ]

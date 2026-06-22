@@ -13,7 +13,7 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 
 - CI uses `voidzero-dev/setup-vp`; the action owns Node and package-manager bootstrap. Let its default `run-install: true` run `vp install`, then run `vp check`, `vp test`, and `vp build`; set `run-install: false` only when the workflow needs an explicit install step. In repos that pin GitHub Actions, pin `setup-vp` to a full commit SHA with a same-line exact version comment and let Dependabot maintain it
 - Tooling versions have one checked-in source of truth. Node comes from `.node-version`; package-manager versions come from `package.json#packageManager`; Vite+ comes from the repo's `vite-plus` dependency or workspace catalog. Do not repeat Node, pnpm, or Vite+ literals in workflows when a source file can be read
-- test files use `vite-plus/test` (and `vite-plus/test/browser/context` for browser mode)
+- test files use `vite-plus/test` (and `vite-plus/test/browser/context` for browser mode); Vite+ 0.2.x runs upstream Vitest directly and no longer uses `@voidzero-dev/vite-plus-test`
 - scripts prefer `vp dev`, `vp test`, `vp test watch`, `vp test run --coverage`, `vp pack`, `vp build`, `vp preview`, `vp update`, and `vp run <script>` (or `vpr <script>`) over direct package-manager, raw Vitest, or tsdown wiring
 - hooks use `vp config`, `.vite-hooks`, and `vp staged` as the default hook stack
 - single-source config in `vite.config.ts`: no parallel `vitest.config.ts`, `.oxlintrc*`, `.oxfmtrc*`, or `tsdown.config.ts`
@@ -21,7 +21,7 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 
 ## Workflow
 
-1. Confirm the project is on Vite 8+ and Vitest 4.1+ — Vite+ refuses older versions.
+1. Confirm the project is on Vite 8+ and, when it directly depends on Vitest or `@vitest/*`, Vitest 4.1+.
 2. Audit current scripts, workflows, Vite config, test imports, release flow, package manager, and packaging.
 3. Read [references/bootstrap.md](references/bootstrap.md) for entrypoints (`vp create`, `vp migrate`), editor/agent config, local guidance-file discovery, and validation path.
 4. Pick the shape and load only that reference: [references/packages.md](references/packages.md) for standalone packages, or [references/monorepos.md](references/monorepos.md) for workspaces.
@@ -30,7 +30,7 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 7. Update tests and coverage per [references/testing.md](references/testing.md).
 8. Check [references/commands.md](references/commands.md) before changing command invocations. Load [references/known-issues.md](references/known-issues.md) only on unexpected behavior or when upgrading Vite+.
 9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace. Verify jobs may use Vite+ dependency caches; secret-bearing release, publish, signing, and deploy jobs disable dependency caches and run fresh installs.
-10. To adopt a newer Vite+ release: `vp upgrade` (global), then `vp update vite-plus @voidzero-dev/vite-plus-core @voidzero-dev/vite-plus-test` (project). Confirm with `vp outdated`.
+10. To adopt a newer Vite+ release: `vp upgrade` (global), then update the project-local stack. For 0.2.x and newer, update `vite-plus` plus the required `vite` core alias (`@voidzero-dev/vite-plus-core`) and remove the old `@voidzero-dev/vite-plus-test` wrapper. Confirm with `vp outdated`.
 11. End-to-end validation: `vp install && vp check && vp test`, then verify `vp build` or `vp pack` artifacts, `vp preview` where applicable, `vp test run --coverage`, and `vp staged` on a staged change.
 
 ## Tooling Source Of Truth
@@ -40,6 +40,8 @@ Before changing CI, preserve one canonical version owner:
 - Node: `.node-version`; wire it through `node-version-file: ".node-version"`
 - package manager: `package.json#packageManager`
 - Vite+: the `vite-plus` dependency or workspace catalog; when CI needs an explicit `version`, derive it from that source with a structured parser
+- Vite core: keep the `vite` override/catalog/resolution pointed at the matching `npm:@voidzero-dev/vite-plus-core@<version>`
+- Vitest: do not add a `vitest` override for node-mode-only Vite+ 0.2.x projects; add direct Vitest and `@vitest/*` packages only when the project uses Vitest APIs, coverage packages, UI, or browser providers directly
 - workflow exceptions: document why the action cannot read the repo-owned source
 
 Concrete shapes:
@@ -84,4 +86,4 @@ export default defineConfig({
 
 ## Known Caveats
 
-See [references/known-issues.md](references/known-issues.md) for current upstream caveats (single-file `vp check --fix`, SSR `instanceof` failures, Cloudflare Workers tests, `@vitest/coverage-v8` mixed-version warnings).
+See [references/known-issues.md](references/known-issues.md) for current upstream caveats (single-file `vp check --fix`, SSR `instanceof` failures, Cloudflare Workers tests, Vite+ 0.2.x Vitest wrapper removal).

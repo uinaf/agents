@@ -42,17 +42,17 @@ The following files are provided as inputs. Extract them before beginning.
     "verify": "vp check && vp test run --coverage"
   },
   "devDependencies": {
-    "vite-plus": "^1.0.0",
-    "@voidzero-dev/vite-plus-core": "^1.0.0",
-    "@voidzero-dev/vite-plus-test": "^1.0.0",
+    "vite-plus": "0.1.24",
+    "@voidzero-dev/vite-plus-core": "0.1.24",
+    "@voidzero-dev/vite-plus-test": "0.1.24",
     "typescript": "^5.4.0"
   }
 }
 
 =============== FILE: pnpm-workspace.yaml ===============
 overrides:
-  vite: npm:@voidzero-dev/vite-plus-core@latest
-  vitest: npm:@voidzero-dev/vite-plus-test@latest
+  vite: npm:@voidzero-dev/vite-plus-core@0.1.24
+  vitest: npm:@voidzero-dev/vite-plus-test@0.1.24
 
 =============== FILE: vite.config.ts ===============
 import { defineConfig } from 'vite-plus'
