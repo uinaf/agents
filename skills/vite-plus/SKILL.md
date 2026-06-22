@@ -30,7 +30,7 @@ Default to this destination unless a repo-specific boundary clearly blocks it. I
 7. Update tests and coverage per [references/testing.md](references/testing.md).
 8. Check [references/commands.md](references/commands.md) before changing command invocations. Load [references/known-issues.md](references/known-issues.md) only on unexpected behavior or when upgrading Vite+.
 9. Keep repo-specific release, binary, or packaging steps Vite+ does not replace. Verify jobs may use Vite+ dependency caches; secret-bearing release, publish, signing, and deploy jobs disable dependency caches and run fresh installs.
-10. To adopt a newer Vite+ release: `vp upgrade` (global), then update the project-local stack. For 0.2.x and newer, update `vite-plus` plus the required `vite` core alias (`@voidzero-dev/vite-plus-core`) and remove the old `@voidzero-dev/vite-plus-test` wrapper. Confirm with `vp outdated`.
+10. To adopt a newer Vite+ release: `vp upgrade` (global), then update the project-local stack. For 0.2.x and newer, update `vite-plus` plus the required explicit `vite` alias to `@voidzero-dev/vite-plus-core`, refresh the lockfile until the importer records that alias, and remove the old `@voidzero-dev/vite-plus-test` wrapper. Confirm with `vp outdated`.
 11. End-to-end validation: `vp install && vp check && vp test`, then verify `vp build` or `vp pack` artifacts, `vp preview` where applicable, `vp test run --coverage`, and `vp staged` on a staged change.
 
 ## Tooling Source Of Truth
@@ -40,7 +40,7 @@ Before changing CI, preserve one canonical version owner:
 - Node: `.node-version`; wire it through `node-version-file: ".node-version"`
 - package manager: `package.json#packageManager`
 - Vite+: the `vite-plus` dependency or workspace catalog; when CI needs an explicit `version`, derive it from that source with a structured parser
-- Vite core: keep the `vite` override/catalog/resolution pointed at the matching `npm:@voidzero-dev/vite-plus-core@<version>`
+- Vite core: keep the `vite` manifest dependency plus package-manager override/catalog/resolution pointed at the matching `npm:@voidzero-dev/vite-plus-core@<version>`
 - Vitest: do not add a `vitest` override for node-mode-only Vite+ 0.2.x projects; add direct Vitest and `@vitest/*` packages only when the project uses Vitest APIs, coverage packages, UI, or browser providers directly
 - workflow exceptions: document why the action cannot read the repo-owned source
 

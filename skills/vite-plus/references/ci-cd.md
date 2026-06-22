@@ -33,6 +33,7 @@ Prefer the documented Vite+ setup:
 ## Defaults
 
 - Prefer `voidzero-dev/setup-vp` over hand-rolled Node/Corepack bootstrapping unless the repo has a proven exception. In repos that pin Actions, use a full commit SHA with a same-line exact version comment and a `github-actions` Dependabot entry so updates stay reviewable.
+- Treat `setup-vp` as the CI `vp` provider. Do not add `GITHUB_PATH`, `node_modules/.bin`, `pnpm exec vp`, or similar PATH workarounds to prefer the project binary; if plain `vp` fails under the official action, verify against `setup-vp` or the official installer before changing workflow shape.
 - Prefer `setup-vp`'s built-in Node and package-manager bootstrap over adding separate CI-time `vp env` setup steps unless the repo has a specific environment need the action does not cover.
 - Prefer `setup-vp`'s default install step over a separate `vp install` when Vite+ is the tool owner. Set `run-install: false` only when the workflow needs to pass custom install arguments or control install as a separate step.
 - Prefer `vp config` when the repo wants stock hooks or agent integration instead of hand-rolled hook setup.
