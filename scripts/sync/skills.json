@@ -29,6 +29,10 @@
       "source": "uinaf/agents"
     },
     {
+      "name": "grilling",
+      "source": "mattpocock/skills"
+    },
+    {
       "name": "react-ban-use-effect",
       "source": "uinaf/agents"
     },
