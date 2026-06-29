@@ -11,6 +11,7 @@ interface:
     - Use Codex by default; use Claude when requested.
     - Let long reviews continue while heartbeat/progress output is advancing.
     - Use review panels only when explicitly requested or when risk justifies the extra spend.
+    - Keep review-triggered fixes inside the original task scope; stop and report when a finding needs broader design, ownership, or release-process decisions.
     - Findings are verified against real code before any fix is accepted.
     - Focused tests or proof are rerun after review-triggered code changes.
     - The final report names the review command, proof run, accepted/rejected findings, and clean result.
@@ -19,6 +20,7 @@ interface:
     - Treat review output as advisory.
     - Ordinary review verdicts are outside this closeout helper.
     - Do not push just to review.
+    - `--prompt-file` and `--dataset` inputs must be repo-relative.
     - Resolve the bundled helper from the skill directory; do not look for `scripts/autoreview` in the target repo.
 
     Output: compact closeout with command used, proof run, findings accepted/rejected, and the final clean review result or conscious rejection.

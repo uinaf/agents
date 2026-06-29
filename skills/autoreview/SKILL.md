@@ -7,7 +7,7 @@ description: "Run structured Codex/Claude autoreview closeout for local changes,
 
 Run the bundled structured review helper as a closeout check. This is code review, not Guardian `auto_review` approval routing.
 
-Codex review is the default when no engine is set. It usually delivers the best review results and should remain the normal final closeout engine.
+Codex review is the default when no engine is set. It uses the helper's built-in Codex model default unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in Claude model default unless overridden.
 
 Use when:
 
@@ -18,17 +18,18 @@ Use when:
 ## Contract
 
 - Treat review output as advisory: verify every finding against real code, adjacent files, and dependency docs/types when relevant.
-- Reject unrealistic edge cases, speculative risks, broad rewrites, and fixes that over-complicate the codebase.
-- Prefer small fixes at the right ownership boundary; no refactor unless it clearly improves the bug class.
-- When an accepted finding shows a bug class or repeated pattern, inspect the current PR scope for sibling instances before fixing.
-- Keep going until structured review returns no accepted/actionable findings; if a review-triggered fix changes code, rerun focused tests and review.
-- Never switch or override the requested review engine/model. If the review hits model capacity, retry the same command a few times with the same engine/model.
-- Security perspective is always included, but it should not cripple legitimate functionality. Report security findings only when the change creates a concrete, actionable risk or removes an important safety check.
-- Do not invoke built-in `codex review`, nested reviewers, or reviewer panels from inside the review. The helper builds one bundle, calls one selected engine, validates one structured result, and stops.
-- Multi-reviewer panels are opt-in only. Use them when explicitly requested or when risk justifies the extra spend; the main agent still verifies every accepted finding before fixing.
-- Do not push just to review. Push only when the user requested push/ship/PR update.
+- Reject speculative or over-broad findings; fix accepted issues with the smallest change at the right ownership boundary.
+- When a finding exposes a repeated bug class, inspect the current PR scope for sibling instances before fixing.
+- Keep review-triggered fixes inside the original task scope; use [references/scope.md](references/scope.md) before accepting anything broader.
+- If a review-triggered fix changes code, rerun focused proof plus autoreview until the helper exits cleanly; stop there.
+- Honor the requested engine/model, do not invoke nested reviewers, and use review panels only when explicitly requested or risk justifies them.
+- Do not push just to review. Push only when the user requested push, ship, or PR update.
 
-Use [references/troubleshooting.md](references/troubleshooting.md) for heartbeat patience, Gitcrawl repair, provenance, security-suppression, and other edge-case closeout rules.
+Use [references/troubleshooting.md](references/troubleshooting.md) for heartbeat patience, Gitcrawl repair, regression provenance, security-suppression, and conscious-rejection rules.
+
+## Scope And Release Guardrails
+
+Use [references/scope.md](references/scope.md) before accepting review-triggered fixes that could expand the task, touch release process, or exceed two patch cycles.
 
 ## Core Workflow
 
@@ -88,10 +89,10 @@ Branch/PR work:
 "$AUTOREVIEW" --mode branch --base origin/main
 ```
 
-Optional review context is first-class:
+Optional review context is first-class. Prompt files and datasets must be repo-relative so review bundles cannot pull arbitrary host files:
 
 ```bash
-"$AUTOREVIEW" --mode branch --base origin/main --prompt-file /tmp/review-notes.md --dataset /tmp/evidence.json
+"$AUTOREVIEW" --mode branch --base origin/main --prompt-file review-notes.md --dataset evidence.json
 ```
 
 If an open PR exists, use its actual base:
@@ -142,15 +143,24 @@ Set reviewer models and thinking/effort explicitly:
 "$AUTOREVIEW" --reviewers codex,claude --model codex=gpt-5.1 --thinking codex=high --model claude=sonnet --thinking claude=max
 ```
 
-Inline syntax is also supported:
+Inline syntax is also supported for simple model IDs:
 
 ```bash
-"$AUTOREVIEW" --reviewers codex:gpt-5.1:high,claude:sonnet:max
+"$AUTOREVIEW" --reviewers codex:gpt-5.5:high,claude:claude-fable-5:max
 ```
 
 Codex maps thinking to `model_reasoning_effort` and accepts `low`, `medium`,
 `high`, or `xhigh`. Claude maps thinking to `--effort` and also accepts `max`.
-Engines without a real thinking knob reject `--thinking`.
+
+For models with slashes or extra colons, prefer keyed form:
+
+```bash
+"$AUTOREVIEW" --reviewers codex,claude --model codex=gpt-5.5 --model claude=claude-fable-5
+```
+
+## Engine Details
+
+Use [references/engine-details.md](references/engine-details.md) for model defaults, environment overrides, Claude fallback models, and Codex/Claude isolation details.
 
 ## Context Efficiency
 
@@ -172,22 +182,11 @@ The smoke harness has thin shell wrappers over a shared Python implementation:
 
 The helper:
 
-- chooses dirty local changes first
-- accepts `--mode uncommitted` as an alias for `--mode local`
-- otherwise uses current PR base if `gh pr view` works
-- otherwise uses `origin/main` for non-main branches
-- supports `--engine codex` and `claude`; default is `AUTOREVIEW_ENGINE` or `codex`; Codex should remain the default when nothing is set
-- resolves bare `git`, `gh`, and reviewer commands from absolute `PATH` entries only, never from the reviewed checkout; explicit relative `--*-bin` paths are resolved from the reviewed repository root
-- use `--mode commit --commit <ref>` for already-committed work, especially clean `main` after landing
-- should be left in `--mode auto` or forced to `--mode branch` for PR/branch work; do not force `--mode local` after committing
-- writes only to stdout unless `--output`, `--json-output`, or live streamed engine stderr is set
-- supports `--dry-run`, `--parallel-tests`, `--prompt`, `--prompt-file`, `--dataset`, `--no-tools`, `--no-web-search`, and commit refs
-- supports `--stream-engine-output` or `AUTOREVIEW_STREAM_ENGINE_OUTPUT=1` for live engine text while preserving structured validation; Codex and Claude hide tool/file event details, emit compact activity summaries, and report usage at turn completion
-- supports opt-in review panels with `--panel` / `--reviewers`, plus per-engine `--model` and `--thinking`
-- allows read-only tools and web search by default where the selected CLI supports them; forbids nested review in the prompt; Codex is run through `codex exec` with read-only sandbox and structured output
-- prints `review still running: <engine> elapsed=<seconds>s pid=<pid>` to stderr at long-running intervals while waiting for the selected review engine, unless streamed output or compact Codex activity has been visible recently
-- prints `autoreview clean: no accepted/actionable findings reported` when the selected review command exits 0
-- exits nonzero when accepted/actionable findings are present
+- chooses dirty local changes first, otherwise PR base, otherwise `origin/main` for non-main branches; branch review does not fetch automatically.
+- supports Codex and Claude only; Codex is the default, and panels are opt-in with `--panel` or `--reviewers`.
+- treats `--prompt-file` and `--dataset` as repo-relative inputs, with sensitive paths, symlinks, oversized content, and secret-looking values guarded.
+- resolves commands safely outside the reviewed checkout and runs reviewers with read-only/tool-isolated settings; see [references/engine-details.md](references/engine-details.md).
+- prints a clean line and exits 0 when no accepted/actionable findings remain; exits nonzero when accepted/actionable findings are present.
 
 ## Final Report
 
@@ -203,4 +202,6 @@ Do not run another review solely to improve the final report wording. If the fin
 ## References
 
 - [references/troubleshooting.md](references/troubleshooting.md) - security-audit suppression and other edge-case closeout notes
+- [references/scope.md](references/scope.md) - scope governor and release-branch freeze rules
+- [references/engine-details.md](references/engine-details.md) - model defaults, environment overrides, and engine isolation details
 - [references/upstream.md](references/upstream.md) - OpenClaw upstream provenance and local packaging notes

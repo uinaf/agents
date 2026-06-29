@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import concurrent.futures
 import copy
 import json
 import os
 import queue
+import re
 import subprocess
 import sys
 import tempfile
@@ -18,10 +20,79 @@ from typing import Any, Callable
 
 
 ENGINES = ("codex", "claude")
+ALL_REVIEWERS = ("codex", "claude")
+SAFE_GIT_CONFIG_ARGS = (
+    "-c",
+    "core.fsmonitor=false",
+    "-c",
+    "core.pager=cat",
+    "-c",
+    "diff.external=",
+    "-c",
+    "diff.renames=false",
+    "-c",
+    "pager.diff=cat",
+    "-c",
+    "pager.log=cat",
+    "-c",
+    "pager.show=cat",
+)
+SAFE_DIFF_FLAGS = ("--no-ext-diff", "--no-textconv", "--no-renames")
+ENGINE_GIT_CONFIG_OVERRIDES = (
+    ("core.fsmonitor", "false"),
+    ("core.pager", "cat"),
+    ("diff.external", ""),
+    ("diff.renames", "false"),
+    ("pager.diff", "cat"),
+    ("pager.log", "cat"),
+    ("pager.show", "cat"),
+)
+SENSITIVE_PATH_PARTS = {
+    ".aws",
+    ".azure",
+    ".config/gcloud",
+    ".docker",
+    ".gnupg",
+    ".ssh",
+    "private",
+    "secrets",
+}
+SENSITIVE_NAME_PATTERNS = [
+    re.compile(r"(^|/)\.env($|[._/-])", re.IGNORECASE),
+    re.compile(r"(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)(\.pub)?$", re.IGNORECASE),
+    re.compile(r"\.(pem|p12|pfx|key)$", re.IGNORECASE),
+    re.compile(
+        r"(^|/)[^/]*(secret|token|credential|credentials|service[-_]?account|private[-_]?key|apikey|api[-_]?key)[^/]*$",
+        re.IGNORECASE,
+    ),
+]
+SECRET_VALUE_PATTERNS = [
+    re.compile(r"-----BEGIN (?:RSA |DSA |EC |OPENSSH |PGP )?PRIVATE KEY-----"),
+    re.compile(
+        r"(?i)(api[_-]?key|token|secret|password)\s*[:=]\s*(?:[\"'][A-Za-z0-9_./+=-]{12,}[\"']|[A-Za-z0-9_+=/-]{20,})"
+    ),
+    re.compile(r"(?i)bearer\s+[A-Za-z0-9._-]{20,}"),
+    re.compile(r"\b(?:sk|rk|pk|org|proj)-[A-Za-z0-9_-]{20,}\b"),
+    re.compile(r"\bgithub_pat_[A-Za-z0-9_]{20,}\b"),
+    re.compile(r"\bgh[pousr]_[A-Za-z0-9_]{20,}\b"),
+    re.compile(r"\bglpat-[A-Za-z0-9_-]{20,}\b"),
+    re.compile(r"\bnpm_[A-Za-z0-9]{20,}\b"),
+    re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{20,}\b"),
+    re.compile(r"\b(?:A3T|AKIA|ASIA)[A-Z0-9]{16}\b"),
+    re.compile(r"\bAIza[0-9A-Za-z_-]{35}\b"),
+    re.compile(r"\bya29\.[0-9A-Za-z_-]{20,}\b"),
+]
+MAX_BUNDLE_TEXT_BYTES = 180_000
+DEFAULT_ENGINE_PATHS = ("/usr/local/bin", "/usr/bin", "/bin")
+DEFAULT_MODEL_BY_ENGINE = {
+    "codex": "gpt-5.5",
+    "claude": "claude-fable-5",
+}
 THINKING_LEVELS_BY_ENGINE = {
-    "codex": {"low", "medium", "high", "xhigh"},
+    "codex": {"none", "minimal", "low", "medium", "high", "xhigh"},
     "claude": {"low", "medium", "high", "xhigh", "max"},
 }
+CLAUDE_SAFE_MODE_MIN_VERSION = (2, 1, 169)
 
 
 SCHEMA: dict[str, Any] = {
@@ -78,7 +149,14 @@ SCHEMA: dict[str, Any] = {
 }
 
 
-def run(args: list[str], cwd: Path, *, input_text: str | None = None, check: bool = True) -> subprocess.CompletedProcess[str]:
+def run(
+    args: list[str],
+    cwd: Path,
+    *,
+    input_text: str | None = None,
+    check: bool = True,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
     result = subprocess.run(
         args,
         cwd=cwd,
@@ -86,11 +164,209 @@ def run(args: list[str], cwd: Path, *, input_text: str | None = None, check: boo
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        env=env,
     )
     if check and result.returncode != 0:
         cmd = " ".join(args)
         raise SystemExit(f"command failed ({result.returncode}): {cmd}\n{result.stderr or result.stdout}")
     return result
+
+
+def subprocess_env(extra: dict[str, str] | None) -> dict[str, str] | None:
+    if not extra:
+        return None
+    merged = os.environ.copy()
+    merged.update(extra)
+    return merged
+
+
+def safe_git_env() -> dict[str, str]:
+    return {
+        "GIT_CONFIG_GLOBAL": os.devnull,
+        "GIT_CONFIG_NOSYSTEM": "1",
+        "GIT_CONFIG_SYSTEM": os.devnull,
+        "GIT_OPTIONAL_LOCKS": "0",
+        "GIT_TERMINAL_PROMPT": "0",
+        "HOME": os.environ.get("HOME", str(Path.home())),
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "PATH": os.pathsep.join(DEFAULT_ENGINE_PATHS),
+    }
+
+
+def safe_engine_path(repo: Path, extra_paths: list[Path] | None = None) -> str:
+    entries: list[str] = []
+    resolved_repo = repo.resolve()
+
+    def add(path: str | Path) -> None:
+        candidate = Path(path).expanduser()
+        if not candidate.is_absolute() or not candidate.exists():
+            return
+        try:
+            resolved = candidate.resolve()
+        except OSError:
+            return
+        if is_within(resolved, resolved_repo):
+            return
+        value = str(resolved)
+        if value not in entries:
+            entries.append(value)
+
+    for path in extra_paths or []:
+        add(path)
+    for part in os.environ.get("PATH", "").split(os.pathsep):
+        if part:
+            add(part)
+    for path in DEFAULT_ENGINE_PATHS:
+        add(path)
+    return os.pathsep.join(entries)
+
+
+def safe_engine_env(
+    repo: Path,
+    extra_paths: list[Path] | None = None,
+    extra: dict[str, str] | None = None,
+) -> dict[str, str]:
+    blocked_exact = {
+        "BASH_ENV",
+        "ENV",
+        "GIT_CONFIG",
+        "GIT_CONFIG_GLOBAL",
+        "GIT_CONFIG_NOSYSTEM",
+        "GIT_CONFIG_SYSTEM",
+        "GIT_OPTIONAL_LOCKS",
+        "GIT_TERMINAL_PROMPT",
+        "LD_PRELOAD",
+        "NODE_OPTIONS",
+        "PYTHONHOME",
+        "PYTHONPATH",
+    }
+    blocked_prefixes = ("GIT_", "DYLD_")
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if key not in blocked_exact and not any(key.startswith(prefix) for prefix in blocked_prefixes)
+    }
+    env["PATH"] = safe_engine_path(repo, extra_paths)
+    env["GIT_CONFIG_COUNT"] = str(len(ENGINE_GIT_CONFIG_OVERRIDES))
+    for index, (key, value) in enumerate(ENGINE_GIT_CONFIG_OVERRIDES):
+        env[f"GIT_CONFIG_KEY_{index}"] = key
+        env[f"GIT_CONFIG_VALUE_{index}"] = value
+    env.update(extra or {})
+    return env
+
+
+def parse_ps_time(value: str) -> float:
+    try:
+        day_text, clock = value.strip().split("-", 1) if "-" in value else ("0", value.strip())
+        parts = clock.split(":")
+        if not parts or len(parts) > 3:
+            return 0.0
+        total = float(parts[-1])
+        if len(parts) >= 2:
+            total += int(parts[-2]) * 60
+        if len(parts) == 3:
+            total += int(parts[-3]) * 3600
+        return int(day_text) * 86400 + total
+    except (IndexError, ValueError):
+        return 0.0
+
+
+def process_pids(repo: Path, pid: int) -> list[str]:
+    ps = find_command("ps", repo)
+    if not ps:
+        return [str(pid)]
+    result = subprocess.run(
+        [ps, "-A", "-o", "pid=", "-o", "ppid="],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.DEVNULL,
+        check=False,
+    )
+    if result.returncode != 0:
+        return [str(pid)]
+    pids = [str(pid)]
+    for line in result.stdout.splitlines():
+        fields = line.split()
+        if len(fields) == 2 and fields[1] == str(pid):
+            pids.append(fields[0])
+    return pids
+
+
+def sample_process_metrics(repo: Path, pid: int) -> tuple[float, float, int, str] | None:
+    ps = find_command("ps", repo)
+    if not ps:
+        return None
+    try:
+        result = subprocess.run(
+            [
+                ps,
+                "-o",
+                "state=",
+                "-o",
+                "rss=",
+                "-o",
+                "time=",
+                "-p",
+                ",".join(process_pids(repo, pid)),
+            ],
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            check=False,
+        )
+    except OSError:
+        return None
+    if result.returncode != 0:
+        return None
+
+    cpu_seconds = 0.0
+    rss_kb = 0
+    states: list[str] = []
+    for line in result.stdout.splitlines():
+        fields = line.split()
+        if len(fields) < 3:
+            continue
+        states.append(fields[0][:1] or "?")
+        try:
+            rss_kb += int(fields[1])
+        except ValueError:
+            pass
+        cpu_seconds += parse_ps_time(fields[2])
+    if not states:
+        return None
+    return (time.monotonic(), cpu_seconds, rss_kb, ",".join(sorted(set(states))))
+
+
+def format_process_metrics(
+    previous: tuple[float, float, int, str] | None,
+    current: tuple[float, float, int, str] | None,
+) -> str:
+    if current is None:
+        return ""
+    interval = max(0.0, current[0] - previous[0]) if previous else 0.0
+    cpu_delta = max(0.0, current[1] - previous[1]) if previous else 0.0
+    cpu_percent = (cpu_delta / interval * 100) if interval > 0 else 0.0
+    rss_mb = int(round(current[2] / 1024))
+    interval_seconds = int(interval) if interval else 0
+    return (
+        f" cpu={cpu_delta:.1f}s/{interval_seconds}s({cpu_percent:.0f}%)"
+        f" rss={rss_mb}M state={current[3]}"
+    )
+
+
+def emit_heartbeat(
+    label: str,
+    repo: Path,
+    started: float,
+    proc: subprocess.Popen,
+    metrics: tuple[float, float, int, str] | None,
+) -> tuple[float, float, int, str] | None:
+    elapsed = int(time.monotonic() - started)
+    next_metrics = sample_process_metrics(repo, proc.pid)
+    metrics_text = format_process_metrics(metrics, next_metrics)
+    print(f"review still running: {label} elapsed={elapsed}s pid={proc.pid}{metrics_text}", file=sys.stderr, flush=True)
+    return next_metrics or metrics
 
 
 def run_with_heartbeat(
@@ -102,7 +378,10 @@ def run_with_heartbeat(
     heartbeat_seconds: int = 60,
     stream_output: bool = False,
     stream_display: Callable[[str, str], str | None] | None = None,
+    env: dict[str, str] | None = None,
+    resolve_root: Path | None = None,
 ) -> subprocess.CompletedProcess[str]:
+    resolve_root = resolve_root or cwd
     if stream_output:
         return run_with_stream(
             args,
@@ -111,6 +390,8 @@ def run_with_heartbeat(
             label=label,
             heartbeat_seconds=heartbeat_seconds,
             stream_display=stream_display,
+            env=env,
+            resolve_root=resolve_root,
         )
     started = time.monotonic()
     proc = subprocess.Popen(
@@ -120,8 +401,10 @@ def run_with_heartbeat(
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        env=env,
     )
     first_communicate = True
+    metrics = sample_process_metrics(resolve_root, proc.pid)
     while True:
         try:
             stdout, stderr = proc.communicate(
@@ -131,8 +414,7 @@ def run_with_heartbeat(
             return subprocess.CompletedProcess(args, int(proc.returncode or 0), stdout, stderr)
         except subprocess.TimeoutExpired:
             first_communicate = False
-            elapsed = int(time.monotonic() - started)
-            print(f"review still running: {label} elapsed={elapsed}s pid={proc.pid}", file=sys.stderr, flush=True)
+            metrics = emit_heartbeat(label, resolve_root, started, proc, metrics)
 
 
 def run_with_stream(
@@ -143,6 +425,8 @@ def run_with_stream(
     label: str,
     heartbeat_seconds: int,
     stream_display: Callable[[str, str], str | None] | None,
+    env: dict[str, str] | None = None,
+    resolve_root: Path,
 ) -> subprocess.CompletedProcess[str]:
     started = time.monotonic()
     proc = subprocess.Popen(
@@ -153,6 +437,7 @@ def run_with_stream(
         stderr=subprocess.PIPE,
         text=True,
         bufsize=1,
+        env=env,
     )
     events: queue.Queue[tuple[str, str | None]] = queue.Queue()
     stdout_parts: list[str] = []
@@ -182,14 +467,14 @@ def run_with_stream(
         thread.start()
     stdin_thread = threading.Thread(target=write_stdin, daemon=True)
     stdin_thread.start()
+    metrics = sample_process_metrics(resolve_root, proc.pid)
 
     open_streams = 2
     while open_streams:
         try:
             name, line = events.get(timeout=heartbeat_seconds)
         except queue.Empty:
-            elapsed = int(time.monotonic() - started)
-            print(f"review still running: {label} elapsed={elapsed}s pid={proc.pid}", file=sys.stderr, flush=True)
+            metrics = emit_heartbeat(label, resolve_root, started, proc, metrics)
             continue
         if line is None:
             open_streams -= 1
@@ -212,7 +497,16 @@ def run_with_stream(
 
 
 def git(repo: Path, *args: str, check: bool = True) -> str:
-    return run([resolve_command("git", repo), *args], repo, check=check).stdout
+    return run(
+        [resolve_command("git", repo), "--no-optional-locks", *SAFE_GIT_CONFIG_ARGS, *args],
+        repo,
+        check=check,
+        env=safe_git_env(),
+    ).stdout
+
+
+def git_path_list(repo: Path, *args: str, check: bool = True) -> list[str]:
+    return [path for path in git(repo, *args, check=check).split("\0") if path]
 
 
 def repo_root() -> Path:
@@ -222,10 +516,11 @@ def repo_root() -> Path:
     if not git_bin:
         raise SystemExit("git executable not found. Install Git or add it to PATH.")
     result = subprocess.run(
-        [git_bin, "rev-parse", "--show-toplevel"],
+        [git_bin, "--no-optional-locks", *SAFE_GIT_CONFIG_ARGS, "rev-parse", "--show-toplevel"],
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
+        env=safe_git_env(),
     )
     if result.returncode != 0:
         raise SystemExit("autoreview must run inside a git repository")
@@ -331,6 +626,23 @@ def first_executable_candidate(path: Path, *, reject_root: Path | None = None) -
     return None
 
 
+def validate_git_ref(repo: Path, ref: str, label: str) -> str:
+    if not ref or ref.startswith("-") or ":" in ref or "\0" in ref or any(char.isspace() for char in ref):
+        raise SystemExit(f"unsafe {label} ref: {ref}")
+    result = git(
+        repo,
+        "rev-parse",
+        "--verify",
+        "--quiet",
+        "--end-of-options",
+        f"{ref}^{{commit}}",
+        check=False,
+    )
+    if not result:
+        raise SystemExit(f"unknown {label} ref: {ref}")
+    return ref
+
+
 def bounded(text: str, limit: int = 180_000) -> str:
     if len(text) <= limit:
         return text
@@ -344,29 +656,139 @@ def bounded_field(text: str, limit: int) -> str:
     return text[: max(0, limit - len(suffix))] + suffix
 
 
-def read_text(path: Path, limit: int = 40_000) -> str:
+def read_prefix(path: Path, limit: int) -> tuple[bytes, bool]:
     try:
-        data = path.read_bytes()
+        with path.open("rb") as handle:
+            data = handle.read(limit + 1)
     except OSError as exc:
+        raise SystemExit(f"unreadable file: {path}: {exc}") from exc
+    return data[:limit], len(data) > limit
+
+
+def read_text(path: Path, limit: int = MAX_BUNDLE_TEXT_BYTES) -> str:
+    try:
+        data, truncated = read_prefix(path, limit)
+    except SystemExit as exc:
         return f"[unreadable: {exc}]"
     if b"\0" in data:
         return "[binary file omitted]"
     text = data.decode("utf-8", errors="replace")
-    return bounded(text, limit)
+    if len(text) > limit:
+        text = text[:limit]
+        truncated = True
+    if truncated:
+        return text + f"\n\n[truncated at {limit} characters]\n"
+    return text
+
+
+def path_has_sensitive_part(rel: str | Path) -> bool:
+    normalized = Path(rel).as_posix().lower()
+    if "/.config/gcloud/" in f"/{normalized}/":
+        return True
+    return any(part.lower() in SENSITIVE_PATH_PARTS for part in Path(rel).parts)
+
+
+def raw_repo_path_has_symlink_component(repo: Path, rel_path: Path) -> bool:
+    current = repo.resolve()
+    for part in rel_path.parts:
+        current = current / part
+        if current.is_symlink():
+            return True
+        if not current.exists():
+            break
+    return False
+
+
+def secret_text_risk(text: str) -> bool:
+    return any(pattern.search(text) for pattern in SECRET_VALUE_PATTERNS)
+
+
+def require_no_secret_values(label: str, text: str) -> None:
+    if secret_text_risk(text):
+        raise SystemExit(
+            "refusing to include secret-like content in review bundle; "
+            f"clean or redact {label} before running autoreview"
+        )
+
+
+def file_bundle_risk(
+    repo: Path,
+    path: Path,
+    rel: str,
+    *,
+    allow_binary_omission: bool = False,
+) -> str | None:
+    normalized = rel.replace(os.sep, "/")
+    if path_has_sensitive_part(normalized):
+        return "sensitive path"
+    for pattern in SENSITIVE_NAME_PATTERNS:
+        if pattern.search(normalized):
+            return "sensitive filename"
+    if path.is_symlink():
+        return "symlink"
+    try:
+        resolved = path.resolve(strict=True)
+    except OSError as exc:
+        return f"unreadable file: {exc}"
+    if not is_within(resolved, repo.resolve()):
+        return "path outside repository"
+    if not path.is_file():
+        return "not a regular file"
+    try:
+        data, _ = read_prefix(path, MAX_BUNDLE_TEXT_BYTES)
+    except SystemExit as exc:
+        return str(exc)
+    if b"\0" in data:
+        return None if allow_binary_omission else "binary file"
+    if secret_text_risk(data.decode("utf-8", errors="replace")):
+        return "secret-like content"
+    return None
+
+
+def safe_untracked_files(repo: Path) -> list[str]:
+    files = git_path_list(repo, "ls-files", "--others", "--exclude-standard", "-z")
+    blocked: list[str] = []
+    included: list[str] = []
+    for rel in files:
+        risk = file_bundle_risk(repo, repo / rel, rel, allow_binary_omission=True)
+        if risk:
+            blocked.append(f"{rel} ({risk})")
+        else:
+            included.append(rel)
+    if blocked:
+        details = "\n".join(f"- {item}" for item in blocked[:20])
+        more = f"\n... {len(blocked) - 20} more" if len(blocked) > 20 else ""
+        raise SystemExit(
+            "refusing to include untracked sensitive files in review bundle; "
+            "stage, ignore, remove, or redact them before running autoreview:\n"
+            f"{details}{more}"
+        )
+    return included
+
+
+def local_status(repo: Path, untracked: list[str]) -> str:
+    status = git(repo, "status", "--short", "--untracked-files=no").rstrip()
+    lines = [status] if status else []
+    lines.extend(f"?? {rel}" for rel in untracked)
+    return "\n".join(lines)
 
 
 def local_bundle(repo: Path) -> str:
+    staged_patch = git(repo, "diff", *SAFE_DIFF_FLAGS, "--cached", "--patch")
+    unstaged_patch = git(repo, "diff", *SAFE_DIFF_FLAGS, "--patch")
+    untracked = safe_untracked_files(repo)
+    if not staged_patch.strip() and not unstaged_patch.strip() and not untracked:
+        raise SystemExit("no local changes to review")
     parts = [
         "# Git Status",
-        git(repo, "status", "--short"),
+        local_status(repo, untracked),
         "# Staged Diff",
-        git(repo, "diff", "--cached", "--stat"),
-        bounded(git(repo, "diff", "--cached", "--patch", "--find-renames")),
+        git(repo, "diff", *SAFE_DIFF_FLAGS, "--cached", "--stat"),
+        bounded(staged_patch),
         "# Unstaged Diff",
-        git(repo, "diff", "--stat"),
-        bounded(git(repo, "diff", "--patch", "--find-renames")),
+        git(repo, "diff", *SAFE_DIFF_FLAGS, "--stat"),
+        bounded(unstaged_patch),
     ]
-    untracked = [line for line in git(repo, "ls-files", "--others", "--exclude-standard").splitlines() if line]
     if untracked:
         parts.append("# Untracked Files")
         for rel in untracked:
@@ -376,24 +798,57 @@ def local_bundle(repo: Path) -> str:
 
 
 def branch_bundle(repo: Path, base_ref: str) -> str:
-    git(repo, "fetch", "origin", "--quiet", check=False)
+    base_ref = validate_git_ref(repo, base_ref, "base")
+    branch_patch = git(
+        repo,
+        "diff",
+        *SAFE_DIFF_FLAGS,
+        "--patch",
+        "--end-of-options",
+        f"{base_ref}...HEAD",
+    )
     return "\n\n".join(
         [
             "# Branch Diff",
             f"base: {base_ref}",
-            git(repo, "diff", "--stat", f"{base_ref}...HEAD"),
-            bounded(git(repo, "diff", "--patch", "--find-renames", f"{base_ref}...HEAD")),
+            git(
+                repo,
+                "diff",
+                *SAFE_DIFF_FLAGS,
+                "--stat",
+                "--end-of-options",
+                f"{base_ref}...HEAD",
+            ),
+            bounded(branch_patch),
         ]
     )
 
 
 def commit_bundle(repo: Path, commit_ref: str) -> str:
+    commit_ref = validate_git_ref(repo, commit_ref, "commit")
+    commit_patch = git(
+        repo,
+        "show",
+        *SAFE_DIFF_FLAGS,
+        "--patch",
+        "--format=fuller",
+        "--end-of-options",
+        commit_ref,
+    )
     return "\n\n".join(
         [
             "# Commit Diff",
             f"commit: {commit_ref}",
-            git(repo, "show", "--stat", "--format=fuller", commit_ref),
-            bounded(git(repo, "show", "--patch", "--find-renames", "--format=fuller", commit_ref)),
+            git(
+                repo,
+                "show",
+                *SAFE_DIFF_FLAGS,
+                "--stat",
+                "--format=fuller",
+                "--end-of-options",
+                commit_ref,
+            ),
+            bounded(commit_patch),
         ]
     )
 
@@ -401,45 +856,110 @@ def commit_bundle(repo: Path, commit_ref: str) -> str:
 def review_paths(repo: Path, target: str, target_ref: str | None, commit_ref: str) -> set[str]:
     names: set[str] = set()
     if target == "local":
-        sources = [
-            git(repo, "diff", "--name-only", "--cached"),
-            git(repo, "diff", "--name-only"),
-            git(repo, "ls-files", "--others", "--exclude-standard"),
-        ]
+        names.update(git_path_list(repo, "diff", *SAFE_DIFF_FLAGS, "--name-only", "--cached", "-z"))
+        names.update(git_path_list(repo, "diff", *SAFE_DIFF_FLAGS, "--name-only", "-z"))
+        names.update(safe_untracked_files(repo))
     elif target == "branch":
         assert target_ref
-        sources = [git(repo, "diff", "--name-only", f"{target_ref}...HEAD")]
+        target_ref = validate_git_ref(repo, target_ref, "base")
+        names.update(
+            git_path_list(
+                repo,
+                "diff",
+                *SAFE_DIFF_FLAGS,
+                "--name-only",
+                "-z",
+                "--end-of-options",
+                f"{target_ref}...HEAD",
+            )
+        )
     else:
-        sources = [git(repo, "show", "--name-only", "--format=", commit_ref)]
-    for source in sources:
-        for line in source.splitlines():
-            path = line.strip()
-            if path:
-                names.add(path)
+        commit_ref = validate_git_ref(repo, commit_ref, "commit")
+        names.update(
+            git_path_list(
+                repo,
+                "show",
+                *SAFE_DIFF_FLAGS,
+                "--name-only",
+                "--format=",
+                "-z",
+                "--end-of-options",
+                commit_ref,
+            )
+        )
     return names
 
 
-def load_extra_prompt(args: argparse.Namespace) -> str:
+def validate_evidence_file(repo: Path, raw_path: str, label: str) -> tuple[Path, str]:
+    original = Path(raw_path)
+    if original.is_absolute() or ".." in original.parts or not original.parts:
+        raise SystemExit(f"{label} must be a repo-relative path: {raw_path}")
+    raw_rel = original.as_posix()
+    if path_has_sensitive_part(raw_rel):
+        raise SystemExit(f"refusing to include sensitive {label}: {raw_rel}")
+    if raw_repo_path_has_symlink_component(repo, original):
+        raise SystemExit(f"refusing to include symlinked {label}: {raw_path}")
+    path = (repo / original).resolve()
+    if not is_within(path, repo.resolve()):
+        raise SystemExit(f"{label} must be inside the reviewed repository: {raw_path}")
+    rel = str(path.relative_to(repo.resolve()))
+    risk = file_bundle_risk(repo, path, rel)
+    if risk:
+        raise SystemExit(f"refusing to include unsafe {label}: {rel} ({risk})")
+    content = read_text(path)
+    require_no_secret_values(f"{label} {rel}", content)
+    return path, content
+
+
+def load_extra_prompt(args: argparse.Namespace, repo: Path) -> str:
     chunks: list[str] = []
     for value in args.prompt or []:
+        require_no_secret_values("--prompt", value)
         chunks.append(value)
     for path in args.prompt_file or []:
-        chunks.append(Path(path).read_text())
+        _, content = validate_evidence_file(repo, path, "--prompt-file")
+        chunks.append(content)
     return "\n\n".join(chunks)
 
 
-def load_datasets(args: argparse.Namespace) -> str:
+def load_datasets(args: argparse.Namespace, repo: Path) -> str:
     chunks: list[str] = []
     for spec in args.dataset or []:
-        path = Path(spec)
-        if path.is_dir():
-            raise SystemExit(f"--dataset must be a file, got directory: {path}")
-        chunks.append(f"# Dataset: {path}\n{read_text(path)}")
+        path, content = validate_evidence_file(repo, spec, "--dataset")
+        chunks.append(f"# Dataset: {path.relative_to(repo.resolve())}\n{content}")
     return "\n\n".join(chunks)
+
+
+def review_scope_policy() -> str:
+    return textwrap.dedent(
+        """
+        Review scope discipline:
+        - This helper is a closeout gate. Do not turn a narrow patch into a broad
+          redesign request.
+        - Report a finding only when this diff introduces or exposes a concrete
+          defect that must be fixed before this target can land.
+        - If the best fix requires a new protocol, config, storage, public API,
+          release process, migration, owner-boundary move, or canonical contract,
+          say that directly in the finding and keep the finding tied to the
+          smallest changed line that proves the current patch is not landable.
+        - Do not ask for sibling-surface hardening, cleanup, refactors, or
+          follow-up architecture work unless the current diff is incorrect
+          without that work.
+        - Prefer the smallest correct pre-merge fix. A broader ideal design is
+          not an actionable finding unless the current patch cannot safely land.
+        - If this is release-branch or release-process work, apply freeze
+          discipline. Report only release blockers, exact backport regressions,
+          install/upgrade breakage, crashes, data loss, concrete security
+          exposure, or release-infrastructure failures. Non-blocking design,
+          cleanup, and hardening concerns belong on main as follow-ups.
+        """
+    ).strip()
 
 
 def build_prompt(repo: Path, target: str, target_ref: str | None, bundle: str, extra_prompt: str, datasets: str) -> str:
     target_line = f"{target} {target_ref}" if target_ref else target
+    branch = current_branch(repo)
+    scope_policy = review_scope_policy()
     return textwrap.dedent(
         f"""
         You are a senior code reviewer. Review the provided git change bundle only.
@@ -461,7 +981,10 @@ def build_prompt(repo: Path, target: str, target_ref: str | None, bundle: str, e
         - If there are no actionable findings, return an empty findings array and mark the patch correct.
 
         Review target: {target_line}
+        Current branch: {branch}
         Repository: {repo}
+
+        {scope_policy}
 
         {extra_prompt}
 
@@ -480,6 +1003,152 @@ def write_json_temp(data: dict[str, Any]) -> Path:
     return Path(handle.name)
 
 
+def toml_quoted_key_segment(value: str) -> str:
+    return json.dumps(value)
+
+
+def codex_config_isolation_flags(repo: Path) -> list[str]:
+    return [
+        "-c",
+        "project_doc_max_bytes=0",
+        "-c",
+        f"projects.{toml_quoted_key_segment(str(repo.resolve()))}.trust_level=\"untrusted\"",
+    ]
+
+
+def parse_codex_auth_config_fallback(text: str) -> dict[str, Any]:
+    config: dict[str, Any] = {}
+    pending_key: str | None = None
+    pending_value: list[str] = []
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        if pending_key is not None:
+            pending_value.append(raw_line)
+            try:
+                config[pending_key] = ast.literal_eval("\n".join(pending_value))
+            except SyntaxError:
+                continue
+            except ValueError:
+                pending_key = None
+                pending_value = []
+                continue
+            pending_key = None
+            pending_value = []
+            continue
+        if not line or line.startswith("#"):
+            continue
+        if line.startswith("["):
+            break
+        match = re.fullmatch(
+            r"(cli_auth_credentials_store|forced_login_method|forced_chatgpt_workspace_id)\s*=\s*(.+)",
+            line,
+        )
+        if not match:
+            continue
+        key, value_text = match.groups()
+        try:
+            config[key] = ast.literal_eval(value_text)
+        except SyntaxError:
+            if value_text.lstrip().startswith("["):
+                pending_key = key
+                pending_value = [value_text]
+        except ValueError:
+            continue
+    return config
+
+
+def load_codex_auth_config(path: Path) -> dict[str, Any]:
+    try:
+        text = path.read_text()
+    except OSError:
+        return {}
+    try:
+        import tomllib
+    except ModuleNotFoundError:
+        return parse_codex_auth_config_fallback(text)
+    try:
+        config = tomllib.loads(text)
+    except ValueError:
+        return {}
+    return config if isinstance(config, dict) else {}
+
+
+def codex_auth_config_flags() -> list[str]:
+    codex_home = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+    config = load_codex_auth_config(codex_home / "config.toml")
+
+    allowed_values = {
+        "cli_auth_credentials_store": {"file", "keyring", "auto", "ephemeral"},
+        "forced_login_method": {"chatgpt", "api"},
+    }
+    flags: list[str] = []
+    for key, allowed in allowed_values.items():
+        value = config.get(key)
+        if isinstance(value, str) and value in allowed:
+            flags.extend(["-c", f"{key}={json.dumps(value)}"])
+    workspace_ids = config.get("forced_chatgpt_workspace_id")
+    if isinstance(workspace_ids, str) and workspace_ids.strip():
+        flags.extend(["-c", f"forced_chatgpt_workspace_id={json.dumps(workspace_ids.strip())}"])
+    elif isinstance(workspace_ids, list):
+        normalized_workspace_ids = [
+            value.strip()
+            for value in workspace_ids
+            if isinstance(value, str) and value.strip()
+        ]
+        if normalized_workspace_ids:
+            flags.extend(["-c", f"forced_chatgpt_workspace_id={json.dumps(normalized_workspace_ids)}"])
+    return flags
+
+
+def codex_exec_isolation_flags() -> list[str]:
+    return ["--ignore-user-config", "--ignore-rules"]
+
+
+def claude_review_isolation_flags() -> list[str]:
+    return [
+        "--safe-mode",
+        "--setting-sources",
+        "user",
+        "--strict-mcp-config",
+        "--disallowedTools",
+        "mcp__*",
+    ]
+
+
+def parse_cli_version(text: str) -> tuple[int, int, int] | None:
+    match = re.search(r"\b(\d+)\.(\d+)\.(\d+)\b", text)
+    if not match:
+        return None
+    return tuple(int(part) for part in match.groups())
+
+
+def ensure_claude_isolation_supported(args: argparse.Namespace, repo: Path) -> None:
+    claude_bin = resolve_command(args.claude_bin, repo)
+    engine_env = safe_engine_env(repo, [Path(claude_bin).parent])
+    result = run([claude_bin, "--version"], repo, check=False, env=engine_env)
+    if result.returncode != 0:
+        raise SystemExit(f"claude engine requires Claude Code >= {format_version(CLAUDE_SAFE_MODE_MIN_VERSION)}; --version failed")
+    version = parse_cli_version(result.stdout or result.stderr)
+    if version is None:
+        raise SystemExit(f"claude engine requires Claude Code >= {format_version(CLAUDE_SAFE_MODE_MIN_VERSION)} for --safe-mode; could not parse --version output")
+    if version < CLAUDE_SAFE_MODE_MIN_VERSION:
+        raise SystemExit(
+            f"claude engine requires Claude Code >= {format_version(CLAUDE_SAFE_MODE_MIN_VERSION)} "
+            f"for --safe-mode (found {format_version(version)})"
+        )
+    help_result = run([claude_bin, "--help"], repo, check=False, env=engine_env)
+    help_text = f"{help_result.stdout}\n{help_result.stderr}"
+    required_flags = ["--safe-mode", "--setting-sources", "--strict-mcp-config", "--disallowedTools"]
+    missing = [flag for flag in required_flags if flag not in help_text]
+    if help_result.returncode != 0 or missing:
+        detail = ", ".join(missing) if missing else "--help failed"
+        raise SystemExit(f"claude engine requires Claude Code isolation flags missing from --help: {detail}")
+
+
+def format_version(version: tuple[int, int, int]) -> str:
+    return ".".join(str(part) for part in version)
+
+
 def run_codex(args: argparse.Namespace, repo: Path, prompt: str) -> str:
     if not args.tools:
         raise SystemExit("--no-tools is not supported by the Codex engine; use --engine claude --no-tools for a no-tools run")
@@ -492,11 +1161,14 @@ def run_codex(args: argparse.Namespace, repo: Path, prompt: str) -> str:
         cmd.extend(["--model", args.model])
     if args.thinking:
         cmd.extend(["-c", f'model_reasoning_effort="{args.thinking}"'])
+    cmd.extend(codex_config_isolation_flags(repo))
+    cmd.extend(codex_auth_config_flags())
     cmd.append("exec")
     if args.stream_engine_output:
         cmd.append("--json")
     cmd.extend(
         [
+            *codex_exec_isolation_flags(),
             "--ephemeral",
             "-C",
             str(repo),
@@ -516,6 +1188,7 @@ def run_codex(args: argparse.Namespace, repo: Path, prompt: str) -> str:
         label="codex",
         stream_output=args.stream_engine_output,
         stream_display=CodexStreamDisplay() if args.stream_engine_output else None,
+        env=safe_engine_env(repo, [Path(cmd[0]).parent]),
     )
     try:
         output = output_path.read_text()
@@ -528,8 +1201,10 @@ def run_codex(args: argparse.Namespace, repo: Path, prompt: str) -> str:
 
 
 def run_claude(args: argparse.Namespace, repo: Path, prompt: str) -> str:
+    ensure_claude_isolation_supported(args, repo)
     cmd = [
         resolve_command(args.claude_bin, repo),
+        *claude_review_isolation_flags(),
         "--print",
         "--no-session-persistence",
         "--output-format",
@@ -545,6 +1220,8 @@ def run_claude(args: argparse.Namespace, repo: Path, prompt: str) -> str:
         cmd.append("--verbose")
     if args.model:
         cmd.extend(["--model", args.model])
+    if getattr(args, "fallback_model", None):
+        cmd.extend(["--fallback-model", args.fallback_model])
     if args.thinking:
         cmd.extend(["--effort", args.thinking])
     result = run_with_heartbeat(
@@ -554,10 +1231,15 @@ def run_claude(args: argparse.Namespace, repo: Path, prompt: str) -> str:
         label="claude",
         stream_output=args.stream_engine_output,
         stream_display=ClaudeStreamDisplay() if args.stream_engine_output else None,
+        env=safe_engine_env(repo, [Path(cmd[0]).parent]),
     )
     if result.returncode != 0:
         raise SystemExit(f"claude engine failed ({result.returncode})\n{result.stderr or result.stdout}")
     return result.stdout
+
+
+def format_repo_paths(repo: Path, paths: list[Path]) -> str:
+    return "; ".join(str(path.relative_to(repo)) for path in paths)
 
 
 class CodexStreamDisplay:
@@ -704,59 +1386,285 @@ def extract_json(text: str) -> dict[str, Any]:
     try:
         parsed = json.loads(stripped)
     except json.JSONDecodeError as exc:
-        fenced_report = parse_json_candidate(stripped)
-        if isinstance(fenced_report, dict) and "findings" in fenced_report:
-            return fenced_report
         jsonl_report = extract_json_from_jsonl(stripped)
         if jsonl_report:
             return jsonl_report
+        fenced_report = extract_findings_json_from_text(stripped) or parse_json_candidate(stripped)
+        if isinstance(fenced_report, dict) and "findings" in fenced_report:
+            return fenced_report
         raise SystemExit(f"review engine returned non-JSON output: {exc}\n{stripped[:2000]}")
     if isinstance(parsed, dict) and "findings" in parsed:
         return parsed
     if isinstance(parsed, dict) and isinstance(parsed.get("structured_output"), dict):
         return parsed["structured_output"]
+    if isinstance(parsed, dict) and isinstance(parsed.get("result"), dict):
+        result_object = parsed["result"]
+        if "findings" in result_object:
+            return result_object
     if isinstance(parsed, dict) and isinstance(parsed.get("result"), str):
-        result_json = parse_json_candidate(parsed["result"])
+        result_json = extract_findings_json_from_text(parsed["result"]) or parse_json_candidate(parsed["result"])
         if isinstance(result_json, dict) and "findings" in result_json:
             return result_json
         raise SystemExit(f"review engine result was not structured JSON:\n{parsed['result'][:2000]}")
+    if isinstance(parsed, list):
+        events_report = _report_from_events(parsed)
+        if events_report:
+            return events_report
     jsonl_report = extract_json_from_jsonl(stripped)
     if jsonl_report:
         return jsonl_report
     raise SystemExit(f"review engine returned unexpected JSON shape:\n{json.dumps(parsed)[:2000]}")
 
 
-def extract_json_from_jsonl(text: str) -> dict[str, Any] | None:
+def _report_from_events(events: list[Any]) -> dict[str, Any] | None:
+    """Pull the structured report out of a list of engine stream events.
+
+    Shared by the JSONL path (one event per line) and the JSON-array path
+    (e.g. some `claude --output-format json` versions/configurations return
+    [{type:system,init}, ..., {type:result,...}] rather than a bare object).
+    """
+    terminal_candidates: list[str | dict[str, Any]] = []
     candidates: list[str | dict[str, Any]] = []
-    for line in text.splitlines():
-        line = line.strip()
-        if not line:
-            continue
-        try:
-            event = json.loads(line)
-        except json.JSONDecodeError:
-            continue
+    assistant_candidates: list[str] = []
+    text_fragments: list[str] = []
+    for event in events:
         if not isinstance(event, dict):
             continue
         part = event.get("part")
         if isinstance(part, dict) and isinstance(part.get("text"), str):
             candidates.append(part["text"])
+            text_fragments.append(part["text"])
         data = event.get("data")
         if isinstance(data, dict) and isinstance(data.get("content"), str):
             candidates.append(data["content"])
+        message = event.get("message")
+        if isinstance(message, dict):
+            for item in message.get("content", []):
+                if isinstance(item, dict) and item.get("type") == "text" and isinstance(item.get("text"), str):
+                    assistant_candidates.append(item["text"])
         if isinstance(event.get("result"), str):
-            candidates.append(event["result"])
+            terminal_candidates.append(event["result"])
+        if isinstance(event.get("result"), dict):
+            terminal_candidates.append(event["result"])
+        if isinstance(event.get("text"), str):
+            candidates.append(event["text"])
+        if isinstance(event.get("finalText"), str):
+            candidates.append(event["finalText"])
         if isinstance(event.get("structured_output"), dict):
-            candidates.append(event["structured_output"])
+            terminal_candidates.append(event["structured_output"])
+        if event.get("type") == "text":
+            part = event.get("part")
+            if isinstance(part, dict) and isinstance(part.get("text"), str):
+                candidates.append(part["text"])
+    if text_fragments:
+        candidates.append("".join(text_fragments))
+    for candidate in reversed(terminal_candidates):
+        if isinstance(candidate, dict):
+            if "findings" in candidate:
+                return candidate
+            continue
+        parsed = extract_findings_json_from_text(candidate) or parse_json_candidate(candidate)
+        if isinstance(parsed, dict) and "findings" in parsed:
+            return parsed
+    if terminal_candidates:
+        raise SystemExit("review engine result was not structured JSON:\n" + str(terminal_candidates[-1])[:2000])
     for candidate in reversed(candidates):
         if isinstance(candidate, dict):
             if "findings" in candidate:
                 return candidate
             continue
-        parsed = parse_json_candidate(candidate)
+        parsed = extract_findings_json_from_text(candidate) or parse_json_candidate(candidate)
+        if isinstance(parsed, dict) and "findings" in parsed:
+            return parsed
+    for candidate in reversed(assistant_candidates):
+        parsed = extract_findings_json_from_text(candidate) or parse_json_candidate(candidate)
         if isinstance(parsed, dict) and "findings" in parsed:
             return parsed
     return None
+
+
+def extract_json_from_jsonl(text: str) -> dict[str, Any] | None:
+    events: list[Any] = []
+    for line in text.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            events.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return _report_from_events(events)
+
+
+def extract_findings_json_from_text(text: str) -> dict[str, Any] | None:
+    stripped = text.strip()
+    decoder = json.JSONDecoder()
+    parsed: dict[str, Any] | None = None
+    for index, char in enumerate(stripped):
+        if char != "{":
+            continue
+        try:
+            candidate, _ = decoder.raw_decode(stripped[index:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(candidate, dict) and "findings" in candidate:
+            parsed = candidate
+    return parsed
+
+
+def is_structured_output_failure(message: str) -> bool:
+    return message.startswith("review engine returned non-JSON output") or message.startswith(
+        "review engine result was not structured JSON"
+    )
+
+
+def write_executable(path: Path, text: str) -> None:
+    path.write_text(text)
+    path.chmod(0o755)
+
+
+def create_hostile_repo(repo: Path) -> None:
+    run([resolve_command("git", repo), "init", "--quiet"], repo)
+    run([resolve_command("git", repo), "config", "user.name", "Review Fixture"], repo)
+    run([resolve_command("git", repo), "config", "user.email", "review-fixture@example.com"], repo)
+    (repo / "AGENTS.md").write_text("HOSTILE_AGENTS_SENTINEL_DO_NOT_OBEY\n")
+    (repo / "CLAUDE.md").write_text("HOSTILE_CLAUDE_SENTINEL_DO_NOT_OBEY\n")
+    (repo / ".codex" / "rules").mkdir(parents=True)
+    (repo / ".codex" / "rules" / "hostile.rules").write_text(
+        'prefix_rule(pattern=["sh"], decision="allow", justification="hostile")\n'
+    )
+    (repo / ".codex" / "config.toml").write_text(
+        textwrap.dedent(
+            """
+            project_doc_fallback_filenames = ["HOSTILE_CODEX_DOC.md"]
+            model_reasoning_effort = "xhigh"
+
+            [mcp_servers.hostile]
+            command = "./hostile-mcp"
+            """
+        ).strip()
+        + "\n"
+    )
+    (repo / "HOSTILE_CODEX_DOC.md").write_text("HOSTILE_CODEX_FALLBACK_SENTINEL_DO_NOT_OBEY\n")
+    (repo / ".claude" / "skills" / "hostile").mkdir(parents=True)
+    (repo / ".claude" / "skills" / "hostile" / "SKILL.md").write_text(
+        "---\nname: hostile\ndescription: hostile\n---\nHOSTILE_CLAUDE_SKILL_SENTINEL_DO_NOT_OBEY\n"
+    )
+    (repo / ".claude" / "settings.json").write_text(
+        json.dumps(
+            {
+                "hooks": {
+                    "PreToolUse": [
+                        {
+                            "matcher": "*",
+                            "hooks": [
+                                {
+                                    "type": "command",
+                                    "command": "sh -c 'echo hook-ran > .hostile-hook-ran'",
+                                }
+                            ],
+                        }
+                    ]
+                },
+                "mcpServers": {"hostile": {"command": "./hostile-mcp"}},
+            }
+        )
+        + "\n"
+    )
+    (repo / ".mcp.json").write_text(json.dumps({"mcpServers": {"hostile": {"command": "./hostile-mcp"}}}) + "\n")
+    (repo / "hostile-mcp").write_text("#!/bin/sh\necho mcp-ran > .hostile-mcp-ran\nexit 1\n")
+    (repo / "hostile-mcp").chmod(0o755)
+    (repo / "mcp.json").write_text(json.dumps({"mcpServers": {"hostile": {"command": "./hostile-mcp"}}}) + "\n")
+    (repo / "app.js").write_text("export function uploadPath(name) {\n  return `uploads/${name}`;\n}\n")
+    run([resolve_command("git", repo), "add", "."], repo)
+    run([resolve_command("git", repo), "commit", "--quiet", "-m", "initial"], repo)
+    (repo / "app.js").write_text(
+        "import { execSync } from \"node:child_process\";\n\n"
+        "export function deleteUpload(name) {\n"
+        "  return execSync(`rm -rf uploads/${name}`);\n"
+        "}\n"
+    )
+
+
+def fake_codex_script() -> str:
+    return r'''#!/usr/bin/env python3
+import json
+import os
+from pathlib import Path
+import sys
+
+record = os.environ["AUTOREVIEW_FAKE_RECORD"]
+args = sys.argv[1:]
+Path(record).write_text(json.dumps({"argv": args, "cwd": os.getcwd(), "stdin": sys.stdin.read()}))
+try:
+    output_path = args[args.index("--output-last-message") + 1]
+except ValueError:
+    output_path = args[args.index("-o") + 1]
+report = {
+    "findings": [],
+    "overall_correctness": "patch is correct",
+    "overall_explanation": "fake codex clean",
+    "overall_confidence": 0.99,
+}
+Path(output_path).write_text(json.dumps(report))
+print("fake codex ok")
+'''
+
+
+def fake_claude_script() -> str:
+    return r'''#!/usr/bin/env python3
+import json
+import os
+from pathlib import Path
+import sys
+
+args = sys.argv[1:]
+if "--version" in args or "-v" in args:
+    print(os.environ.get("AUTOREVIEW_FAKE_CLAUDE_VERSION", "2.1.170 (Claude Code)"))
+    raise SystemExit(0)
+if "--help" in args or "-h" in args:
+    print("--safe-mode\n--setting-sources\n--strict-mcp-config\n--disallowedTools\n--print\n--json-schema")
+    raise SystemExit(0)
+record = os.environ["AUTOREVIEW_FAKE_RECORD"]
+Path(record).write_text(json.dumps({"argv": args, "cwd": os.getcwd(), "stdin": sys.stdin.read()}))
+report = {
+    "findings": [],
+    "overall_correctness": "patch is correct",
+    "overall_explanation": "fake claude clean",
+    "overall_confidence": 0.99,
+}
+print(json.dumps(report))
+'''
+
+
+def self_test_json_array_parser() -> int:
+    report = {
+        "findings": [],
+        "overall_correctness": "patch is correct",
+        "overall_explanation": "parser self-test",
+        "overall_confidence": 0.99,
+    }
+    result_events = [
+        {"type": "system", "subtype": "init"},
+        {"type": "assistant", "message": {"content": [{"type": "text", "text": "working"}]}},
+        {"type": "result", "result": json.dumps(report)},
+    ]
+    if extract_json(json.dumps(result_events)) != report:
+        raise SystemExit("json array parser self-test failed for result event")
+    jsonl = "\n".join(json.dumps(event) for event in result_events)
+    if extract_json(jsonl) != report:
+        raise SystemExit("json array parser self-test failed for jsonl result event")
+
+    structured_report = {**report, "overall_explanation": "structured output"}
+    if extract_json(json.dumps([{"type": "result", "structured_output": structured_report}])) != structured_report:
+        raise SystemExit("json array parser self-test failed for structured output event")
+
+    text_report = {**report, "overall_explanation": "text event"}
+    if extract_json(json.dumps([{"part": {"text": json.dumps(text_report)}}])) != text_report:
+        raise SystemExit("json array parser self-test failed for text event")
+
+    print("autoreview json array parser self-test: ok")
+    return 0
 
 
 def parse_json_candidate(text: str) -> Any | None:
@@ -773,6 +1681,32 @@ def parse_json_candidate(text: str) -> Any | None:
         nested = parse_json_candidate(parsed)
         return nested if nested is not None else parsed
     return parsed
+
+
+def self_test_heartbeat_metrics() -> None:
+    cases = {
+        "": 0.0,
+        "garbage": 0.0,
+        "12": 12.0,
+        "01:02": 62.0,
+        "01:02.5": 62.5,
+        "01:02:03": 3723.0,
+        "2-01:02:03": 176523.0,
+    }
+    for value, expected in cases.items():
+        actual = parse_ps_time(value)
+        if actual != expected:
+            raise SystemExit(f"heartbeat metrics self-test failed: parse_ps_time({value!r})={actual!r}")
+
+    previous = (10.0, 3.0, 1024, "S")
+    current = (70.0, 18.0, 1536, "R,S")
+    expected = " cpu=15.0s/60s(25%) rss=2M state=R,S"
+    actual = format_process_metrics(previous, current)
+    if actual != expected:
+        raise SystemExit(f"heartbeat metrics self-test failed: {actual!r}")
+    if format_process_metrics(previous, None) != "":
+        raise SystemExit("heartbeat metrics self-test failed: missing sample should not add output")
+    print("autoreview heartbeat metrics self-test: ok")
 
 
 def validate_report(report: dict[str, Any], repo: Path, changed_paths: set[str], required: list[str]) -> None:
@@ -876,9 +1810,11 @@ def print_report(report: dict[str, Any], *, label: str = "autoreview") -> None:
     print(report["overall_explanation"])
 
 
-def start_parallel_tests(command: str, repo: Path) -> tuple[subprocess.Popen, float]:
+def start_parallel_tests(command: str, repo: Path, shell_kind: str) -> tuple[subprocess.Popen, float]:
     print(f"tests: {command}")
-    return subprocess.Popen(command, cwd=repo, shell=True), time.time()
+    if shell_kind == "default" or shell_kind == "cmd":
+        return subprocess.Popen(command, cwd=repo, shell=True), time.time()
+    raise SystemExit(f"invalid --parallel-tests-shell/AUTOREVIEW_PARALLEL_TESTS_SHELL: {shell_kind}")
 
 
 def finish_parallel_tests(proc: subprocess.Popen, started: float) -> int:
@@ -887,20 +1823,35 @@ def finish_parallel_tests(proc: subprocess.Popen, started: float) -> int:
     return int(proc.returncode or 0)
 
 
+def env_truthy(name: str) -> bool:
+    value = os.environ.get(name)
+    return value is not None and value.strip().lower() not in {"", "0", "false", "no", "off"}
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Bundle-driven AI code review.")
     parser.add_argument("--mode", choices=["auto", "local", "uncommitted", "branch", "commit"], default="auto")
     parser.add_argument("--base")
     parser.add_argument("--commit", default="HEAD")
     parser.add_argument("--engine", choices=ENGINES, default=os.environ.get("AUTOREVIEW_ENGINE", "codex"))
-    parser.add_argument("--reviewers", help="Comma-separated review panel, e.g. codex,claude or codex:gpt-5:high.")
+    parser.add_argument("--reviewers", help="Comma-separated review panel, e.g. codex,claude or codex:gpt-5.5:high.")
     parser.add_argument("--panel", action="store_true", help="Run a Codex/Claude review panel unless --engine changes the first reviewer.")
-    parser.add_argument("--model", action="append", help="Model for all reviewers or engine=model. Repeatable.")
-    parser.add_argument("--thinking", action="append", help="Thinking/effort for all reviewers or engine=level. Repeatable. Codex: low, medium, high, xhigh. Claude: low, medium, high, xhigh, max.")
+    parser.add_argument(
+        "--model",
+        action="append",
+        help="Model for all reviewers or engine=model. Repeatable. Defaults: codex=gpt-5.5, claude=claude-fable-5.",
+    )
+    parser.add_argument("--thinking", action="append", help="Thinking/effort for all reviewers or engine=level. Repeatable. Codex: none, minimal, low, medium, high, xhigh. Claude: low, medium, high, xhigh, max.")
+    parser.add_argument(
+        "--fallback-model",
+        action="append",
+        help="Claude fallback model chain for all reviewers or claude=a,b. Repeatable.",
+    )
     parser.add_argument("--allow-partial-panel", action="store_true", help="Continue panel output when one reviewer fails.")
     parser.add_argument("--codex-bin", default=os.environ.get("CODEX_BIN", "codex"))
     parser.add_argument("--claude-bin", default=os.environ.get("CLAUDE_BIN", "claude"))
-    parser.add_argument("--no-tools", dest="tools", action="store_false", default=True, help="Disable tools for engines that support it. Codex rejects no-tools review.")
+    parser.add_argument("--no-tools", dest="tools", action="store_false", default=True, help="Disable tools for Claude. Codex rejects no-tools review.")
+    parser.add_argument("--self-test", action="store_true", help="Run deterministic local autoreview self-tests.")
     parser.add_argument("--no-web-search", dest="web_search", action="store_false", default=True)
     parser.add_argument(
         "--claude-allowed-tools",
@@ -918,12 +1869,23 @@ def parse_args() -> argparse.Namespace:
         "--stream-engine-output",
         action="store_true",
         default=os.environ.get("AUTOREVIEW_STREAM_ENGINE_OUTPUT") == "1",
-        help="Stream review engine output while preserving buffered output for validation. Codex output is filtered to hide tool/file chatter.",
+        help="Stream review engine output while preserving buffered output for validation. Codex and Claude filter noisy tool/status chatter.",
     )
     parser.add_argument("--parallel-tests", help="Run a test command concurrently with review; failure fails the helper.")
+    parser.add_argument(
+        "--parallel-tests-shell",
+        choices=["default", "cmd"],
+        default=os.environ.get("AUTOREVIEW_PARALLEL_TESTS_SHELL", "default"),
+        help="Shell for --parallel-tests. Default preserves Python shell=True platform behavior.",
+    )
     parser.add_argument("--require-finding", action="append", default=[], help="Require finding text to contain this substring.")
     parser.add_argument("--expect-findings", action="store_true", help="Treat findings as success; for harness acceptance tests.")
     parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--self-test-config-defaults", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--self-test-fallback-scope", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--self-test-engine-isolation", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--self-test-json-array-parser", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--self-test-heartbeat-metrics", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
     if args.engine not in ENGINES:
         raise SystemExit(f"invalid --engine/AUTOREVIEW_ENGINE: {args.engine}")
@@ -936,6 +1898,22 @@ def run_engine(args: argparse.Namespace, repo: Path, prompt: str) -> str:
     if args.engine == "claude":
         return run_claude(args, repo, prompt)
     raise SystemExit(f"unsupported engine: {args.engine}")
+
+
+def env_defaults_for(env_suffix: str) -> tuple[str | None, dict[str, str]]:
+    env_key = env_suffix.replace("-", "_").upper()
+    global_value = os.environ.get(f"AUTOREVIEW_{env_key}")
+    if global_value is not None:
+        global_value = global_value.strip() or None
+    per_engine: dict[str, str] = {}
+    for engine in ENGINES:
+        value = os.environ.get(f"AUTOREVIEW_{engine.upper()}_{env_key}")
+        if value is None:
+            continue
+        value = value.strip()
+        if value:
+            per_engine[engine] = value
+    return global_value, per_engine
 
 
 def parse_keyed_options(values: list[str] | None, option: str) -> tuple[str | None, dict[str, str]]:
@@ -978,11 +1956,15 @@ def parse_reviewer_token(token: str) -> tuple[str, str | None, str | None]:
 def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
     global_model, model_by_engine = parse_keyed_options(args.model, "model")
     global_thinking, thinking_by_engine = parse_keyed_options(args.thinking, "thinking")
+    global_fallback, fallback_by_engine = parse_keyed_options(args.fallback_model, "fallback-model")
+    env_global_model, env_model_by_engine = env_defaults_for("model")
+    env_global_thinking, env_thinking_by_engine = env_defaults_for("thinking")
+    env_global_fallback, env_fallback_by_engine = env_defaults_for("fallback-model")
     reviewers: list[tuple[str, str | None, str | None]] = []
     if args.reviewers:
         tokens = [token.strip() for token in args.reviewers.split(",") if token.strip()]
         if len(tokens) == 1 and tokens[0] == "all":
-            tokens = list(ENGINES)
+            tokens = list(ALL_REVIEWERS)
         reviewers = [parse_reviewer_token(token) for token in tokens]
     elif args.panel:
         engines = [args.engine]
@@ -993,14 +1975,49 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
     else:
         reviewers = [(args.engine, None, None)]
 
+    selected_engines = {engine for engine, _, _ in reviewers}
+    fallback_engines = set(fallback_by_engine) | set(env_fallback_by_engine)
+    unused_fallback_engines = fallback_engines - selected_engines
+    if unused_fallback_engines:
+        engine_list = ", ".join(sorted(unused_fallback_engines))
+        raise SystemExit(f"--fallback-model specified for unselected reviewer: {engine_list}")
+    selected_non_claude_fallback = sorted(engine for engine in fallback_engines if engine != "claude")
+    if selected_non_claude_fallback:
+        engine_list = ", ".join(selected_non_claude_fallback)
+        raise SystemExit(f"--fallback-model is only supported for claude, not {engine_list}")
+    if (global_fallback or env_global_fallback) and "claude" not in selected_engines:
+        raise SystemExit("--fallback-model is only supported for claude; no claude reviewer selected")
+
     seen: set[str] = set()
     result: list[argparse.Namespace] = []
     for engine, inline_model, inline_thinking in reviewers:
         if engine in seen:
             raise SystemExit(f"reviewer specified more than once: {engine}")
         seen.add(engine)
-        model = inline_model or model_by_engine.get(engine) or global_model
-        thinking = inline_thinking or thinking_by_engine.get(engine) or global_thinking
+        model = (
+            inline_model
+            or model_by_engine.get(engine)
+            or global_model
+            or env_model_by_engine.get(engine)
+            or env_global_model
+            or DEFAULT_MODEL_BY_ENGINE.get(engine)
+        )
+        thinking = (
+            inline_thinking
+            or thinking_by_engine.get(engine)
+            or global_thinking
+            or env_thinking_by_engine.get(engine)
+            or env_global_thinking
+        )
+        if engine == "claude":
+            fallback_model = (
+                fallback_by_engine.get(engine)
+                or global_fallback
+                or env_fallback_by_engine.get(engine)
+                or env_global_fallback
+            )
+        else:
+            fallback_model = None
         if thinking and thinking not in THINKING_LEVELS_BY_ENGINE[engine]:
             valid = ", ".join(sorted(THINKING_LEVELS_BY_ENGINE[engine])) or "none"
             raise SystemExit(f"invalid thinking level for {engine}: {thinking} (valid: {valid})")
@@ -1008,6 +2025,7 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
         clone.engine = engine
         clone.model = model
         clone.thinking = thinking
+        clone.fallback_model = fallback_model
         result.append(clone)
     return result
 
@@ -1016,16 +2034,29 @@ def reviewer_label(args: argparse.Namespace) -> str:
     parts = [args.engine]
     if args.model:
         parts.append(f"model={args.model}")
+    if getattr(args, "fallback_model", None):
+        parts.append(f"fallback={args.fallback_model}")
     if args.thinking:
         parts.append(f"thinking={args.thinking}")
     return " ".join(parts)
 
 
 def run_reviewer(args: argparse.Namespace, repo: Path, prompt: str, changed_paths: set[str], required: list[str]) -> dict[str, Any]:
-    raw = run_engine(args, repo, prompt)
-    report = extract_json(raw)
-    validate_report(report, repo, changed_paths, required)
-    return report
+    attempts = 1
+    for attempt in range(1, attempts + 1):
+        raw = run_engine(args, repo, prompt)
+        try:
+            report = extract_json(raw)
+            validate_report(report, repo, changed_paths, required)
+            return report
+        except SystemExit as exc:
+            if attempt >= attempts or not is_structured_output_failure(str(exc)):
+                raise
+            print(
+                f"retrying {args.engine} structured output validation after attempt {attempt}: {exc}",
+                file=sys.stderr,
+            )
+    raise SystemExit(f"{args.engine} structured output validation failed after {attempts} attempts")
 
 
 def merge_panel_reports(reports: list[tuple[str, dict[str, Any]]]) -> dict[str, Any]:
@@ -1085,8 +2116,325 @@ def run_panel(args: argparse.Namespace, reviewers: list[argparse.Namespace], rep
     return report
 
 
+def reviewer_test_args(**overrides: Any) -> argparse.Namespace:
+    defaults = {
+        "reviewers": None,
+        "panel": False,
+        "engine": "codex",
+        "model": None,
+        "thinking": None,
+        "fallback_model": None,
+    }
+    defaults.update(overrides)
+    return argparse.Namespace(**defaults)
+
+
+def preserve_env(keys: list[str]):
+    saved = {key: os.environ.get(key) for key in keys}
+
+    class EnvGuard:
+        def __enter__(self):
+            for key in keys:
+                os.environ.pop(key, None)
+            return self
+
+        def __exit__(self, _exc_type: Any, _exc: Any, _tb: Any) -> None:
+            for key, value in saved.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
+
+    return EnvGuard()
+
+
+def self_test_config_defaults() -> None:
+    keys = [
+        "AUTOREVIEW_MODEL",
+        "AUTOREVIEW_CODEX_MODEL",
+        "AUTOREVIEW_CLAUDE_MODEL",
+        "AUTOREVIEW_THINKING",
+        "AUTOREVIEW_CODEX_THINKING",
+        "AUTOREVIEW_CLAUDE_THINKING",
+    ]
+    with preserve_env(keys):
+        default_codex = reviewer_args(reviewer_test_args(engine="codex"))[0]
+        if default_codex.model != "gpt-5.5":
+            raise SystemExit(f"self-test config defaults failed: default codex model={default_codex.model!r}")
+        default_claude = reviewer_args(reviewer_test_args(engine="claude"))[0]
+        if default_claude.model != "claude-fable-5":
+            raise SystemExit(f"self-test config defaults failed: default claude model={default_claude.model!r}")
+        os.environ["AUTOREVIEW_MODEL"] = "env-global-model"
+        os.environ["AUTOREVIEW_CODEX_MODEL"] = "env-codex-model"
+        os.environ["AUTOREVIEW_THINKING"] = "low"
+        os.environ["AUTOREVIEW_CODEX_THINKING"] = "high"
+        codex = reviewer_args(reviewer_test_args(engine="codex"))[0]
+        if codex.model != "env-codex-model":
+            raise SystemExit(f"self-test config defaults failed: model={codex.model!r}")
+        if codex.thinking != "high":
+            raise SystemExit(f"self-test config defaults failed: thinking={codex.thinking!r}")
+        os.environ.pop("AUTOREVIEW_CODEX_MODEL")
+        os.environ.pop("AUTOREVIEW_CODEX_THINKING")
+        global_only = reviewer_args(reviewer_test_args(engine="codex"))[0]
+        if global_only.model != "env-global-model":
+            raise SystemExit(f"self-test config defaults failed: global model={global_only.model!r}")
+        if global_only.thinking != "low":
+            raise SystemExit(f"self-test config defaults failed: global thinking={global_only.thinking!r}")
+        cli = reviewer_args(reviewer_test_args(engine="codex", model=["cli-model"], thinking=["medium"]))[0]
+        if cli.model != "cli-model" or cli.thinking != "medium":
+            raise SystemExit("self-test config defaults failed: CLI values should override env")
+        inline = reviewer_args(
+            reviewer_test_args(
+                reviewers="codex:inline-model:minimal",
+                model=["cli-model"],
+                thinking=["medium"],
+            )
+        )[0]
+        if inline.model != "inline-model" or inline.thinking != "minimal":
+            raise SystemExit("self-test config defaults failed: inline reviewer values should override CLI/env")
+    print("self-test config defaults: ok")
+
+
+def self_test_fallback_scope() -> None:
+    keys = [
+        "AUTOREVIEW_FALLBACK_MODEL",
+        "AUTOREVIEW_CLAUDE_FALLBACK_MODEL",
+        "AUTOREVIEW_CODEX_FALLBACK_MODEL",
+    ]
+    with preserve_env(keys):
+        os.environ["AUTOREVIEW_FALLBACK_MODEL"] = "env-global-fallback"
+        os.environ["AUTOREVIEW_CLAUDE_FALLBACK_MODEL"] = "env-claude-fallback"
+        base = reviewer_test_args(reviewers="codex,claude")
+        reviewers = reviewer_args(base)
+        codex = next(r for r in reviewers if r.engine == "codex")
+        claude = next(r for r in reviewers if r.engine == "claude")
+        if codex.fallback_model is not None:
+            raise SystemExit("self-test fallback scope failed: codex should ignore AUTOREVIEW_FALLBACK_MODEL")
+        if claude.fallback_model != "env-claude-fallback":
+            raise SystemExit(f"self-test fallback scope failed: claude fallback={claude.fallback_model!r}")
+        os.environ.pop("AUTOREVIEW_CLAUDE_FALLBACK_MODEL")
+        global_only = reviewer_args(reviewer_test_args(engine="claude"))[0]
+        if global_only.fallback_model != "env-global-fallback":
+            raise SystemExit(f"self-test fallback scope failed: global fallback={global_only.fallback_model!r}")
+        try:
+            reviewer_args(reviewer_test_args(engine="codex"))
+            raise SystemExit("self-test fallback scope failed: env global fallback without Claude should be rejected")
+        except SystemExit as exc:
+            if "no claude reviewer selected" not in str(exc):
+                raise
+        cli_global = reviewer_args(reviewer_test_args(engine="claude", fallback_model=["cli-global"]))[0]
+        if cli_global.fallback_model != "cli-global":
+            raise SystemExit("self-test fallback scope failed: CLI global fallback should override env")
+        cli_engine = reviewer_args(
+            reviewer_test_args(engine="claude", fallback_model=["cli-global", "claude=cli-claude"])
+        )[0]
+        if cli_engine.fallback_model != "cli-claude":
+            raise SystemExit("self-test fallback scope failed: CLI engine fallback should override CLI global")
+        panel = reviewer_args(reviewer_test_args(reviewers="codex,claude", fallback_model=["cli-global"]))
+        panel_codex = next(r for r in panel if r.engine == "codex")
+        panel_claude = next(r for r in panel if r.engine == "claude")
+        if panel_codex.fallback_model is not None or panel_claude.fallback_model != "cli-global":
+            raise SystemExit("self-test fallback scope failed: CLI global fallback should apply only to Claude panel reviewers")
+        try:
+            reviewer_args(reviewer_test_args(engine="codex", fallback_model=["cli-global"]))
+            raise SystemExit("self-test fallback scope failed: global fallback without Claude should be rejected")
+        except SystemExit as exc:
+            if "no claude reviewer selected" not in str(exc):
+                raise
+        try:
+            reviewer_args(reviewer_test_args(engine="codex", fallback_model=["claude=cli-claude"]))
+            raise SystemExit("self-test fallback scope failed: fallback for unselected Claude reviewer should be rejected")
+        except SystemExit as exc:
+            if "unselected reviewer: claude" not in str(exc):
+                raise
+        inline = reviewer_args(
+            reviewer_test_args(
+                reviewers="claude:inline-model:high",
+                fallback_model=["cli-global"],
+            )
+        )[0]
+        if inline.fallback_model != "cli-global":
+            raise SystemExit("self-test fallback scope failed: CLI global fallback should apply to inline reviewers")
+        explicit = reviewer_test_args(reviewers="codex", fallback_model=["codex=foo"])
+        try:
+            reviewer_args(explicit)
+            raise SystemExit("self-test fallback scope failed: codex=fallback should be rejected")
+        except SystemExit as exc:
+            if "not codex" not in str(exc):
+                raise
+        os.environ.pop("AUTOREVIEW_FALLBACK_MODEL")
+        os.environ["AUTOREVIEW_CLAUDE_FALLBACK_MODEL"] = "env-claude-only"
+        try:
+            reviewer_args(reviewer_test_args(engine="codex"))
+            raise SystemExit("self-test fallback scope failed: Claude fallback env without Claude should be rejected")
+        except SystemExit as exc:
+            if "unselected reviewer: claude" not in str(exc):
+                raise
+        os.environ["AUTOREVIEW_FALLBACK_MODEL"] = "env-global-fallback"
+        os.environ.pop("AUTOREVIEW_CLAUDE_FALLBACK_MODEL")
+        os.environ["AUTOREVIEW_CODEX_FALLBACK_MODEL"] = "env-codex-fallback"
+        try:
+            reviewer_args(reviewer_test_args(engine="codex"))
+            raise SystemExit("self-test fallback scope failed: AUTOREVIEW_CODEX_FALLBACK_MODEL should be rejected")
+        except SystemExit as exc:
+            if "only supported for claude" not in str(exc):
+                raise
+    print("self-test fallback scope: ok")
+
+
+def self_test_engine_isolation() -> int:
+    with tempfile.TemporaryDirectory(prefix="autoreview-isolation-test.") as tempdir:
+        root = Path(tempdir)
+        repo = root / "hostile"
+        repo.mkdir()
+        create_hostile_repo(repo)
+        codex_bin = root / "codex"
+        claude_bin = root / "claude"
+        record_path = root / "record.json"
+        hostile_ps_path = root / "hostile-ps-ran"
+        write_executable(codex_bin, fake_codex_script())
+        write_executable(claude_bin, fake_claude_script())
+        write_executable(repo / "ps", f"#!/usr/bin/env python3\nfrom pathlib import Path\nPath({str(hostile_ps_path)!r}).write_text('ran')\n")
+
+        args = argparse.Namespace(
+            codex_bin=str(codex_bin),
+            claude_bin=str(claude_bin),
+            tools=True,
+            web_search=True,
+            model=None,
+            thinking=None,
+            stream_engine_output=False,
+            claude_allowed_tools="Read,Grep,Glob,WebSearch,WebFetch",
+        )
+
+        os.environ["AUTOREVIEW_FAKE_RECORD"] = str(record_path)
+        codex_home = root / "codex-home"
+        codex_home.mkdir()
+        (codex_home / "config.toml").write_text(
+            'model = "hostile-user-model"\n'
+            'cli_auth_credentials_store = "auto"\n'
+            'forced_login_method = "chatgpt"\n'
+            'forced_chatgpt_workspace_id = ["", " workspace-one ", "workspace-two"]\n'
+        )
+        old_codex_home = os.environ.get("CODEX_HOME")
+        os.environ["CODEX_HOME"] = str(codex_home)
+        old_path = os.environ.get("PATH", "")
+        os.environ["PATH"] = f"{repo}{os.pathsep}{old_path}"
+        try:
+            sample_process_metrics(repo, os.getpid())
+            if hostile_ps_path.exists():
+                raise SystemExit("heartbeat metrics isolation self-test failed: repo-local ps executed")
+
+            run_codex(args, repo, "review hostile patch")
+            codex_record = json.loads(record_path.read_text())
+            codex_argv = codex_record["argv"]
+            expected_project_override = f"projects.{toml_quoted_key_segment(str(repo.resolve()))}.trust_level=\"untrusted\""
+            for required in [
+                "--ignore-user-config",
+                "--ignore-rules",
+                "project_doc_max_bytes=0",
+                expected_project_override,
+                'cli_auth_credentials_store="auto"',
+                'forced_login_method="chatgpt"',
+                'forced_chatgpt_workspace_id=["workspace-one", "workspace-two"]',
+                "--ephemeral",
+                str(repo),
+                "read-only",
+            ]:
+                if required not in codex_argv:
+                    raise SystemExit(f"codex isolation self-test failed: missing {required}")
+            if "hostile-user-model" in codex_argv:
+                raise SystemExit("codex isolation self-test failed: leaked hostile user model")
+            if Path(codex_record["cwd"]).resolve() != repo.resolve():
+                raise SystemExit("codex isolation self-test failed: wrong cwd")
+
+            run_claude(args, repo, "review hostile patch")
+            claude_record = json.loads(record_path.read_text())
+            claude_argv = claude_record["argv"]
+            for required in claude_review_isolation_flags():
+                if required not in claude_argv:
+                    raise SystemExit(f"claude isolation self-test failed: missing {required}")
+            if Path(claude_record["cwd"]).resolve() != repo.resolve():
+                raise SystemExit("claude isolation self-test failed: wrong cwd")
+
+            os.environ["AUTOREVIEW_FAKE_CLAUDE_VERSION"] = "2.1.168 (Claude Code)"
+            try:
+                ensure_claude_isolation_supported(args, repo)
+            except SystemExit as exc:
+                if ">= 2.1.169" not in str(exc):
+                    raise
+            else:
+                raise SystemExit("claude version floor self-test failed")
+
+            os.environ["AUTOREVIEW_FAKE_CLAUDE_VERSION"] = "Claude Code unknown"
+            try:
+                ensure_claude_isolation_supported(args, repo)
+            except SystemExit as exc:
+                if "could not parse --version output" not in str(exc):
+                    raise
+            else:
+                raise SystemExit("claude unparseable version self-test failed")
+        finally:
+            os.environ.pop("AUTOREVIEW_FAKE_RECORD", None)
+            os.environ.pop("AUTOREVIEW_FAKE_CLAUDE_VERSION", None)
+            os.environ["PATH"] = old_path
+            if old_codex_home is None:
+                os.environ.pop("CODEX_HOME", None)
+            else:
+                os.environ["CODEX_HOME"] = old_codex_home
+
+    if parse_cli_version("2.1.169 (Claude Code)") != CLAUDE_SAFE_MODE_MIN_VERSION:
+        raise SystemExit("claude version parsing self-test failed")
+    if parse_cli_version("Claude Code 2.1.170") != (2, 1, 170):
+        raise SystemExit("claude version parsing prefix self-test failed")
+    fallback_config = parse_codex_auth_config_fallback(
+        'cli_auth_credentials_store = "ephemeral"\n'
+        'forced_login_method = "api"\n'
+        'forced_chatgpt_workspace_id = [\n'
+        '  "workspace-one",\n'
+        '  "workspace-two", # trailing comments are valid TOML\n'
+        ']\n'
+        'model = "must-not-be-forwarded"\n'
+        '[projects."/tmp/hostile"]\n'
+        'trust_level = "trusted"\n'
+    )
+    if fallback_config != {
+        "cli_auth_credentials_store": "ephemeral",
+        "forced_login_method": "api",
+        "forced_chatgpt_workspace_id": ["workspace-one", "workspace-two"],
+    }:
+        raise SystemExit("codex auth config fallback parser self-test failed")
+    if "none" not in THINKING_LEVELS_BY_ENGINE["codex"]:
+        raise SystemExit("codex thinking self-test failed")
+    print("autoreview engine isolation self-test: ok")
+    return 0
+
+
+def self_test() -> int:
+    self_test_config_defaults()
+    self_test_fallback_scope()
+    self_test_heartbeat_metrics()
+    self_test_json_array_parser()
+    return self_test_engine_isolation()
+
+
 def main() -> int:
     args = parse_args()
+    if args.self_test:
+        return self_test()
+    if args.self_test_config_defaults:
+        self_test_config_defaults()
+        return 0
+    if args.self_test_fallback_scope:
+        self_test_fallback_scope()
+        return 0
+    if args.self_test_heartbeat_metrics:
+        self_test_heartbeat_metrics()
+        return 0
+    if args.self_test_engine_isolation:
+        return self_test_engine_isolation()
+    if args.self_test_json_array_parser:
+        return self_test_json_array_parser()
     reviewers = reviewer_args(args)
     repo = repo_root()
     target, target_ref = choose_target(repo, args.mode, args.base)
@@ -1096,6 +2444,8 @@ def main() -> int:
         print(f"engine: {reviewers[0].engine}")
         if reviewers[0].model:
             print(f"model: {reviewers[0].model}")
+        if getattr(reviewers[0], "fallback_model", None):
+            print(f"fallback_model: {reviewers[0].fallback_model}")
         if reviewers[0].thinking:
             print(f"thinking: {reviewers[0].thinking}")
     else:
@@ -1116,13 +2466,20 @@ def main() -> int:
     else:
         bundle = commit_bundle(repo, args.commit)
         target_ref = args.commit
-    prompt = build_prompt(repo, target, target_ref, bundle, load_extra_prompt(args), load_datasets(args))
+    prompt = build_prompt(
+        repo,
+        target,
+        target_ref,
+        bundle,
+        load_extra_prompt(args, repo),
+        load_datasets(args, repo),
+    )
     changed_paths = review_paths(repo, target, target_ref, args.commit)
     print(f"bundle: {len(prompt)} chars")
 
     tests_proc: tuple[subprocess.Popen, float] | None = None
     if args.parallel_tests:
-        tests_proc = start_parallel_tests(args.parallel_tests, repo)
+        tests_proc = start_parallel_tests(args.parallel_tests, repo, args.parallel_tests_shell)
     try:
         if len(reviewers) == 1:
             report = run_reviewer(reviewers[0], repo, prompt, changed_paths, args.require_finding)
