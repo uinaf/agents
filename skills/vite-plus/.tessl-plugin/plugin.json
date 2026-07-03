@@ -1,6 +1,6 @@
 {
   "name": "uinaf/vite-plus",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Migrate or align frontend repositories to the stock Vite+ workflow. Use when standardizing package or monorepo repos around `vp`, `voidzero-dev/setup-vp`, `vite-plus/test`, and Vite+ native CI, test, packaging, and hook flows, including Vite+ 0.2.x Vitest-wrapper cleanup.",
   "private": false,
   "skills": [
