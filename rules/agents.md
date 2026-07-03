@@ -121,6 +121,7 @@ Reproduce the failure, find the root cause with evidence, and fix the root cause
 ### Pull requests
 
 - Use Conventional Commit-style PR titles where the repo has no stronger convention: `<type>(<scope>): <subject>`. For multi-commit PRs, title the net change rather than copying an incidental commit subject.
+- After addressing PR feedback on an already-pushed branch, push follow-up commits instead of amending existing commits and force-pushing.
 - Follow the repo's PR template when it has one. If there is no template, use this shape for non-trivial changes:
 
 ```md
