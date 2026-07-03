@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent correctly sets up the autoreview helper environment variables, picks the right review mode for three distinct code-state scenarios, uses the Codex default engine without adding unrequested overrides, and avoids panel/multi-reviewer flags when not requested.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "AUTOREVIEW variable set",
+      "description": "Script sets AUTOREVIEW to a path under $AGENTS_HOME (or $HOME/.agents or $HOME/.claude) — not a hardcoded absolute path",
+      "max_score": 8
+    },
+    {
+      "name": "AUTOREVIEW_HARNESS variable set",
+      "description": "Script sets AUTOREVIEW_HARNESS (using $AGENTS_HOME, $HOME/.agents, or $HOME/.claude as base) — not a hardcoded path",
+      "max_score": 7
+    },
+    {
+      "name": "AGENTS_HOME for global skill",
+      "description": "Script sets or references AGENTS_HOME — either as $HOME/.agents or $HOME/.claude — when setting up the global skill path",
+      "max_score": 8
+    },
+    {
+      "name": "$AUTOREVIEW invocation used",
+      "description": "All three helper invocations use \"$AUTOREVIEW\" (the variable), not a hardcoded script path",
+      "max_score": 8
+    },
+    {
+      "name": "Local mode for uncommitted changes",
+      "description": "The scenario covering unstaged/staged/uncommitted changes uses --mode local (or --mode uncommitted) — not --mode branch or --mode commit",
+      "max_score": 12
+    },
+    {
+      "name": "Branch mode for PR/feature branch",
+      "description": "The scenario covering the open pull request / feature branch uses --mode branch",
+      "max_score": 10
+    },
+    {
+      "name": "Branch mode has --base flag",
+      "description": "The --mode branch invocation includes a --base flag (e.g. --base origin/main or base from gh pr view)",
+      "max_score": 10
+    },
+    {
+      "name": "Commit mode for pushed-to-main",
+      "description": "The scenario covering already-pushed work on main uses --mode commit",
+      "max_score": 12
+    },
+    {
+      "name": "--commit HEAD for commit mode",
+      "description": "The --mode commit invocation includes --commit HEAD",
+      "max_score": 10
+    },
+    {
+      "name": "No --engine claude override",
+      "description": "The script does NOT add --engine claude (or --reviewers claude) on any invocation — Codex default is used implicitly",
+      "max_score": 8
+    },
+    {
+      "name": "No panel flags",
+      "description": "The script does NOT include --panel or --reviewers flags on any invocation (panels were not requested)",
+      "max_score": 7
+    }
+  ]
+}
