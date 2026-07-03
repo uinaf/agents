@@ -15,11 +15,15 @@ The wrapper pins the Tessl CLI through `TESSL_CLI_VERSION`, defaulting to the
 version in the script. Bump it intentionally rather than relying on moving npm
 latest.
 
-In CI, Tessl's scored `review run` requires authentication. When `CI` is set
-and `TESSL_TOKEN` is absent, the wrapper falls back to `tessl plugin lint` so
-pull requests still get deterministic structure validation without requiring a
-secret or posting bot-authored review comments. Set `TESSL_REVIEW_MODE=lint` to
-force that mode locally.
+In CI, Tessl has two lanes:
+
+- Pull requests run with `TESSL_REVIEW_MODE=lint` and no `TESSL_TOKEN`, so
+  untrusted PR code only gets deterministic plugin structure validation.
+- Trusted `main` review runs through the GitHub `release` environment with
+  `TESSL_TOKEN` and executes authenticated `tessl review run`.
+
+Set `TESSL_REVIEW_MODE=lint` to force the pull-request lane locally. If `CI` is
+set and `TESSL_TOKEN` is absent, the wrapper also falls back to lint mode.
 
 Useful direct invocations:
 
@@ -74,5 +78,6 @@ npx tessl@0.90.0 skill review --optimize --yes --max-iterations 1 skills/review-
 - `skills/review.sh` is the batch entrypoint for local skill review
 - `skills/optimize.sh` applies mutations, so run it intentionally and inspect the resulting diff
 - Prefer optimizing one skill at a time rather than churning the whole repo at once
-- CI runs `./scripts/skills/review.sh` on pull requests and pushes to `main`
+- CI runs lint-only `./scripts/skills/review.sh` on pull requests and
+  authenticated review on `main` through the `release` environment
 - Skill packages use `.tessl-plugin/plugin.json`; do not reintroduce `tile.json`
