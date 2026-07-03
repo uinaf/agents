@@ -32,14 +32,14 @@ Audit a skill before calling it ready. Favor Tessl output, repo conventions, and
 
 ```bash
 skill_dir="skills/<name>"
-npx tessl@0.80.0 plugin lint "$skill_dir"
-npx tessl@0.80.0 review run --workspace uinaf --threshold 0 --json "$skill_dir"
+npx tessl@0.90.0 plugin lint "$skill_dir"
+npx tessl@0.90.0 review run --workspace uinaf --threshold 0 --json "$skill_dir"
 ```
 
 For a full repo batch, use the repo wrapper such as `./scripts/skills/review.sh` when present; otherwise repeat the direct Tessl review per skill. Use optimizer only when explicitly requested:
 
 ```bash
-npx tessl@0.80.0 skill review --optimize --yes --max-iterations 1 skills/<name>
+npx tessl@0.90.0 skill review --optimize --yes --max-iterations 1 skills/<name>
 ```
 
 ## Workflow

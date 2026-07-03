@@ -24,9 +24,9 @@ force that mode locally.
 Useful direct invocations:
 
 ```bash
-npx tessl@0.80.0 review run --workspace uinaf skills/review-gang
-npx tessl@0.80.0 review run --json --workspace uinaf --threshold 90 skills/verify
-npx tessl@0.80.0 plugin lint skills/vite-plus
+npx tessl@0.90.0 review run --workspace uinaf skills/review-gang
+npx tessl@0.90.0 review run --json --workspace uinaf --threshold 90 skills/verify
+npx tessl@0.90.0 plugin lint skills/vite-plus
 ```
 
 Use per-skill `--json` output directly with Tessl rather than `skills/review.sh`, because the batch wrapper emits one review per skill.
@@ -59,7 +59,7 @@ Apply Tessl's optimizer to one skill at a time:
 Direct form:
 
 ```bash
-npx tessl@0.80.0 skill review --optimize --yes --max-iterations 1 skills/review-gang
+npx tessl@0.90.0 skill review --optimize --yes --max-iterations 1 skills/review-gang
 ```
 
 ## Suggested workflow

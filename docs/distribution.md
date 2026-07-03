@@ -1,27 +1,26 @@
 # Distribution
 
-This repo publishes each skill as its own public Tessl tile in the `uinaf` workspace.
+This repo publishes each skill as its own public Tessl plugin in the `uinaf` workspace.
 
-## Tile names
+## Plugin names
 
-Do not maintain a hardcoded list here. The source of truth is the `name` field in each `skills/*/tile.json`.
+Do not maintain a hardcoded list here. The source of truth is the `name` field in each `skills/*/.tessl-plugin/plugin.json`.
 
-To inspect the current published tile names locally:
+To inspect the current published plugin names locally:
 
 ```bash
-jq -r '.name' skills/*/tile.json
+jq -r '.name' skills/*/.tessl-plugin/plugin.json
 ```
 
 ## How publishing works
 
-- Each skill directory under `skills/*` has its own `tile.json`
-- `.github/workflows/publish-skills.yml` runs a secretless review job first, then continuously publishes through the `release` Environment for secret scoping
-- Pushes to `main` publish only the tiles that changed
-- Manual workflow runs publish all tiles only when the run ref is `main`; non-`main` manual runs can review, but the publish job is skipped
-- The publish job uses [`uinaf/tessl-publish-action`](https://github.com/uinaf/tessl-publish-action) to detect changed tiles, run review and lint, and publish them
-- The action derives semantic version bumps from Conventional Commit messages: breaking changes -> `major`, `feat` -> `minor`, everything else -> `patch`
-- Before publish, the action probes `tessl tile publish --dry-run` and keeps bumping patch versions in the job workspace until Tessl accepts a free version
-- After a successful publish, the workflow commits the resulting `tile.json` version bumps back to `main` as `github-actions[bot]` with the workflow `GITHUB_TOKEN` and a skip-CI commit message
+- Each skill directory under `skills/*` has its own `.tessl-plugin/plugin.json`
+- `.github/workflows/publish-skills.yml` runs the same Tessl review gate first, then continuously publishes through the `release` Environment for secret scoping
+- Pushes to `main` publish only the plugins that changed
+- Manual workflow runs publish all plugins only when the run ref is `main`; non-`main` manual runs can review, but the publish job is skipped
+- The publish job runs `scripts/skills/publish.sh`, which detects changed plugin directories, runs `tessl plugin lint`, and publishes with `tessl plugin publish`
+- The script defaults to `--bump patch`; set `TESSL_PUBLISH_BUMP=minor` or `major` only for intentional release version changes
+- After a successful publish, the workflow commits the resulting `.tessl-plugin/plugin.json` version bumps back to `main` as `github-actions[bot]` with the workflow `GITHUB_TOKEN` and a skip-CI commit message
 - Both review and publish jobs skip `[skip ci]` commits, and the publish job uses non-cancellable concurrency so version probing and writeback cannot race another publish
 - Publish-path actions are pinned to full commit SHAs with trailing comments for their human version tags
 
@@ -49,6 +48,6 @@ The workflow still references the token as `${{ secrets.TESSL_TOKEN }}`; GitHub 
 ## Local checks
 
 ```bash
-npx tessl tile lint skills/review-gang
-npx tessl tile publish --dry-run skills/review-gang
+npx tessl@0.90.0 plugin lint skills/review-gang
+npx tessl@0.90.0 plugin publish --dry-run --workspace uinaf --bump patch skills/review-gang
 ```
