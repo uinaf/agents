@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether autoreview treats model findings as advisory, accepts only in-scope blockers, rejects over-broad architecture churn, and routes sibling risk to follow-up when outside the requested owner boundary.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Accepted in-scope blocker",
+      "max_score": 18,
+      "description": "Finding A is accepted because it is introduced or exposed by the touched retry button and has failing focused proof"
+    },
+    {
+      "name": "Architecture churn rejected",
+      "max_score": 14,
+      "description": "Finding B is rejected or deferred because a command bus/event-sourcing rewrite is outside the small bug-fix scope"
+    },
+    {
+      "name": "Sibling risk follow-up",
+      "max_score": 14,
+      "description": "Finding C is treated as a follow-up or inspection note, not patched in this PR without approval"
+    },
+    {
+      "name": "Scope baseline referenced",
+      "max_score": 12,
+      "description": "The triage ties decisions to the original retry-button request, changed files, and owner boundary"
+    },
+    {
+      "name": "Verification after fix",
+      "max_score": 14,
+      "description": "The plan reruns the focused RetryInvoiceButton test after fixing the accepted finding"
+    },
+    {
+      "name": "Autoreview rerun",
+      "max_score": 12,
+      "description": "The plan reruns autoreview after code changes and stops only after no accepted/actionable findings remain"
+    },
+    {
+      "name": "No public posting",
+      "max_score": 8,
+      "description": "The response does not publish review comments externally; it keeps the triage local"
+    },
+    {
+      "name": "Concise final report",
+      "max_score": 8,
+      "description": "The final closeout names accepted/rejected findings, proof run, and clean rerun status without dumping long logs"
+    }
+  ]
+}

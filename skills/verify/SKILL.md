@@ -1,6 +1,6 @@
 ---
 name: verify
-description: "Self-check your own completed change before independent review — the pre-review sanity pass. Use when you want to check your work, run checks, validate changes, make sure a change is ready, test it end-to-end, run repo guardrails (lint, typecheck, tests, build), exercise the real surface with evidence, and catch obvious self-correctable issues. Produces a `ready for review` / `needs more work` / `blocked` verdict — never a ship decision. Do not use when the repo cannot be booted or exercised reliably, or when auditing someone else's diff, branch, or PR."
+description: "Self-check an agent's own completed change before independent review — the pre-review sanity pass. Use when checking recent work, running checks, validating changes, making sure a change is ready, testing it end-to-end, running repo guardrails (lint, typecheck, tests, build), exercising the real surface with evidence, or catching obvious self-correctable issues. Produces a `ready for review` / `needs more work` / `blocked` verdict — never a ship decision. Do not use when the repo cannot be booted or exercised reliably, or when auditing someone else's diff, branch, or PR."
 ---
 
 # Verify

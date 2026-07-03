@@ -1,0 +1,51 @@
+{
+  "context": "Tests whether react-ban-use-effect can encode the policy into lint rules while preserving a narrow mount-only wrapper exception and existing hook guardrails.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Import ban",
+      "max_score": 16,
+      "description": "ESLint blocks importing `useEffect` from `react` in normal application code, for example with `no-restricted-imports`"
+    },
+    {
+      "name": "Namespace call ban",
+      "max_score": 16,
+      "description": "ESLint blocks `React.useEffect(...)` namespace calls in normal application code, for example with `no-restricted-syntax`"
+    },
+    {
+      "name": "Wrapper exception scoped",
+      "max_score": 14,
+      "description": "The policy allows direct useEffect only in `src/hooks/useMountEffect.ts` or an equivalently narrow shared wrapper path"
+    },
+    {
+      "name": "Mount wrapper narrow",
+      "max_score": 12,
+      "description": "`useMountEffect` exposes mount-only setup/cleanup behavior and does not pretend to solve dependency-aware synchronization"
+    },
+    {
+      "name": "Hooks lint preserved",
+      "max_score": 10,
+      "description": "Existing `react-hooks/rules-of-hooks` and `react-hooks/exhaustive-deps` enforcement is preserved or strengthened, not disabled globally"
+    },
+    {
+      "name": "No unrelated bans",
+      "max_score": 8,
+      "description": "The policy does not ban unrelated APIs such as `useLayoutEffect` or non-React effect systems unless requested"
+    },
+    {
+      "name": "Message points to replacements",
+      "max_score": 8,
+      "description": "Lint messages direct developers toward declarative replacements or the approved wrapper rather than dependency-array tuning"
+    },
+    {
+      "name": "Verification named",
+      "max_score": 10,
+      "description": "The report says to run lint and includes positive/negative checks for blocked imports, blocked namespace calls, and the allowed wrapper"
+    },
+    {
+      "name": "Boundary explained",
+      "max_score": 6,
+      "description": "The report explains that the wrapper is only for external-system mount synchronization and not fetching, derived state, resets, or relaying user actions"
+    }
+  ]
+}

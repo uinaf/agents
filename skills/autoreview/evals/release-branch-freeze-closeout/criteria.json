@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether autoreview applies release-branch freeze discipline: fix only release blockers, reject non-blocking cleanup, rerun focused proof, and capture forward-port/follow-up decisions.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Release freeze recognized",
+      "max_score": 16,
+      "description": "The closeout states that the release branch only allows blockers such as crashes, data loss, install/upgrade breakage, or concrete security exposure"
+    },
+    {
+      "name": "Crash finding accepted",
+      "max_score": 18,
+      "description": "Finding A is accepted as release-blocking because it preserves the startup crash under a missing config file"
+    },
+    {
+      "name": "Style finding deferred",
+      "max_score": 14,
+      "description": "Finding B is deferred to main/follow-up rather than fixed on the release branch"
+    },
+    {
+      "name": "Smallest allowed fix",
+      "max_score": 12,
+      "description": "The fix plan is limited to the missing-file crash path and avoids broad startup refactors"
+    },
+    {
+      "name": "Focused release proof",
+      "max_score": 14,
+      "description": "Verification includes a focused missing-config startup test or runtime proof tied to the release target"
+    },
+    {
+      "name": "Autoreview rerun after fix",
+      "max_score": 10,
+      "description": "The closeout requires rerunning autoreview after the crash fix and reporting the clean result or conscious rejection"
+    },
+    {
+      "name": "Forward-port decision",
+      "max_score": 8,
+      "description": "The response states whether the crash fix must forward-port to main and where the style cleanup should live"
+    },
+    {
+      "name": "No branch broadening",
+      "max_score": 8,
+      "description": "The response does not introduce new product behavior, process policy, or style-only cleanup on the release branch"
+    }
+  ]
+}

@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "skills/**"
+      - "scripts/skills/publish.sh"
       - ".github/workflows/publish-skills.yml"
   workflow_dispatch:
 
@@ -63,10 +64,25 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: gh auth setup-git
 
-      - name: Publish changed tiles
-        uses: uinaf/tessl-publish-action@c886763f2a95d6971317fd4b8abe88679619ebad # v2.1.2
+      - name: Publish changed plugins
+        env:
+          GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+          GITHUB_SHA: ${{ github.sha }}
+          TESSL_WORKSPACE: uinaf
+          TESSL_PUBLISH_ALL: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+        run: ./scripts/skills/publish.sh
+
+      - name: Commit published plugin versions
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         env:
           GH_TOKEN: ${{ github.token }}
-        with:
-          review-threshold: "90"
-          commit-version-bumps: "true"
+        run: |
+          if git diff --quiet -- skills; then
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add skills
+          git commit -m "chore: sync published plugin versions [skip ci]"
+          git push

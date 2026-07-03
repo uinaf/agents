@@ -1,0 +1,46 @@
+{
+  "context": "Tests whether autoreview chooses the correct branch/PR target for a clean committed branch instead of running an empty dirty-local review, and whether it preserves the closeout proof loop.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Branch target selected",
+      "max_score": 18,
+      "description": "The plan selects branch review against the PR base, such as `--mode branch --base origin/main`, rather than local/dirty mode"
+    },
+    {
+      "name": "PR base discovery command",
+      "max_score": 12,
+      "description": "The commands include discovering the actual PR base with `gh pr view --json baseRefName --jq .baseRefName` or an equivalent reliable source"
+    },
+    {
+      "name": "Autoreview helper used",
+      "max_score": 14,
+      "description": "The commands run the bundled autoreview helper directly rather than asking another model to perform a generic review"
+    },
+    {
+      "name": "No empty local review",
+      "max_score": 14,
+      "description": "The plan explicitly avoids dirty-local/local mode because the working tree is clean and the committed branch diff is the real target"
+    },
+    {
+      "name": "No push requirement",
+      "max_score": 10,
+      "description": "The plan does not push the branch solely to make autoreview possible"
+    },
+    {
+      "name": "Focused proof loop",
+      "max_score": 14,
+      "description": "The plan says accepted findings require focused tests or proof plus a rerun of autoreview until no accepted/actionable findings remain"
+    },
+    {
+      "name": "Reject advisory weakness",
+      "max_score": 10,
+      "description": "The plan treats review output as advisory and says findings must be verified before fixing"
+    },
+    {
+      "name": "Compact closeout shape",
+      "max_score": 8,
+      "description": "The output is a concise plan with the requested sections and no verbose review transcript"
+    }
+  ]
+}

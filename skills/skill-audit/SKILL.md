@@ -1,6 +1,6 @@
 ---
 name: skill-audit
-description: "Audit existing skills with Tessl scoring, metadata and trigger-coverage checks, repo conventions, and skill-authoring best practices. Use when creating or revising a skill, triaging weak self-activation, or comparing a skill against source-repo guidance such as `AGENTS.md`, `CLAUDE.md`, or repo rules, plus external skill guidance. Do not use to verify general application code or to rewrite unrelated docs."
+description: "Audit, score, or improve existing skills with Tessl review output, metadata checks, repo conventions, and skill-authoring best practices. Use when creating or revising a skill, asking why a skill did not activate, checking skill quality, comparing a skill against `AGENTS.md`, `CLAUDE.md`, or repo rules, or preparing a skill for publish. Do not use to verify general application code or to rewrite unrelated docs."
 ---
 
 # Skill Audit
@@ -28,10 +28,19 @@ Audit a skill before calling it ready. Favor Tessl output, repo conventions, and
 1. Define scope: one skill folder or the whole skills repo
 2. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
 3. Read the target `SKILL.md` first, then nearby `references/`, `scripts/`, and `agents/openai.yaml` only as needed
-4. Pick the right Tessl loop:
-   - single skill: `npx tessl skill review --json skills/<name>`
-   - full repo batch: use a repo wrapper such as `./scripts/skills/review.sh` if one exists; otherwise run direct Tessl reviews per skill
-   - optimizer only when explicitly requested: `npx tessl skill review --optimize --yes --max-iterations 1 skills/<name>`
+4. Run the common single-skill audit path first:
+
+```bash
+skill_dir="skills/<name>"
+npx tessl@0.80.0 plugin lint "$skill_dir"
+npx tessl@0.80.0 review run --workspace uinaf --threshold 0 --json "$skill_dir"
+```
+
+For a full repo batch, use the repo wrapper such as `./scripts/skills/review.sh` when present; otherwise repeat the direct Tessl review per skill. Use optimizer only when explicitly requested:
+
+```bash
+npx tessl@0.80.0 skill review --optimize --yes --max-iterations 1 skills/<name>
+```
 
 ## Workflow
 

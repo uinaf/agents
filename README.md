@@ -4,12 +4,12 @@ Reusable agent skills, global behavioral rules, and a small sync script for AI c
 
 ## Layout
 
-- `skills/` — local skill packages.
+- `skills/` — local Tessl plugin packages with `SKILL.md`, `.tessl-plugin/plugin.json`, and optional `evals/`.
 - `rules/agents.md` — global behavioral rules.
 - `rules/agents.local.md` — optional private machine-specific overrides, ignored by git.
 - `rules/agents.final.md` — generated combined rules, ignored by git.
 - `scripts/sync/sync.sh` — symlink rules and install manifest skills.
-- `scripts/skills/` — Tessl review helpers.
+- `scripts/skills/` — Tessl review and publish helpers.
 - `docs/` — distribution notes.
 
 ## Sync (rules + skills together)
