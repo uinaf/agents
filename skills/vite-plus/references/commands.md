@@ -9,7 +9,7 @@ Use this reference before changing command invocations, package-manager usage, o
 - Use the built-in `vp test`, `vp lint`, `vp fmt`, and `vp check` commands.
 - Built-in commands cannot be overridden by same-named scripts. `vp build` always runs the built-in Vite build; use `vp run build` (or `vpr build`) to execute a `package.json` `build` script.
 - `vpr` is a standalone shorthand for `vp run`. Use whichever spelling the repo already prefers in a given scripts block.
-- Distinguish global upgrades from repo-local upgrades: `vp upgrade` updates the global CLI, while `vp update ...` updates project dependencies.
+- Distinguish global upgrades from repo-local upgrades: `vp upgrade` updates the global CLI, while `vp migrate` updates the project-local Vite+ stack.
 
 ## Runtime and Package Manager
 
@@ -45,8 +45,8 @@ Use this reference before changing command invocations, package-manager usage, o
 ## Upgrades
 
 - Use `vp upgrade` to update the global `vp` binary on the machine.
-- Use `vp update vite-plus` to move the local `vite-plus` package forward in a repo.
-- Keep the package-manager `vite` alias mapped to the matching `npm:@voidzero-dev/vite-plus-core@<version>`. `vp update vite-plus` does not necessarily re-resolve that alias, so update `@voidzero-dev/vite-plus-core` explicitly when moving releases.
+- Use `vp migrate` from the project root to move the local `vite-plus` package forward in a repo. On projects already using Vite+, this defaults to a version-only upgrade and skips first-time setup unless `--full` is passed.
+- Keep the package-manager `vite` alias mapped to the matching `npm:@voidzero-dev/vite-plus-core@<version>`. `vp migrate` should re-pin it; verify the manifest, catalog or override, and lockfile importer before calling the upgrade done.
 - For Vite+ 0.2.x and newer, remove the old `@voidzero-dev/vite-plus-test` alias/wrapper instead of updating it. `vp test` uses upstream Vitest through `vite-plus`; direct `vitest` and `@vitest/*` packages are only for repos that use upstream Vitest APIs, coverage/UI packages, or browser providers directly.
 - Use `vp outdated` to confirm whether any Vite+ packages remain behind the intended release.
 

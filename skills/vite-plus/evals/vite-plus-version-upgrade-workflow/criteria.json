@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent correctly handles a Vite+ version upgrade by distinguishing between the global CLI upgrade surface and the project-local upgrade surface, explicitly updating the Vite+ core alias, removing the obsolete test wrapper, classifying direct Vitest usage, and performing the correct end-to-end validation sequence.",
+  "context": "Tests whether the agent correctly handles a Vite+ version upgrade by distinguishing between the global CLI upgrade surface and the project-local migration surface, using current vp migrate behavior, removing the obsolete test wrapper, classifying direct Vitest usage, and performing the correct end-to-end validation sequence.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -10,17 +10,17 @@
     {
       "name": "Global before local",
       "max_score": 8,
-      "description": "The global `vp upgrade` step appears before (or is documented as separate from) the project-local `vp update` steps — the two surfaces are not conflated into a single operation"
+      "description": "The global `vp upgrade` step appears before (or is documented as separate from) the project-local `vp migrate` step — the two surfaces are not conflated into a single operation"
     },
     {
-      "name": "vp update vite-plus",
+      "name": "vp migrate for local stack",
       "max_score": 10,
-      "description": "The project-local update includes `vp update vite-plus` (updating the vite-plus package itself)"
+      "description": "The project-local upgrade uses `vp migrate` from the project root so Vite+ updates the local `vite-plus` package and related toolchain pins together"
     },
     {
-      "name": "Explicit core alias update",
+      "name": "Core alias verified",
       "max_score": 15,
-      "description": "The procedure explicitly updates `@voidzero-dev/vite-plus-core` with `vp update @voidzero-dev/vite-plus-core` (or combined with other packages) — NOT relying on `vp update vite-plus` alone to re-resolve this alias"
+      "description": "The procedure verifies that `vp migrate` updated the `vite` -> `npm:@voidzero-dev/vite-plus-core@<matching-version>` alias in the manifest, catalog or override, and lockfile importer before calling the upgrade done"
     },
     {
       "name": "Removed obsolete test wrapper",
@@ -55,7 +55,7 @@
     {
       "name": "No direct package manager for Vite+ packages",
       "max_score": 3,
-      "description": "The upgrade steps do NOT use `npm install`, `pnpm update`, `yarn upgrade`, or other direct package-manager commands for the Vite+ packages — all updates go through `vp update`"
+      "description": "The upgrade steps do NOT use `npm install`, `pnpm update`, `yarn upgrade`, or other direct package-manager commands for the Vite+ packages — the local Vite+ stack moves through `vp migrate`"
     }
   ]
 }
