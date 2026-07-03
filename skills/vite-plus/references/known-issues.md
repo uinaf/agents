@@ -1,6 +1,6 @@
-# Known Issues (alpha)
+# Known Issues (beta)
 
-Vite+ is still in alpha. These are real, recent caveats observed against the upstream issue tracker. Surface them only if the repo actually hits them — do not preemptively work around something a stock setup is fine with. Re-check this list against [the issue tracker](https://github.com/voidzero-dev/vite-plus/issues) when adopting a newer release.
+Vite+ is in beta and still moving quickly. These are real, recent caveats observed against the upstream issue tracker. Surface them only if the repo actually hits them — do not preemptively work around something a stock setup is fine with. Re-check this list against [the issue tracker](https://github.com/voidzero-dev/vite-plus/issues) when adopting a newer release.
 
 ## `vp check --fix` on a single file
 

@@ -22,6 +22,7 @@ Prefer the documented Vite+ setup:
 | Input | Purpose |
 | ----- | ------- |
 | `version` | Pin a specific Vite+ release. Defaults to latest; pin when CI must stay aligned with a chosen release. |
+| `version-file` | Resolve the Vite+ release from `package.json`, `pnpm-workspace.yaml`, or `.yarnrc.yml`; default auto-detection reads the local `vite-plus` dependency/lockfile when possible. |
 | `node-version` | Node.js version to install via `vp env use`. |
 | `node-version-file` | Read the Node.js version from `.node-version`. |
 | `working-directory` | Project root for path resolution and lockfile detection. |
@@ -36,6 +37,7 @@ Prefer the documented Vite+ setup:
 - Treat `setup-vp` as the CI `vp` provider. Do not add `GITHUB_PATH`, `node_modules/.bin`, `pnpm exec vp`, or similar PATH workarounds to prefer the project binary; if plain `vp` fails under the official action, verify against `setup-vp` or the official installer before changing workflow shape.
 - Prefer `setup-vp`'s built-in Node and package-manager bootstrap over adding separate CI-time `vp env` setup steps unless the repo has a specific environment need the action does not cover.
 - Prefer `setup-vp`'s default install step over a separate `vp install` when Vite+ is the tool owner. Set `run-install: false` only when the workflow needs to pass custom install arguments or control install as a separate step.
+- When neither `version` nor `version-file` is set, current `setup-vp` tries to resolve the Vite+ version from the checked-out project's `vite-plus` dependency and lockfile before falling back to `latest`; watch warnings because an unresolved range or alias means CI may not be using the intended project version.
 - Prefer `vp config` when the repo wants stock hooks or agent integration instead of hand-rolled hook setup.
 - Prefer one repo-local verify entrypoint if CI needs extra repo-specific commands.
 - Keep release orchestration in GitHub Actions when the repo has npm, GitHub Release, binary, or Homebrew automation that goes beyond stock Vite+.
@@ -49,3 +51,4 @@ Prefer the documented Vite+ setup:
 - Prefer `vp run <script>` (or `vpr <script>`) when CI needs a repo-specific script that Vite+ does not replace.
 - Preserve release-only steps while making the surrounding workflow more stock.
 - Keep packaging and publish steps that Vite+ does not own.
+- For non-GitHub container CI, the official `ghcr.io/voidzero-dev/vite-plus` image is the stock toolchain image. Pin an exact tag or digest when reproducibility matters, and keep production runtime images separate.

@@ -26,8 +26,9 @@ Vite+ does not support older upstream versions. In Vite+ 0.2.x and newer, node-m
 4. If Vite+ is already installed, inspect its packaged guidance files first. Recent releases ship docs directly at `node_modules/vite-plus/docs/`, and a common guidance entry is `node_modules/vite-plus/AGENTS.md`. Use whatever `AGENTS.md`, `CLAUDE.md`, or rules file ships with the installed toolchain.
 5. Reconcile generated files with the repo's real guardrails and release flow instead of assuming stock output is final.
 6. Keep useful generated agent guidance, but merge it into the repo's real guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules instead of accepting generic Vite+ boilerplate unchanged.
-7. Treat the machine-global `vp` binary and the repo-local `vite-plus` package as separate upgrade surfaces. `vp upgrade` updates the global CLI, while project dependencies should move with `vp update ...` inside the repo.
-8. For 0.1.x to 0.2.x upgrades, do not trust `vp migrate` as the only step. Remove `@voidzero-dev/vite-plus-test`, keep only the `vite` -> `@voidzero-dev/vite-plus-core` alias, and classify any direct Vitest, coverage, UI, or browser-provider usage before deciding which upstream Vitest packages must remain direct dependencies.
+7. Treat the machine-global `vp` binary and the repo-local `vite-plus` package as separate upgrade surfaces. `vp upgrade` updates the global CLI; project dependencies should normally move with `vp migrate` from the workspace root.
+8. For existing Vite+ projects, current `vp migrate` performs a version-only upgrade by default: it re-pins `vite-plus`, the `vite` -> `@voidzero-dev/vite-plus-core` alias, and Vitest-related pins across workspace packages without re-running first-time setup. Use `vp migrate --full` only when you intentionally want hooks, editor files, agent files, and lint migration touched again.
+9. For 0.1.x to 0.2.x upgrades, still inspect the result instead of trusting migration as a black box. Remove `@voidzero-dev/vite-plus-test`, keep only the `vite` -> `@voidzero-dev/vite-plus-core` alias, and classify any direct Vitest, coverage, UI, or browser-provider usage before deciding which upstream Vitest packages must remain direct dependencies.
 
 ## Notes
 
