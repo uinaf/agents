@@ -15,6 +15,12 @@ The wrapper pins the Tessl CLI through `TESSL_CLI_VERSION`, defaulting to the
 version in the script. Bump it intentionally rather than relying on moving npm
 latest.
 
+In CI, Tessl's scored `skill review` requires authentication. When `CI` is set
+and `TESSL_TOKEN` is absent, the wrapper falls back to `tessl skill lint` so
+pull requests still get deterministic structure validation without requiring a
+secret or posting bot-authored review comments. Set `TESSL_REVIEW_MODE=lint` to
+force that mode locally.
+
 Useful direct invocations:
 
 ```bash

@@ -85,7 +85,8 @@ The split is intentional: anything that walks the workspace graph goes through `
 
 - `vp run` of a `package.json` script is uncached by default. Opt in with `vp run --cache <script>` for one invocation, set `run.cache.scripts: true` in `vite.config.ts` to flip the default workspace-wide, or move the task into `vite.config.ts` (cached by default).
 - Compound commands joined with `&&` are split into independent sub-tasks, each cached separately. When a script contains `vp run`, Vite Task inlines those nested calls as sibling tasks instead of spawning a nested process. Recursion (root `build` -> `vp run -r build` -> root `build` ...) is detected and the self-reference is pruned automatically.
-- Some targets cannot infer task inputs automatically. If Vite+ reports that a task ran uncached because `input` was not configured, add explicit task inputs in `vite.config.ts`.
+- Automatic file tracking is the default for cache-enabled tasks. `vp build` also reports Vite inputs, outputs, and relevant env metadata to Vite Task, so standard Vite builds do not need hand-written `input`, `output`, or `env` config.
+- Some non-Vite targets cannot infer task inputs automatically. If Vite+ reports that a task ran uncached because `input` was not configured, add explicit task inputs in `vite.config.ts`.
 
 ## Graduating to `vite.config.ts` task definitions
 
@@ -104,6 +105,12 @@ export default defineConfig({
     },
   },
 });
+```
+
+For tasks that should run before all direct dependency packages, use the object form:
+
+```ts
+dependsOn: [{ task: 'build', from: ['dependencies', 'devDependencies'] }]
 ```
 
 This is a follow-up, not a day-one migration. Land the script-based orchestration first, measure, then promote the hot paths.
