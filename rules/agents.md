@@ -21,6 +21,12 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 
 ## Workflow
 
+### Session naming
+
+- When starting a distinct job in a harness that supports thread/session titles, name it once the ticket or task is clear.
+- Use `<ticket-id>-<descriptive-slug>` when a ticket exists, otherwise use `<descriptive-slug>`.
+- Keep slugs lowercase, hyphen-separated, and specific enough to recognize later.
+
 ### Plan before code
 
 Trivial tasks skip planning. For non-trivial tasks (multiple files, public contracts, persistence/external I/O, tests, or migrations), before code:
