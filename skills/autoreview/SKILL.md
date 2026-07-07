@@ -7,7 +7,7 @@ description: "Run structured Codex/Claude autoreview closeout for local changes,
 
 Run the bundled structured review helper as a closeout check. This is code review, not Guardian `auto_review` approval routing.
 
-Codex review is the default when no engine is set. It tries the helper's built-in preferred Codex models unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in Claude model default unless overridden.
+Codex review is the default when no engine is set. It tries the helper's built-in preferred Codex models unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in preferred Claude model plus fallback unless overridden.
 
 Use when:
 

@@ -119,7 +119,7 @@ MAX_BUNDLE_TEXT_BYTES = 180_000
 DEFAULT_ENGINE_PATHS = ("/usr/local/bin", "/usr/bin", "/bin")
 DEFAULT_MODEL_CANDIDATES_BY_ENGINE = {
     "codex": ("gpt-5.6-sol", "gpt-5.5"),
-    "claude": ("claude-fable-5",),
+    "claude": ("claude-fable-5", "claude-opus-4-8"),
 }
 DEFAULT_MODEL_BY_ENGINE = {
     engine: candidates[0] for engine, candidates in DEFAULT_MODEL_CANDIDATES_BY_ENGINE.items()
@@ -1295,10 +1295,23 @@ def comma_list_env(name: str) -> list[str]:
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
-def codex_default_model_candidates() -> list[str]:
+def preferred_model_candidates(engine: str) -> list[str]:
     return (
-        comma_list_env("AUTOREVIEW_CODEX_PREFERRED_MODELS")
-        or list(DEFAULT_MODEL_CANDIDATES_BY_ENGINE["codex"])
+        comma_list_env(f"AUTOREVIEW_{engine.upper()}_PREFERRED_MODELS")
+        or list(DEFAULT_MODEL_CANDIDATES_BY_ENGINE[engine])
+    )
+
+
+def default_fallback_model(engine: str, candidates: list[str] | None) -> str | None:
+    if engine != "claude" or not candidates or len(candidates) < 2:
+        return None
+    return ",".join(candidates[1:])
+
+
+def is_default_fallback_model(args: argparse.Namespace) -> bool:
+    return getattr(args, "fallback_model", None) == default_fallback_model(
+        args.engine,
+        getattr(args, "model_candidates", None),
     )
 
 
@@ -2064,7 +2077,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--model",
         action="append",
-        help="Model for all reviewers or engine=model. Repeatable. Defaults: codex tries gpt-5.6-sol then gpt-5.5; claude=claude-fable-5.",
+        help="Model for all reviewers or engine=model. Repeatable. Defaults: codex tries gpt-5.6-sol then gpt-5.5; claude tries claude-fable-5 with claude-opus-4-8 fallback.",
     )
     parser.add_argument("--thinking", action="append", help="Thinking/effort for all reviewers or engine=level. Repeatable. Codex: none, minimal, low, medium, high, xhigh. Claude: low, medium, high, xhigh, max.")
     parser.add_argument(
@@ -2226,7 +2239,7 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
             or env_model_by_engine.get(engine)
             or env_global_model
         )
-        model_candidates = codex_default_model_candidates() if engine == "codex" and not explicit_model else None
+        model_candidates = preferred_model_candidates(engine) if not explicit_model else None
         model = explicit_model or (model_candidates[0] if model_candidates else DEFAULT_MODEL_BY_ENGINE.get(engine))
         thinking = (
             inline_thinking
@@ -2241,6 +2254,7 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
                 or global_fallback
                 or env_fallback_by_engine.get(engine)
                 or env_global_fallback
+                or default_fallback_model(engine, model_candidates)
             )
         else:
             fallback_model = None
@@ -2264,7 +2278,7 @@ def reviewer_label(args: argparse.Namespace) -> str:
         parts.append(f"models={','.join(candidates)}")
     elif args.model:
         parts.append(f"model={args.model}")
-    if getattr(args, "fallback_model", None):
+    if getattr(args, "fallback_model", None) and not is_default_fallback_model(args):
         parts.append(f"fallback={args.fallback_model}")
     if args.thinking:
         parts.append(f"thinking={args.thinking}")
@@ -2399,6 +2413,7 @@ def self_test_config_defaults() -> None:
         "AUTOREVIEW_CODEX_MODEL",
         "AUTOREVIEW_CODEX_PREFERRED_MODELS",
         "AUTOREVIEW_CLAUDE_MODEL",
+        "AUTOREVIEW_CLAUDE_PREFERRED_MODELS",
         "AUTOREVIEW_THINKING",
         "AUTOREVIEW_CODEX_THINKING",
         "AUTOREVIEW_CLAUDE_THINKING",
@@ -2412,11 +2427,22 @@ def self_test_config_defaults() -> None:
         default_claude = reviewer_args(reviewer_test_args(engine="claude"))[0]
         if default_claude.model != "claude-fable-5":
             raise SystemExit(f"self-test config defaults failed: default claude model={default_claude.model!r}")
+        if default_claude.model_candidates != ["claude-fable-5", "claude-opus-4-8"]:
+            raise SystemExit(f"self-test config defaults failed: default claude candidates={default_claude.model_candidates!r}")
+        if default_claude.fallback_model != "claude-opus-4-8":
+            raise SystemExit(f"self-test config defaults failed: default claude fallback={default_claude.fallback_model!r}")
         os.environ["AUTOREVIEW_CODEX_PREFERRED_MODELS"] = "local-a, local-b"
         preferred_codex = reviewer_args(reviewer_test_args(engine="codex"))[0]
         if preferred_codex.model_candidates != ["local-a", "local-b"] or preferred_codex.model != "local-a":
             raise SystemExit(f"self-test config defaults failed: preferred codex candidates={preferred_codex.model_candidates!r}")
         os.environ.pop("AUTOREVIEW_CODEX_PREFERRED_MODELS")
+        os.environ["AUTOREVIEW_CLAUDE_PREFERRED_MODELS"] = "claude-a, claude-b, claude-c"
+        preferred_claude = reviewer_args(reviewer_test_args(engine="claude"))[0]
+        if preferred_claude.model_candidates != ["claude-a", "claude-b", "claude-c"] or preferred_claude.model != "claude-a":
+            raise SystemExit(f"self-test config defaults failed: preferred claude candidates={preferred_claude.model_candidates!r}")
+        if preferred_claude.fallback_model != "claude-b,claude-c":
+            raise SystemExit(f"self-test config defaults failed: preferred claude fallback={preferred_claude.fallback_model!r}")
+        os.environ.pop("AUTOREVIEW_CLAUDE_PREFERRED_MODELS")
         os.environ["AUTOREVIEW_MODEL"] = "env-global-model"
         os.environ["AUTOREVIEW_CODEX_MODEL"] = "env-codex-model"
         os.environ["AUTOREVIEW_THINKING"] = "low"
@@ -2700,7 +2726,7 @@ def main() -> int:
             print(f"models: {','.join(candidates)}")
         elif reviewers[0].model:
             print(f"model: {reviewers[0].model}")
-        if getattr(reviewers[0], "fallback_model", None):
+        if getattr(reviewers[0], "fallback_model", None) and not is_default_fallback_model(reviewers[0]):
             print(f"fallback_model: {reviewers[0].fallback_model}")
         if reviewers[0].thinking:
             print(f"thinking: {reviewers[0].thinking}")

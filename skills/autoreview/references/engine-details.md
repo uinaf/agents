@@ -11,7 +11,7 @@ Recommended model defaults:
 | Engine | Default model behavior | Source note |
 |--------|---------------|-------------|
 | **codex** (default) | Tries `gpt-5.6-sol`, then `gpt-5.5` when the first model is unavailable | Local preferred review model list; `gpt-5.5` remains the public documented fallback |
-| **claude** | `claude-fable-5` | OpenClaw upstream default |
+| **claude** | Starts with `claude-fable-5` and passes `claude-opus-4-8` as the Claude Code fallback model | Local preferred review model list; Opus 4.8 full identifier follows [Claude Code model configuration](https://code.claude.com/docs/en/model-config) |
 
 CLI flags and environment variables override these defaults.
 
@@ -33,10 +33,11 @@ CLI flags take precedence over environment variables.
 | `AUTOREVIEW_FALLBACK_MODEL` | Default Claude `--fallback-model` chain |
 | `AUTOREVIEW_<ENGINE>_MODEL` | Per-engine model override, for example `AUTOREVIEW_CODEX_MODEL=gpt-5.6-sol` |
 | `AUTOREVIEW_<ENGINE>_THINKING` | Per-engine thinking override |
-| `AUTOREVIEW_CODEX_PREFERRED_MODELS` | Comma-separated Codex fallback list used only when no explicit Codex model override is set |
+| `AUTOREVIEW_CODEX_PREFERRED_MODELS` | Comma-separated Codex preferred list used only when no explicit Codex model override is set |
+| `AUTOREVIEW_CLAUDE_PREFERRED_MODELS` | Comma-separated Claude preferred list; first entry is `--model`, remaining entries become `--fallback-model` when no explicit Claude model or fallback override is set |
 | `AUTOREVIEW_CLAUDE_FALLBACK_MODEL` | Claude-only fallback chain |
 
-Codex maps thinking to `model_reasoning_effort`. Claude maps thinking to `--effort`. Only Claude accepts `--fallback-model`; global CLI/env fallback requires at least one Claude reviewer, and engine-specific fallback overrides require that reviewer to be selected. Non-Claude fallback overrides fail closed instead of being silently ignored.
+Codex maps thinking to `model_reasoning_effort`. Claude maps thinking to `--effort`. Codex retries the next preferred model only when the Codex CLI reports the selected model is unavailable. Claude uses Claude Code's native `--fallback-model` chain for its remaining preferred models. Only Claude accepts explicit `--fallback-model`; global CLI/env fallback requires at least one Claude reviewer, and engine-specific fallback overrides require that reviewer to be selected. Non-Claude fallback overrides fail closed instead of being silently ignored.
 
 ## Review Engine Isolation
 
