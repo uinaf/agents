@@ -7,7 +7,7 @@ description: "Run structured Codex/Claude autoreview closeout for local changes,
 
 Run the bundled structured review helper as a closeout check. This is code review, not Guardian `auto_review` approval routing.
 
-Codex review is the default when no engine is set. It tries the helper's built-in preferred Codex models unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in preferred Claude model plus fallback unless overridden.
+Codex review is the default when no engine is set. It tries the helper's built-in preferred Codex models unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in preferred Claude models unless overridden.
 
 Use when:
 
@@ -160,7 +160,7 @@ For models with slashes or extra colons, prefer keyed form:
 
 ## Engine Details
 
-Use [references/engine-details.md](references/engine-details.md) for model defaults, environment overrides, Claude fallback models, and Codex/Claude isolation details.
+Use [references/engine-details.md](references/engine-details.md) for model defaults, preferred model lists, environment overrides, and Codex/Claude isolation details.
 
 ## Context Efficiency
 
@@ -203,5 +203,5 @@ Do not run another review solely to improve the final report wording. If the fin
 
 - [references/troubleshooting.md](references/troubleshooting.md) - security-audit suppression and other edge-case closeout notes
 - [references/scope.md](references/scope.md) - scope governor and release-branch freeze rules
-- [references/engine-details.md](references/engine-details.md) - model defaults, environment overrides, and engine isolation details
+- [references/engine-details.md](references/engine-details.md) - model defaults, preferred model lists, environment overrides, and engine isolation details
 - [references/upstream.md](references/upstream.md) - OpenClaw upstream provenance and local packaging notes

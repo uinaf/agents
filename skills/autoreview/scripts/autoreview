@@ -1302,17 +1302,10 @@ def preferred_model_candidates(engine: str) -> list[str]:
     )
 
 
-def default_fallback_model(engine: str, candidates: list[str] | None) -> str | None:
+def claude_preferred_model_tail(engine: str, candidates: list[str] | None) -> str | None:
     if engine != "claude" or not candidates or len(candidates) < 2:
         return None
     return ",".join(candidates[1:])
-
-
-def is_default_fallback_model(args: argparse.Namespace) -> bool:
-    return getattr(args, "fallback_model", None) == default_fallback_model(
-        args.engine,
-        getattr(args, "model_candidates", None),
-    )
 
 
 def codex_model_unavailable(output: str) -> bool:
@@ -1458,8 +1451,8 @@ def run_claude(args: argparse.Namespace, repo: Path, prompt: str) -> str:
         cmd.append("--verbose")
     if args.model:
         cmd.extend(["--model", args.model])
-    if getattr(args, "fallback_model", None):
-        cmd.extend(["--fallback-model", args.fallback_model])
+    if getattr(args, "claude_preferred_model_tail", None):
+        cmd.extend(["--fallback-model", args.claude_preferred_model_tail])
     if args.thinking:
         cmd.extend(["--effort", args.thinking])
     result = run_with_heartbeat(
@@ -2077,14 +2070,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--model",
         action="append",
-        help="Model for all reviewers or engine=model. Repeatable. Defaults: codex tries gpt-5.6-sol then gpt-5.5; claude tries claude-fable-5 with claude-opus-4-8 fallback.",
+        help="Model for all reviewers or engine=model. Repeatable. Defaults use preferred model lists: codex gpt-5.6-sol,gpt-5.5; claude claude-fable-5,claude-opus-4-8.",
     )
     parser.add_argument("--thinking", action="append", help="Thinking/effort for all reviewers or engine=level. Repeatable. Codex: none, minimal, low, medium, high, xhigh. Claude: low, medium, high, xhigh, max.")
-    parser.add_argument(
-        "--fallback-model",
-        action="append",
-        help="Claude fallback model chain for all reviewers or claude=a,b. Repeatable.",
-    )
     parser.add_argument("--allow-partial-panel", action="store_true", help="Continue panel output when one reviewer fails.")
     parser.add_argument("--codex-bin", default=os.environ.get("CODEX_BIN", "codex"))
     parser.add_argument("--claude-bin", default=os.environ.get("CLAUDE_BIN", "claude"))
@@ -2120,7 +2108,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--expect-findings", action="store_true", help="Treat findings as success; for harness acceptance tests.")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--self-test-config-defaults", action="store_true", help=argparse.SUPPRESS)
-    parser.add_argument("--self-test-fallback-scope", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--self-test-engine-isolation", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--self-test-json-array-parser", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--self-test-heartbeat-metrics", action="store_true", help=argparse.SUPPRESS)
@@ -2194,10 +2181,8 @@ def parse_reviewer_token(token: str) -> tuple[str, str | None, str | None]:
 def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
     global_model, model_by_engine = parse_keyed_options(args.model, "model")
     global_thinking, thinking_by_engine = parse_keyed_options(args.thinking, "thinking")
-    global_fallback, fallback_by_engine = parse_keyed_options(args.fallback_model, "fallback-model")
     env_global_model, env_model_by_engine = env_defaults_for("model")
     env_global_thinking, env_thinking_by_engine = env_defaults_for("thinking")
-    env_global_fallback, env_fallback_by_engine = env_defaults_for("fallback-model")
     reviewers: list[tuple[str, str | None, str | None]] = []
     if args.reviewers:
         tokens = [token.strip() for token in args.reviewers.split(",") if token.strip()]
@@ -2212,19 +2197,6 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
         reviewers = [(engine, None, None) for engine in engines]
     else:
         reviewers = [(args.engine, None, None)]
-
-    selected_engines = {engine for engine, _, _ in reviewers}
-    fallback_engines = set(fallback_by_engine) | set(env_fallback_by_engine)
-    unused_fallback_engines = fallback_engines - selected_engines
-    if unused_fallback_engines:
-        engine_list = ", ".join(sorted(unused_fallback_engines))
-        raise SystemExit(f"--fallback-model specified for unselected reviewer: {engine_list}")
-    selected_non_claude_fallback = sorted(engine for engine in fallback_engines if engine != "claude")
-    if selected_non_claude_fallback:
-        engine_list = ", ".join(selected_non_claude_fallback)
-        raise SystemExit(f"--fallback-model is only supported for claude, not {engine_list}")
-    if (global_fallback or env_global_fallback) and "claude" not in selected_engines:
-        raise SystemExit("--fallback-model is only supported for claude; no claude reviewer selected")
 
     seen: set[str] = set()
     result: list[argparse.Namespace] = []
@@ -2248,16 +2220,7 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
             or env_thinking_by_engine.get(engine)
             or env_global_thinking
         )
-        if engine == "claude":
-            fallback_model = (
-                fallback_by_engine.get(engine)
-                or global_fallback
-                or env_fallback_by_engine.get(engine)
-                or env_global_fallback
-                or default_fallback_model(engine, model_candidates)
-            )
-        else:
-            fallback_model = None
+        claude_model_tail = claude_preferred_model_tail(engine, model_candidates)
         if thinking and thinking not in THINKING_LEVELS_BY_ENGINE[engine]:
             valid = ", ".join(sorted(THINKING_LEVELS_BY_ENGINE[engine])) or "none"
             raise SystemExit(f"invalid thinking level for {engine}: {thinking} (valid: {valid})")
@@ -2266,7 +2229,7 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
         clone.model = model
         clone.model_candidates = model_candidates
         clone.thinking = thinking
-        clone.fallback_model = fallback_model
+        clone.claude_preferred_model_tail = claude_model_tail
         result.append(clone)
     return result
 
@@ -2278,8 +2241,6 @@ def reviewer_label(args: argparse.Namespace) -> str:
         parts.append(f"models={','.join(candidates)}")
     elif args.model:
         parts.append(f"model={args.model}")
-    if getattr(args, "fallback_model", None) and not is_default_fallback_model(args):
-        parts.append(f"fallback={args.fallback_model}")
     if args.thinking:
         parts.append(f"thinking={args.thinking}")
     return " ".join(parts)
@@ -2382,7 +2343,7 @@ def reviewer_test_args(**overrides: Any) -> argparse.Namespace:
         "engine": "codex",
         "model": None,
         "thinking": None,
-        "fallback_model": None,
+        "claude_preferred_model_tail": None,
     }
     defaults.update(overrides)
     return argparse.Namespace(**defaults)
@@ -2429,8 +2390,8 @@ def self_test_config_defaults() -> None:
             raise SystemExit(f"self-test config defaults failed: default claude model={default_claude.model!r}")
         if default_claude.model_candidates != ["claude-fable-5", "claude-opus-4-8"]:
             raise SystemExit(f"self-test config defaults failed: default claude candidates={default_claude.model_candidates!r}")
-        if default_claude.fallback_model != "claude-opus-4-8":
-            raise SystemExit(f"self-test config defaults failed: default claude fallback={default_claude.fallback_model!r}")
+        if default_claude.claude_preferred_model_tail != "claude-opus-4-8":
+            raise SystemExit(f"self-test config defaults failed: default claude preferred tail={default_claude.claude_preferred_model_tail!r}")
         os.environ["AUTOREVIEW_CODEX_PREFERRED_MODELS"] = "local-a, local-b"
         preferred_codex = reviewer_args(reviewer_test_args(engine="codex"))[0]
         if preferred_codex.model_candidates != ["local-a", "local-b"] or preferred_codex.model != "local-a":
@@ -2440,9 +2401,12 @@ def self_test_config_defaults() -> None:
         preferred_claude = reviewer_args(reviewer_test_args(engine="claude"))[0]
         if preferred_claude.model_candidates != ["claude-a", "claude-b", "claude-c"] or preferred_claude.model != "claude-a":
             raise SystemExit(f"self-test config defaults failed: preferred claude candidates={preferred_claude.model_candidates!r}")
-        if preferred_claude.fallback_model != "claude-b,claude-c":
-            raise SystemExit(f"self-test config defaults failed: preferred claude fallback={preferred_claude.fallback_model!r}")
+        if preferred_claude.claude_preferred_model_tail != "claude-b,claude-c":
+            raise SystemExit(f"self-test config defaults failed: preferred claude tail={preferred_claude.claude_preferred_model_tail!r}")
         os.environ.pop("AUTOREVIEW_CLAUDE_PREFERRED_MODELS")
+        explicit_claude = reviewer_args(reviewer_test_args(engine="claude", model=["claude-explicit"]))[0]
+        if explicit_claude.model_candidates is not None or explicit_claude.claude_preferred_model_tail is not None:
+            raise SystemExit("self-test config defaults failed: explicit claude model should disable preferred list")
         os.environ["AUTOREVIEW_MODEL"] = "env-global-model"
         os.environ["AUTOREVIEW_CODEX_MODEL"] = "env-codex-model"
         os.environ["AUTOREVIEW_THINKING"] = "low"
@@ -2472,94 +2436,6 @@ def self_test_config_defaults() -> None:
         if inline.model != "inline-model" or inline.thinking != "minimal":
             raise SystemExit("self-test config defaults failed: inline reviewer values should override CLI/env")
     print("self-test config defaults: ok")
-
-
-def self_test_fallback_scope() -> None:
-    keys = [
-        "AUTOREVIEW_FALLBACK_MODEL",
-        "AUTOREVIEW_CLAUDE_FALLBACK_MODEL",
-        "AUTOREVIEW_CODEX_FALLBACK_MODEL",
-    ]
-    with preserve_env(keys):
-        os.environ["AUTOREVIEW_FALLBACK_MODEL"] = "env-global-fallback"
-        os.environ["AUTOREVIEW_CLAUDE_FALLBACK_MODEL"] = "env-claude-fallback"
-        base = reviewer_test_args(reviewers="codex,claude")
-        reviewers = reviewer_args(base)
-        codex = next(r for r in reviewers if r.engine == "codex")
-        claude = next(r for r in reviewers if r.engine == "claude")
-        if codex.fallback_model is not None:
-            raise SystemExit("self-test fallback scope failed: codex should ignore AUTOREVIEW_FALLBACK_MODEL")
-        if claude.fallback_model != "env-claude-fallback":
-            raise SystemExit(f"self-test fallback scope failed: claude fallback={claude.fallback_model!r}")
-        os.environ.pop("AUTOREVIEW_CLAUDE_FALLBACK_MODEL")
-        global_only = reviewer_args(reviewer_test_args(engine="claude"))[0]
-        if global_only.fallback_model != "env-global-fallback":
-            raise SystemExit(f"self-test fallback scope failed: global fallback={global_only.fallback_model!r}")
-        try:
-            reviewer_args(reviewer_test_args(engine="codex"))
-            raise SystemExit("self-test fallback scope failed: env global fallback without Claude should be rejected")
-        except SystemExit as exc:
-            if "no claude reviewer selected" not in str(exc):
-                raise
-        cli_global = reviewer_args(reviewer_test_args(engine="claude", fallback_model=["cli-global"]))[0]
-        if cli_global.fallback_model != "cli-global":
-            raise SystemExit("self-test fallback scope failed: CLI global fallback should override env")
-        cli_engine = reviewer_args(
-            reviewer_test_args(engine="claude", fallback_model=["cli-global", "claude=cli-claude"])
-        )[0]
-        if cli_engine.fallback_model != "cli-claude":
-            raise SystemExit("self-test fallback scope failed: CLI engine fallback should override CLI global")
-        panel = reviewer_args(reviewer_test_args(reviewers="codex,claude", fallback_model=["cli-global"]))
-        panel_codex = next(r for r in panel if r.engine == "codex")
-        panel_claude = next(r for r in panel if r.engine == "claude")
-        if panel_codex.fallback_model is not None or panel_claude.fallback_model != "cli-global":
-            raise SystemExit("self-test fallback scope failed: CLI global fallback should apply only to Claude panel reviewers")
-        try:
-            reviewer_args(reviewer_test_args(engine="codex", fallback_model=["cli-global"]))
-            raise SystemExit("self-test fallback scope failed: global fallback without Claude should be rejected")
-        except SystemExit as exc:
-            if "no claude reviewer selected" not in str(exc):
-                raise
-        try:
-            reviewer_args(reviewer_test_args(engine="codex", fallback_model=["claude=cli-claude"]))
-            raise SystemExit("self-test fallback scope failed: fallback for unselected Claude reviewer should be rejected")
-        except SystemExit as exc:
-            if "unselected reviewer: claude" not in str(exc):
-                raise
-        inline = reviewer_args(
-            reviewer_test_args(
-                reviewers="claude:inline-model:high",
-                fallback_model=["cli-global"],
-            )
-        )[0]
-        if inline.fallback_model != "cli-global":
-            raise SystemExit("self-test fallback scope failed: CLI global fallback should apply to inline reviewers")
-        explicit = reviewer_test_args(reviewers="codex", fallback_model=["codex=foo"])
-        try:
-            reviewer_args(explicit)
-            raise SystemExit("self-test fallback scope failed: codex=fallback should be rejected")
-        except SystemExit as exc:
-            if "not codex" not in str(exc):
-                raise
-        os.environ.pop("AUTOREVIEW_FALLBACK_MODEL")
-        os.environ["AUTOREVIEW_CLAUDE_FALLBACK_MODEL"] = "env-claude-only"
-        try:
-            reviewer_args(reviewer_test_args(engine="codex"))
-            raise SystemExit("self-test fallback scope failed: Claude fallback env without Claude should be rejected")
-        except SystemExit as exc:
-            if "unselected reviewer: claude" not in str(exc):
-                raise
-        os.environ["AUTOREVIEW_FALLBACK_MODEL"] = "env-global-fallback"
-        os.environ.pop("AUTOREVIEW_CLAUDE_FALLBACK_MODEL")
-        os.environ["AUTOREVIEW_CODEX_FALLBACK_MODEL"] = "env-codex-fallback"
-        try:
-            reviewer_args(reviewer_test_args(engine="codex"))
-            raise SystemExit("self-test fallback scope failed: AUTOREVIEW_CODEX_FALLBACK_MODEL should be rejected")
-        except SystemExit as exc:
-            if "only supported for claude" not in str(exc):
-                raise
-    print("self-test fallback scope: ok")
-
 
 def self_test_engine_isolation() -> int:
     with tempfile.TemporaryDirectory(prefix="autoreview-isolation-test.") as tempdir:
@@ -2691,7 +2567,6 @@ def self_test_engine_isolation() -> int:
 
 def self_test() -> int:
     self_test_config_defaults()
-    self_test_fallback_scope()
     self_test_heartbeat_metrics()
     self_test_json_array_parser()
     return self_test_engine_isolation()
@@ -2703,9 +2578,6 @@ def main() -> int:
         return self_test()
     if args.self_test_config_defaults:
         self_test_config_defaults()
-        return 0
-    if args.self_test_fallback_scope:
-        self_test_fallback_scope()
         return 0
     if args.self_test_heartbeat_metrics:
         self_test_heartbeat_metrics()
@@ -2726,8 +2598,6 @@ def main() -> int:
             print(f"models: {','.join(candidates)}")
         elif reviewers[0].model:
             print(f"model: {reviewers[0].model}")
-        if getattr(reviewers[0], "fallback_model", None) and not is_default_fallback_model(reviewers[0]):
-            print(f"fallback_model: {reviewers[0].fallback_model}")
         if reviewers[0].thinking:
             print(f"thinking: {reviewers[0].thinking}")
     else:

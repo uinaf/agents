@@ -10,8 +10,8 @@ Recommended model defaults:
 
 | Engine | Default model behavior | Source note |
 |--------|---------------|-------------|
-| **codex** (default) | Tries `gpt-5.6-sol`, then `gpt-5.5` when the first model is unavailable | Local preferred review model list; `gpt-5.5` remains the public documented fallback |
-| **claude** | Starts with `claude-fable-5` and passes `claude-opus-4-8` as the Claude Code fallback model | Local preferred review model list; Opus 4.8 full identifier follows [Claude Code model configuration](https://code.claude.com/docs/en/model-config) |
+| **codex** (default) | Prefers `gpt-5.6-sol`, then `gpt-5.5` when the first model is unavailable | Local preferred review model list; `gpt-5.5` remains the public documented model |
+| **claude** | Prefers `claude-fable-5`, then `claude-opus-4-8` when the first model is unavailable | Local preferred review model list; Opus 4.8 full identifier follows [Claude Code model configuration](https://code.claude.com/docs/en/model-config) |
 
 CLI flags and environment variables override these defaults.
 
@@ -19,8 +19,6 @@ CLI flags and environment variables override these defaults.
 |--------|------------|-------------------|---------------|-----------------|
 | **codex** (default) | `codex --model X exec ...` | `gpt-5.6-sol`, `gpt-5.5` | `-c model_reasoning_effort=Y` | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` |
 | **claude** | `claude --model X` | `claude-fable-5`, `claude-opus-4-8`, `claude-sonnet-4-6`, `claude-haiku-4-5` | `--effort Y` | `low`, `medium`, `high`, `xhigh`, `max` |
-
-Claude also supports `--fallback-model a,b` for availability-based fallback chains ([model-config](https://code.claude.com/docs/en/model-config)). Claude docs note that auth, billing, rate-limit, request-size, and transport errors do not trigger fallback, and the changelog documents interactive-session support in `v2.1.166`.
 
 ## Environment Defaults
 
@@ -30,13 +28,11 @@ CLI flags take precedence over environment variables.
 |----------|---------|
 | `AUTOREVIEW_MODEL` | Override the built-in default `--model` for all engines |
 | `AUTOREVIEW_THINKING` | Default `--thinking` for all engines |
-| `AUTOREVIEW_FALLBACK_MODEL` | Default Claude `--fallback-model` chain |
 | `AUTOREVIEW_<ENGINE>_MODEL` | Per-engine model override, for example `AUTOREVIEW_CODEX_MODEL=gpt-5.6-sol` |
 | `AUTOREVIEW_<ENGINE>_THINKING` | Per-engine thinking override |
 | `AUTOREVIEW_<ENGINE>_PREFERRED_MODELS` | Comma-separated preferred list used when no explicit model override is set, for example `AUTOREVIEW_CLAUDE_PREFERRED_MODELS=claude-fable-5,claude-opus-4-8` |
-| `AUTOREVIEW_CLAUDE_FALLBACK_MODEL` | Claude-only fallback chain |
 
-Codex maps thinking to `model_reasoning_effort`. Claude maps thinking to `--effort`. Codex retries the next preferred model only when the Codex CLI reports the selected model is unavailable. Claude uses Claude Code's native `--fallback-model` chain for its remaining preferred models. Only Claude accepts explicit `--fallback-model`; global CLI/env fallback requires at least one Claude reviewer, and engine-specific fallback overrides require that reviewer to be selected. Non-Claude fallback overrides fail closed instead of being silently ignored.
+Codex maps thinking to `model_reasoning_effort`. Claude maps thinking to `--effort`. Preferred lists apply only when no explicit `--model`, inline reviewer model, `AUTOREVIEW_MODEL`, or `AUTOREVIEW_<ENGINE>_MODEL` is set. Codex tries the next preferred model only when the Codex CLI reports the selected model is unavailable. Claude maps the remaining preferred models onto Claude Code's native model-availability mechanism.
 
 ## Review Engine Isolation
 
