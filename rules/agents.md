@@ -16,7 +16,7 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 ```md
 <comment body>
 
-_🤖 AI-assisted via Codex, GPT-5.5, high reasoning_
+_🤖 AI-assisted via Codex, `GPT-5.5`, high reasoning_
 ```
 
 - PR, MR, or issue body template:
@@ -26,7 +26,7 @@ _🤖 AI-assisted via Codex, GPT-5.5, high reasoning_
 
 ---
 
-_🤖 AI-assisted via Codex, GPT-5.5, high reasoning_
+_🤖 AI-assisted via Codex, `GPT-5.5`, high reasoning_
 ```
 
 - Do not add disclosure text for mechanical actions that publish no prose, and do not invent unavailable harness, model, or reasoning details.
