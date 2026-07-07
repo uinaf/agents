@@ -7,7 +7,7 @@ description: "Run structured Codex/Claude autoreview closeout for local changes,
 
 Run the bundled structured review helper as a closeout check. This is code review, not Guardian `auto_review` approval routing.
 
-Codex review is the default when no engine is set. It uses the helper's built-in Codex model default unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in Claude model default unless overridden.
+Codex review is the default when no engine is set. It tries the helper's built-in preferred Codex models unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in Claude model default unless overridden.
 
 Use when:
 
@@ -140,13 +140,13 @@ Run multiple reviewers against one frozen bundle:
 Set reviewer models and thinking/effort explicitly:
 
 ```bash
-"$AUTOREVIEW" --reviewers codex,claude --model codex=gpt-5.1 --thinking codex=high --model claude=sonnet --thinking claude=max
+"$AUTOREVIEW" --reviewers codex,claude --model codex=gpt-5.6-sol --thinking codex=high --model claude=claude-fable-5 --thinking claude=max
 ```
 
 Inline syntax is also supported for simple model IDs:
 
 ```bash
-"$AUTOREVIEW" --reviewers codex:gpt-5.5:high,claude:claude-fable-5:max
+"$AUTOREVIEW" --reviewers codex:gpt-5.6-sol:high,claude:claude-fable-5:max
 ```
 
 Codex maps thinking to `model_reasoning_effort` and accepts `low`, `medium`,
@@ -155,7 +155,7 @@ Codex maps thinking to `model_reasoning_effort` and accepts `low`, `medium`,
 For models with slashes or extra colons, prefer keyed form:
 
 ```bash
-"$AUTOREVIEW" --reviewers codex,claude --model codex=gpt-5.5 --model claude=claude-fable-5
+"$AUTOREVIEW" --reviewers codex,claude --model codex=gpt-5.6-sol --model claude=claude-fable-5
 ```
 
 ## Engine Details

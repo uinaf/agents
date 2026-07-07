@@ -8,16 +8,16 @@ The helper accepts `--model` globally or per engine (`engine=model`) and `--thin
 
 Recommended model defaults:
 
-| Engine | Default model | Source note |
+| Engine | Default model behavior | Source note |
 |--------|---------------|-------------|
-| **codex** (default) | `gpt-5.5` | OpenClaw upstream default |
+| **codex** (default) | Tries `gpt-5.6-sol`, then `gpt-5.5` when the first model is unavailable | Local preferred review model list; `gpt-5.5` remains the public documented fallback |
 | **claude** | `claude-fable-5` | OpenClaw upstream default |
 
 CLI flags and environment variables override these defaults.
 
 | Engine | Model flag | Example model IDs | Thinking flag | Accepted levels |
 |--------|------------|-------------------|---------------|-----------------|
-| **codex** (default) | `codex --model X exec ...` | `gpt-5.5`, `gpt-5.5-2026-04-23` | `-c model_reasoning_effort=Y` | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` |
+| **codex** (default) | `codex --model X exec ...` | `gpt-5.6-sol`, `gpt-5.5` | `-c model_reasoning_effort=Y` | `none`, `minimal`, `low`, `medium`, `high`, `xhigh` |
 | **claude** | `claude --model X` | `claude-fable-5`, `claude-opus-4-8`, `claude-sonnet-4-6`, `claude-haiku-4-5` | `--effort Y` | `low`, `medium`, `high`, `xhigh`, `max` |
 
 Claude also supports `--fallback-model a,b` for availability-based fallback chains ([model-config](https://code.claude.com/docs/en/model-config)). Claude docs note that auth, billing, rate-limit, request-size, and transport errors do not trigger fallback, and the changelog documents interactive-session support in `v2.1.166`.
@@ -31,8 +31,9 @@ CLI flags take precedence over environment variables.
 | `AUTOREVIEW_MODEL` | Override the built-in default `--model` for all engines |
 | `AUTOREVIEW_THINKING` | Default `--thinking` for all engines |
 | `AUTOREVIEW_FALLBACK_MODEL` | Default Claude `--fallback-model` chain |
-| `AUTOREVIEW_<ENGINE>_MODEL` | Per-engine model override, for example `AUTOREVIEW_CODEX_MODEL=gpt-5.5` |
+| `AUTOREVIEW_<ENGINE>_MODEL` | Per-engine model override, for example `AUTOREVIEW_CODEX_MODEL=gpt-5.6-sol` |
 | `AUTOREVIEW_<ENGINE>_THINKING` | Per-engine thinking override |
+| `AUTOREVIEW_CODEX_PREFERRED_MODELS` | Comma-separated Codex fallback list used only when no explicit Codex model override is set |
 | `AUTOREVIEW_CLAUDE_FALLBACK_MODEL` | Claude-only fallback chain |
 
 Codex maps thinking to `model_reasoning_effort`. Claude maps thinking to `--effort`. Only Claude accepts `--fallback-model`; global CLI/env fallback requires at least one Claude reviewer, and engine-specific fallback overrides require that reviewer to be selected. Non-Claude fallback overrides fail closed instead of being silently ignored.

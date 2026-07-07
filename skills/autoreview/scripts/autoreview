@@ -23,6 +23,8 @@ ENGINES = ("codex", "claude")
 ALL_REVIEWERS = ("codex", "claude")
 SAFE_GIT_CONFIG_ARGS = (
     "-c",
+    "commit.gpgsign=false",
+    "-c",
     "core.fsmonitor=false",
     "-c",
     "core.pager=cat",
@@ -39,6 +41,7 @@ SAFE_GIT_CONFIG_ARGS = (
 )
 SAFE_DIFF_FLAGS = ("--no-ext-diff", "--no-textconv", "--no-renames")
 ENGINE_GIT_CONFIG_OVERRIDES = (
+    ("commit.gpgsign", "false"),
     ("core.fsmonitor", "false"),
     ("core.pager", "cat"),
     ("diff.external", ""),
@@ -57,6 +60,13 @@ SENSITIVE_PATH_PARTS = {
     "private",
     "secrets",
 }
+TRACKED_SENSITIVE_PATH_PARTS = SENSITIVE_PATH_PARTS - {"private", ".docker"}
+TRACKED_CREDENTIAL_DIR_PATTERN = re.compile(
+    r"^(?:.*[._-])?"
+    r"(secret|secrets|credential|credentials|service[-_]?account|private[-_]?key|api[-_]?key)"
+    r"(?:[._-].*)?$",
+    re.IGNORECASE,
+)
 SENSITIVE_NAME_PATTERNS = [
     re.compile(r"(^|/)\.env($|[._/-])", re.IGNORECASE),
     re.compile(r"(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)(\.pub)?$", re.IGNORECASE),
@@ -66,10 +76,33 @@ SENSITIVE_NAME_PATTERNS = [
         re.IGNORECASE,
     ),
 ]
+TRACKED_SENSITIVE_NAME_PATTERNS = [
+    re.compile(
+        r"(^|/)\.env(?:$|/|[._-](?!(?:example|sample|template)$)[^/]*)",
+        re.IGNORECASE,
+    ),
+    re.compile(r"(^|/)(id_rsa|id_dsa|id_ecdsa|id_ed25519)(\.pub)?$", re.IGNORECASE),
+    re.compile(r"\.(pem|p12|pfx|key)$", re.IGNORECASE),
+    re.compile(
+        r"(^|/)(secret|secrets|credential|credentials|service[-_]?account|private[-_]?key|api[-_]?key|token|tokens)$",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"(^|/)(?:[^/]*[._-])?"
+        r"(secret|secrets|credential|credentials|service[-_]?account|private[-_]?key|api[-_]?key|token|tokens)"
+        r"(?:[._-][^/]*)?\.(json|ya?ml|toml|ini|conf|config|txt|csv)$",
+        re.IGNORECASE,
+    ),
+]
 SECRET_VALUE_PATTERNS = [
     re.compile(r"-----BEGIN (?:RSA |DSA |EC |OPENSSH |PGP )?PRIVATE KEY-----"),
     re.compile(
-        r"(?i)(api[_-]?key|token|secret|password)\s*[:=]\s*(?:[\"'][A-Za-z0-9_./+=-]{12,}[\"']|[A-Za-z0-9_+=/-]{20,})"
+        r"(?i)(?:"
+        r"[\"'](?:api[_-]?key|client[_-]?secret|refresh[_-]?token|access[_-]?token|auth[_-]?token|id[_-]?token|token|secret|password)[\"']"
+        r"|(?:api[_-]?key|client[_-]?secret|refresh[_-]?token|access[_-]?token|auth[_-]?token|id[_-]?token|token|secret|password)"
+        r")\s*[:=]\s*"
+        r"(?:[\"'][^\"'\r\n]{12,}[\"']|"
+        r"[A-Za-z0-9_./+=:@#$%&*!?-]{20,}(?![A-Za-z0-9_./+=:@#$%&*!?(\-]))"
     ),
     re.compile(r"(?i)bearer\s+[A-Za-z0-9._-]{20,}"),
     re.compile(r"\b(?:sk|rk|pk|org|proj)-[A-Za-z0-9_-]{20,}\b"),
@@ -84,9 +117,12 @@ SECRET_VALUE_PATTERNS = [
 ]
 MAX_BUNDLE_TEXT_BYTES = 180_000
 DEFAULT_ENGINE_PATHS = ("/usr/local/bin", "/usr/bin", "/bin")
+DEFAULT_MODEL_CANDIDATES_BY_ENGINE = {
+    "codex": ("gpt-5.6-sol", "gpt-5.5"),
+    "claude": ("claude-fable-5",),
+}
 DEFAULT_MODEL_BY_ENGINE = {
-    "codex": "gpt-5.5",
-    "claude": "claude-fable-5",
+    engine: candidates[0] for engine, candidates in DEFAULT_MODEL_CANDIDATES_BY_ENGINE.items()
 }
 THINKING_LEVELS_BY_ENGINE = {
     "codex": {"none", "minimal", "low", "medium", "high", "xhigh"},
@@ -649,6 +685,14 @@ def bounded(text: str, limit: int = 180_000) -> str:
     return text[:limit] + f"\n\n[truncated at {limit} characters]\n"
 
 
+def ensure_reviewer_input_complete(reviewer: argparse.Namespace, input_truncated: bool) -> None:
+    if input_truncated:
+        raise SystemExit(
+            f"{reviewer.engine} engine refused truncated review input because it cannot recover omitted diff hunks; "
+            "reduce the change/input size"
+        )
+
+
 def bounded_field(text: str, limit: int) -> str:
     if len(text) <= limit:
         return text
@@ -665,20 +709,24 @@ def read_prefix(path: Path, limit: int) -> tuple[bytes, bool]:
     return data[:limit], len(data) > limit
 
 
-def read_text(path: Path, limit: int = MAX_BUNDLE_TEXT_BYTES) -> str:
+def read_text_with_status(path: Path, limit: int = MAX_BUNDLE_TEXT_BYTES) -> tuple[str, bool]:
     try:
         data, truncated = read_prefix(path, limit)
     except SystemExit as exc:
-        return f"[unreadable: {exc}]"
+        return f"[unreadable: {exc}]", False
     if b"\0" in data:
-        return "[binary file omitted]"
+        return "[binary file omitted]", False
     text = data.decode("utf-8", errors="replace")
     if len(text) > limit:
         text = text[:limit]
         truncated = True
     if truncated:
-        return text + f"\n\n[truncated at {limit} characters]\n"
-    return text
+        return text + f"\n\n[truncated at {limit} characters]\n", True
+    return text, False
+
+
+def read_text(path: Path, limit: int = MAX_BUNDLE_TEXT_BYTES) -> str:
+    return read_text_with_status(path, limit)[0]
 
 
 def path_has_sensitive_part(rel: str | Path) -> bool:
@@ -711,6 +759,98 @@ def require_no_secret_values(label: str, text: str) -> None:
         )
 
 
+def unified_diff_contents(patch: str) -> tuple[str, str]:
+    old_content: list[str] = []
+    new_content: list[str] = []
+    in_hunk = False
+    prefix_columns = 1
+    for line in patch.splitlines():
+        hunk_header = re.match(r"^(@{2,})", line)
+        if hunk_header:
+            old_content.append(";")
+            new_content.append(";")
+            in_hunk = True
+            prefix_columns = len(hunk_header.group(1)) - 1
+            continue
+        if line.startswith("diff --"):
+            old_content.append(";")
+            new_content.append(";")
+            in_hunk = False
+            continue
+        prefix = line[:prefix_columns]
+        if in_hunk and len(prefix) == prefix_columns and set(prefix) <= {"+", "-", " "}:
+            content = line[prefix_columns:]
+            if set(prefix) == {" "}:
+                old_content.append(content)
+                new_content.append(content)
+            elif "+" in prefix and "-" not in prefix:
+                new_content.append(content)
+            elif "-" in prefix and "+" not in prefix:
+                old_content.append(content)
+            else:
+                old_content.append(content)
+                new_content.append(content)
+    return "\n".join(old_content), "\n".join(new_content)
+
+
+def sensitive_repo_path_risk(rel: str) -> str | None:
+    normalized = rel.replace(os.sep, "/")
+    if path_has_sensitive_part(normalized):
+        return "sensitive path"
+    if any(pattern.search(normalized) for pattern in SENSITIVE_NAME_PATTERNS):
+        return "sensitive filename"
+    return None
+
+
+def tracked_sensitive_repo_path_risk(rel: str) -> str | None:
+    normalized = rel.replace(os.sep, "/")
+    path_parts = Path(normalized).parts
+    parts = {part.lower() for part in path_parts}
+    credential_dir = any(
+        TRACKED_CREDENTIAL_DIR_PATTERN.fullmatch(part)
+        for part in path_parts[:-1]
+    )
+    if (
+        "/.config/gcloud/" in f"/{normalized.lower()}/"
+        or f"/{normalized.lower()}".endswith("/.docker/config.json")
+        or parts & TRACKED_SENSITIVE_PATH_PARTS
+        or credential_dir
+    ):
+        return "sensitive path"
+    if any(pattern.search(normalized) for pattern in TRACKED_SENSITIVE_NAME_PATTERNS):
+        return "sensitive filename"
+    return None
+
+
+def validate_review_patch(
+    label: str,
+    paths: list[str],
+    patch: str,
+    limit: int = MAX_BUNDLE_TEXT_BYTES,
+) -> str:
+    blocked = [
+        f"{rel} ({risk})"
+        for rel in paths
+        if (risk := tracked_sensitive_repo_path_risk(rel)) is not None
+    ]
+    if blocked:
+        details = "\n".join(f"- {item}" for item in blocked[:20])
+        more = f"\n... {len(blocked) - 20} more" if len(blocked) > 20 else ""
+        raise SystemExit(
+            f"refusing to include tracked sensitive paths in {label}:\n"
+            f"{details}{more}"
+        )
+    require_no_secret_values(label, patch)
+    for content in unified_diff_contents(patch):
+        require_no_secret_values(label, content)
+    if len(patch) > limit:
+        raise SystemExit(
+            f"{label} is too large to review safely "
+            f"({len(patch)} characters; limit {limit}); split the change into smaller review targets"
+        )
+    return patch
+
+
 def file_bundle_risk(
     repo: Path,
     path: Path,
@@ -719,11 +859,9 @@ def file_bundle_risk(
     allow_binary_omission: bool = False,
 ) -> str | None:
     normalized = rel.replace(os.sep, "/")
-    if path_has_sensitive_part(normalized):
-        return "sensitive path"
-    for pattern in SENSITIVE_NAME_PATTERNS:
-        if pattern.search(normalized):
-            return "sensitive filename"
+    path_risk = sensitive_repo_path_risk(normalized)
+    if path_risk:
+        return path_risk
     if path.is_symlink():
         return "symlink"
     try:
@@ -773,40 +911,71 @@ def local_status(repo: Path, untracked: list[str]) -> str:
     return "\n".join(lines)
 
 
-def local_bundle(repo: Path) -> str:
+def local_bundle(repo: Path) -> tuple[str, bool]:
     staged_patch = git(repo, "diff", *SAFE_DIFF_FLAGS, "--cached", "--patch")
     unstaged_patch = git(repo, "diff", *SAFE_DIFF_FLAGS, "--patch")
+    staged_paths = git_path_list(
+        repo,
+        "diff",
+        *SAFE_DIFF_FLAGS,
+        "--name-only",
+        "--cached",
+        "-z",
+    )
+    unstaged_paths = git_path_list(
+        repo,
+        "diff",
+        *SAFE_DIFF_FLAGS,
+        "--name-only",
+        "-z",
+    )
     untracked = safe_untracked_files(repo)
     if not staged_patch.strip() and not unstaged_patch.strip() and not untracked:
         raise SystemExit("no local changes to review")
+    staged_patch = validate_review_patch("local staged diff", staged_paths, staged_patch)
+    unstaged_patch = validate_review_patch("local unstaged diff", unstaged_paths, unstaged_patch)
     parts = [
         "# Git Status",
         local_status(repo, untracked),
         "# Staged Diff",
         git(repo, "diff", *SAFE_DIFF_FLAGS, "--cached", "--stat"),
-        bounded(staged_patch),
+        staged_patch,
         "# Unstaged Diff",
         git(repo, "diff", *SAFE_DIFF_FLAGS, "--stat"),
-        bounded(unstaged_patch),
+        unstaged_patch,
     ]
+    input_truncated = len(staged_patch) > 180_000 or len(unstaged_patch) > 180_000
     if untracked:
         parts.append("# Untracked Files")
         for rel in untracked:
             path = repo / rel
-            parts.append(f"## {rel}\n{read_text(path)}")
-    return "\n\n".join(parts)
+            content, truncated = read_text_with_status(path)
+            input_truncated = input_truncated or truncated
+            parts.append(f"## {rel}\n{content}")
+    return "\n\n".join(parts), input_truncated
 
 
-def branch_bundle(repo: Path, base_ref: str) -> str:
+def branch_bundle(repo: Path, base_ref: str) -> tuple[str, bool]:
     base_ref = validate_git_ref(repo, base_ref, "base")
+    diff_range = f"{base_ref}...HEAD"
     branch_patch = git(
         repo,
         "diff",
         *SAFE_DIFF_FLAGS,
         "--patch",
         "--end-of-options",
-        f"{base_ref}...HEAD",
+        diff_range,
     )
+    branch_paths = git_path_list(
+        repo,
+        "diff",
+        *SAFE_DIFF_FLAGS,
+        "--name-only",
+        "-z",
+        "--end-of-options",
+        diff_range,
+    )
+    branch_patch = validate_review_patch("branch diff", branch_paths, branch_patch)
     return "\n\n".join(
         [
             "# Branch Diff",
@@ -817,14 +986,14 @@ def branch_bundle(repo: Path, base_ref: str) -> str:
                 *SAFE_DIFF_FLAGS,
                 "--stat",
                 "--end-of-options",
-                f"{base_ref}...HEAD",
+                diff_range,
             ),
-            bounded(branch_patch),
+            branch_patch,
         ]
-    )
+    ), False
 
 
-def commit_bundle(repo: Path, commit_ref: str) -> str:
+def commit_bundle(repo: Path, commit_ref: str) -> tuple[str, bool]:
     commit_ref = validate_git_ref(repo, commit_ref, "commit")
     commit_patch = git(
         repo,
@@ -835,6 +1004,17 @@ def commit_bundle(repo: Path, commit_ref: str) -> str:
         "--end-of-options",
         commit_ref,
     )
+    commit_paths = git_path_list(
+        repo,
+        "show",
+        *SAFE_DIFF_FLAGS,
+        "--name-only",
+        "--format=",
+        "-z",
+        "--end-of-options",
+        commit_ref,
+    )
+    commit_patch = validate_review_patch("commit diff", commit_paths, commit_patch)
     return "\n\n".join(
         [
             "# Commit Diff",
@@ -848,9 +1028,9 @@ def commit_bundle(repo: Path, commit_ref: str) -> str:
                 "--end-of-options",
                 commit_ref,
             ),
-            bounded(commit_patch),
+            commit_patch,
         ]
-    )
+    ), False
 
 
 def review_paths(repo: Path, target: str, target_ref: str | None, commit_ref: str) -> set[str]:
@@ -890,7 +1070,7 @@ def review_paths(repo: Path, target: str, target_ref: str | None, commit_ref: st
     return names
 
 
-def validate_evidence_file(repo: Path, raw_path: str, label: str) -> tuple[Path, str]:
+def validate_evidence_file(repo: Path, raw_path: str, label: str) -> tuple[Path, str, bool]:
     original = Path(raw_path)
     if original.is_absolute() or ".." in original.parts or not original.parts:
         raise SystemExit(f"{label} must be a repo-relative path: {raw_path}")
@@ -906,28 +1086,32 @@ def validate_evidence_file(repo: Path, raw_path: str, label: str) -> tuple[Path,
     risk = file_bundle_risk(repo, path, rel)
     if risk:
         raise SystemExit(f"refusing to include unsafe {label}: {rel} ({risk})")
-    content = read_text(path)
+    content, truncated = read_text_with_status(path)
     require_no_secret_values(f"{label} {rel}", content)
-    return path, content
+    return path, content, truncated
 
 
-def load_extra_prompt(args: argparse.Namespace, repo: Path) -> str:
+def load_extra_prompt(args: argparse.Namespace, repo: Path) -> tuple[str, bool]:
     chunks: list[str] = []
+    input_truncated = False
     for value in args.prompt or []:
         require_no_secret_values("--prompt", value)
         chunks.append(value)
     for path in args.prompt_file or []:
-        _, content = validate_evidence_file(repo, path, "--prompt-file")
-        chunks.append(content)
-    return "\n\n".join(chunks)
+        resolved, content, truncated = validate_evidence_file(repo, path, "--prompt-file")
+        input_truncated = input_truncated or truncated
+        chunks.append(f"# Prompt file: {resolved.relative_to(repo.resolve())}\n{content}")
+    return "\n\n".join(chunks), input_truncated
 
 
-def load_datasets(args: argparse.Namespace, repo: Path) -> str:
+def load_datasets(args: argparse.Namespace, repo: Path) -> tuple[str, bool]:
     chunks: list[str] = []
+    input_truncated = False
     for spec in args.dataset or []:
-        path, content = validate_evidence_file(repo, spec, "--dataset")
+        path, content, truncated = validate_evidence_file(repo, spec, "--dataset")
+        input_truncated = input_truncated or truncated
         chunks.append(f"# Dataset: {path.relative_to(repo.resolve())}\n{content}")
-    return "\n\n".join(chunks)
+    return "\n\n".join(chunks), input_truncated
 
 
 def review_scope_policy() -> str:
@@ -1104,6 +1288,35 @@ def codex_exec_isolation_flags() -> list[str]:
     return ["--ignore-user-config", "--ignore-rules"]
 
 
+def comma_list_env(name: str) -> list[str]:
+    value = os.environ.get(name)
+    if value is None:
+        return []
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+def codex_default_model_candidates() -> list[str]:
+    return (
+        comma_list_env("AUTOREVIEW_CODEX_PREFERRED_MODELS")
+        or list(DEFAULT_MODEL_CANDIDATES_BY_ENGINE["codex"])
+    )
+
+
+def codex_model_unavailable(output: str) -> bool:
+    text = output.lower()
+    return "model" in text and any(
+        phrase in text
+        for phrase in (
+            "not available",
+            "not found",
+            "not supported",
+            "unknown",
+            "unsupported",
+            "invalid",
+        )
+    )
+
+
 def claude_review_isolation_flags() -> list[str]:
     return [
         "--safe-mode",
@@ -1152,52 +1365,64 @@ def format_version(version: tuple[int, int, int]) -> str:
 def run_codex(args: argparse.Namespace, repo: Path, prompt: str) -> str:
     if not args.tools:
         raise SystemExit("--no-tools is not supported by the Codex engine; use --engine claude --no-tools for a no-tools run")
-    schema_path = write_json_temp(SCHEMA)
-    output_path = Path(tempfile.NamedTemporaryFile("w", suffix=".json", delete=False).name)
-    cmd = [resolve_command(args.codex_bin, repo), "--ask-for-approval", "never"]
-    if args.web_search:
-        cmd.append("--search")
-    if args.model:
-        cmd.extend(["--model", args.model])
-    if args.thinking:
-        cmd.extend(["-c", f'model_reasoning_effort="{args.thinking}"'])
-    cmd.extend(codex_config_isolation_flags(repo))
-    cmd.extend(codex_auth_config_flags())
-    cmd.append("exec")
-    if args.stream_engine_output:
-        cmd.append("--json")
-    cmd.extend(
-        [
-            *codex_exec_isolation_flags(),
-            "--ephemeral",
-            "-C",
-            str(repo),
-            "-s",
-            "read-only",
-            "--output-schema",
-            str(schema_path),
-            "--output-last-message",
-            str(output_path),
-            "-",
-        ]
-    )
-    result = run_with_heartbeat(
-        cmd,
-        repo,
-        input_text=prompt,
-        label="codex",
-        stream_output=args.stream_engine_output,
-        stream_display=CodexStreamDisplay() if args.stream_engine_output else None,
-        env=safe_engine_env(repo, [Path(cmd[0]).parent]),
-    )
-    try:
-        output = output_path.read_text()
-    finally:
-        schema_path.unlink(missing_ok=True)
-        output_path.unlink(missing_ok=True)
-    if result.returncode != 0:
-        raise SystemExit(f"codex engine failed ({result.returncode})\n{result.stderr or result.stdout}")
-    return output or result.stdout
+    candidates = getattr(args, "model_candidates", None) or ([args.model] if args.model else [None])
+    failures: list[str] = []
+    for index, model in enumerate(candidates):
+        schema_path = write_json_temp(SCHEMA)
+        output_path = Path(tempfile.NamedTemporaryFile("w", suffix=".json", delete=False).name)
+        cmd = [resolve_command(args.codex_bin, repo), "--ask-for-approval", "never"]
+        if args.web_search:
+            cmd.append("--search")
+        if model:
+            cmd.extend(["--model", model])
+        if args.thinking:
+            cmd.extend(["-c", f'model_reasoning_effort="{args.thinking}"'])
+        cmd.extend(codex_config_isolation_flags(repo))
+        cmd.extend(codex_auth_config_flags())
+        cmd.append("exec")
+        if args.stream_engine_output:
+            cmd.append("--json")
+        cmd.extend(
+            [
+                *codex_exec_isolation_flags(),
+                "--ephemeral",
+                "-C",
+                str(repo),
+                "-s",
+                "read-only",
+                "--output-schema",
+                str(schema_path),
+                "--output-last-message",
+                str(output_path),
+                "-",
+            ]
+        )
+        result = run_with_heartbeat(
+            cmd,
+            repo,
+            input_text=prompt,
+            label="codex",
+            stream_output=args.stream_engine_output,
+            stream_display=CodexStreamDisplay() if args.stream_engine_output else None,
+            env=safe_engine_env(repo, [Path(cmd[0]).parent]),
+        )
+        try:
+            output = output_path.read_text()
+        finally:
+            schema_path.unlink(missing_ok=True)
+            output_path.unlink(missing_ok=True)
+        if result.returncode == 0:
+            args.model = model
+            return output or result.stdout
+        message = result.stderr or result.stdout
+        failures.append(f"{model or '<default>'}: {message}")
+        if index + 1 >= len(candidates) or not codex_model_unavailable(message):
+            raise SystemExit(f"codex engine failed ({result.returncode})\n{message}")
+        print(
+            f"codex model {model} unavailable; retrying with {candidates[index + 1]}",
+            file=sys.stderr,
+        )
+    raise SystemExit("codex engine failed for all preferred models\n" + "\n".join(failures))
 
 
 def run_claude(args: argparse.Namespace, repo: Path, prompt: str) -> str:
@@ -1576,8 +1801,8 @@ def create_hostile_repo(repo: Path) -> None:
     (repo / "hostile-mcp").chmod(0o755)
     (repo / "mcp.json").write_text(json.dumps({"mcpServers": {"hostile": {"command": "./hostile-mcp"}}}) + "\n")
     (repo / "app.js").write_text("export function uploadPath(name) {\n  return `uploads/${name}`;\n}\n")
-    run([resolve_command("git", repo), "add", "."], repo)
-    run([resolve_command("git", repo), "commit", "--quiet", "-m", "initial"], repo)
+    git(repo, "add", ".")
+    git(repo, "commit", "--quiet", "-m", "initial")
     (repo / "app.js").write_text(
         "import { execSync } from \"node:child_process\";\n\n"
         "export function deleteUpload(name) {\n"
@@ -1834,12 +2059,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--base")
     parser.add_argument("--commit", default="HEAD")
     parser.add_argument("--engine", choices=ENGINES, default=os.environ.get("AUTOREVIEW_ENGINE", "codex"))
-    parser.add_argument("--reviewers", help="Comma-separated review panel, e.g. codex,claude or codex:gpt-5.5:high.")
+    parser.add_argument("--reviewers", help="Comma-separated review panel, e.g. codex,claude or codex:gpt-5.6-sol:high.")
     parser.add_argument("--panel", action="store_true", help="Run a Codex/Claude review panel unless --engine changes the first reviewer.")
     parser.add_argument(
         "--model",
         action="append",
-        help="Model for all reviewers or engine=model. Repeatable. Defaults: codex=gpt-5.5, claude=claude-fable-5.",
+        help="Model for all reviewers or engine=model. Repeatable. Defaults: codex tries gpt-5.6-sol then gpt-5.5; claude=claude-fable-5.",
     )
     parser.add_argument("--thinking", action="append", help="Thinking/effort for all reviewers or engine=level. Repeatable. Codex: none, minimal, low, medium, high, xhigh. Claude: low, medium, high, xhigh, max.")
     parser.add_argument(
@@ -1994,14 +2219,15 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
         if engine in seen:
             raise SystemExit(f"reviewer specified more than once: {engine}")
         seen.add(engine)
-        model = (
+        explicit_model = (
             inline_model
             or model_by_engine.get(engine)
             or global_model
             or env_model_by_engine.get(engine)
             or env_global_model
-            or DEFAULT_MODEL_BY_ENGINE.get(engine)
         )
+        model_candidates = codex_default_model_candidates() if engine == "codex" and not explicit_model else None
+        model = explicit_model or (model_candidates[0] if model_candidates else DEFAULT_MODEL_BY_ENGINE.get(engine))
         thinking = (
             inline_thinking
             or thinking_by_engine.get(engine)
@@ -2024,6 +2250,7 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
         clone = copy.copy(args)
         clone.engine = engine
         clone.model = model
+        clone.model_candidates = model_candidates
         clone.thinking = thinking
         clone.fallback_model = fallback_model
         result.append(clone)
@@ -2032,7 +2259,10 @@ def reviewer_args(args: argparse.Namespace) -> list[argparse.Namespace]:
 
 def reviewer_label(args: argparse.Namespace) -> str:
     parts = [args.engine]
-    if args.model:
+    candidates = getattr(args, "model_candidates", None)
+    if candidates:
+        parts.append(f"models={','.join(candidates)}")
+    elif args.model:
         parts.append(f"model={args.model}")
     if getattr(args, "fallback_model", None):
         parts.append(f"fallback={args.fallback_model}")
@@ -2041,7 +2271,15 @@ def reviewer_label(args: argparse.Namespace) -> str:
     return " ".join(parts)
 
 
-def run_reviewer(args: argparse.Namespace, repo: Path, prompt: str, changed_paths: set[str], required: list[str]) -> dict[str, Any]:
+def run_reviewer(
+    args: argparse.Namespace,
+    repo: Path,
+    prompt: str,
+    changed_paths: set[str],
+    required: list[str],
+    input_truncated: bool = False,
+) -> dict[str, Any]:
+    ensure_reviewer_input_complete(args, input_truncated)
     attempts = 1
     for attempt in range(1, attempts + 1):
         raw = run_engine(args, repo, prompt)
@@ -2087,12 +2325,19 @@ def merge_panel_reports(reports: list[tuple[str, dict[str, Any]]]) -> dict[str, 
     }
 
 
-def run_panel(args: argparse.Namespace, reviewers: list[argparse.Namespace], repo: Path, prompt: str, changed_paths: set[str]) -> dict[str, Any]:
+def run_panel(
+    args: argparse.Namespace,
+    reviewers: list[argparse.Namespace],
+    repo: Path,
+    prompt: str,
+    changed_paths: set[str],
+    input_truncated: bool,
+) -> dict[str, Any]:
     reports: list[tuple[str, dict[str, Any]]] = []
     failures: list[str] = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=len(reviewers)) as executor:
         future_by_label = {
-            executor.submit(run_reviewer, reviewer, repo, prompt, changed_paths, []): reviewer_label(reviewer)
+            executor.submit(run_reviewer, reviewer, repo, prompt, changed_paths, [], input_truncated): reviewer_label(reviewer)
             for reviewer in reviewers
         }
         for future in concurrent.futures.as_completed(future_by_label):
@@ -2152,6 +2397,7 @@ def self_test_config_defaults() -> None:
     keys = [
         "AUTOREVIEW_MODEL",
         "AUTOREVIEW_CODEX_MODEL",
+        "AUTOREVIEW_CODEX_PREFERRED_MODELS",
         "AUTOREVIEW_CLAUDE_MODEL",
         "AUTOREVIEW_THINKING",
         "AUTOREVIEW_CODEX_THINKING",
@@ -2159,11 +2405,18 @@ def self_test_config_defaults() -> None:
     ]
     with preserve_env(keys):
         default_codex = reviewer_args(reviewer_test_args(engine="codex"))[0]
-        if default_codex.model != "gpt-5.5":
+        if default_codex.model != "gpt-5.6-sol":
             raise SystemExit(f"self-test config defaults failed: default codex model={default_codex.model!r}")
+        if default_codex.model_candidates != ["gpt-5.6-sol", "gpt-5.5"]:
+            raise SystemExit(f"self-test config defaults failed: default codex candidates={default_codex.model_candidates!r}")
         default_claude = reviewer_args(reviewer_test_args(engine="claude"))[0]
         if default_claude.model != "claude-fable-5":
             raise SystemExit(f"self-test config defaults failed: default claude model={default_claude.model!r}")
+        os.environ["AUTOREVIEW_CODEX_PREFERRED_MODELS"] = "local-a, local-b"
+        preferred_codex = reviewer_args(reviewer_test_args(engine="codex"))[0]
+        if preferred_codex.model_candidates != ["local-a", "local-b"] or preferred_codex.model != "local-a":
+            raise SystemExit(f"self-test config defaults failed: preferred codex candidates={preferred_codex.model_candidates!r}")
+        os.environ.pop("AUTOREVIEW_CODEX_PREFERRED_MODELS")
         os.environ["AUTOREVIEW_MODEL"] = "env-global-model"
         os.environ["AUTOREVIEW_CODEX_MODEL"] = "env-codex-model"
         os.environ["AUTOREVIEW_THINKING"] = "low"
@@ -2442,7 +2695,10 @@ def main() -> int:
     print(f"branch: {current_branch(repo)}")
     if len(reviewers) == 1 and not args.reviewers and not args.panel:
         print(f"engine: {reviewers[0].engine}")
-        if reviewers[0].model:
+        candidates = getattr(reviewers[0], "model_candidates", None)
+        if candidates:
+            print(f"models: {','.join(candidates)}")
+        elif reviewers[0].model:
             print(f"model: {reviewers[0].model}")
         if getattr(reviewers[0], "fallback_model", None):
             print(f"fallback_model: {reviewers[0].fallback_model}")
@@ -2459,20 +2715,23 @@ def main() -> int:
         return 0
 
     if target == "local":
-        bundle = local_bundle(repo)
+        bundle, bundle_truncated = local_bundle(repo)
     elif target == "branch":
         assert target_ref
-        bundle = branch_bundle(repo, target_ref)
+        bundle, bundle_truncated = branch_bundle(repo, target_ref)
     else:
-        bundle = commit_bundle(repo, args.commit)
+        bundle, bundle_truncated = commit_bundle(repo, args.commit)
         target_ref = args.commit
+    extra_prompt, prompt_truncated = load_extra_prompt(args, repo)
+    datasets, datasets_truncated = load_datasets(args, repo)
+    input_truncated = bundle_truncated or prompt_truncated or datasets_truncated
     prompt = build_prompt(
         repo,
         target,
         target_ref,
         bundle,
-        load_extra_prompt(args, repo),
-        load_datasets(args, repo),
+        extra_prompt,
+        datasets,
     )
     changed_paths = review_paths(repo, target, target_ref, args.commit)
     print(f"bundle: {len(prompt)} chars")
@@ -2482,10 +2741,17 @@ def main() -> int:
         tests_proc = start_parallel_tests(args.parallel_tests, repo, args.parallel_tests_shell)
     try:
         if len(reviewers) == 1:
-            report = run_reviewer(reviewers[0], repo, prompt, changed_paths, args.require_finding)
+            report = run_reviewer(
+                reviewers[0],
+                repo,
+                prompt,
+                changed_paths,
+                args.require_finding,
+                input_truncated,
+            )
             label = "autoreview"
         else:
-            report = run_panel(args, reviewers, repo, prompt, changed_paths)
+            report = run_panel(args, reviewers, repo, prompt, changed_paths, input_truncated)
             label = "autoreview panel"
         if args.json_output:
             Path(args.json_output).write_text(json.dumps(report, indent=2) + "\n")

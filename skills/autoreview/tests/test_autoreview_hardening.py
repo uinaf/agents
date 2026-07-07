@@ -24,6 +24,8 @@ def git(repo: Path, *args: str) -> str:
             "GIT_AUTHOR_EMAIL": "autoreview@example.invalid",
             "GIT_COMMITTER_NAME": "Autoreview Test",
             "GIT_COMMITTER_EMAIL": "autoreview@example.invalid",
+            "GIT_CONFIG_GLOBAL": "/dev/null",
+            "GIT_CONFIG_NOSYSTEM": "1",
         }
     )
     result = subprocess.run(
@@ -64,9 +66,10 @@ class AutoreviewHardeningTests(unittest.TestCase):
             repo = init_repo(Path(tempdir))
             (repo / "image.bin").write_bytes(b"\x89PNG\r\n\0binary-content")
 
-            bundle = self.helper["local_bundle"](repo)
+            bundle, truncated = self.helper["local_bundle"](repo)
 
             self.assertIn("## image.bin\n[binary file omitted]", bundle)
+            self.assertFalse(truncated)
 
     def test_branch_bundle_rejects_unsafe_or_unknown_base_before_diff(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
@@ -95,6 +98,92 @@ class AutoreviewHardeningTests(unittest.TestCase):
         bounded = self.helper["bounded"]("x" * 25, 10)
 
         self.assertEqual(bounded, "x" * 10 + "\n\n[truncated at 10 characters]\n")
+
+    def test_review_patch_rejects_oversized_content(self) -> None:
+        with self.assertRaisesRegex(SystemExit, "too large to review safely"):
+            self.helper["validate_review_patch"]("local staged diff", ["safe.txt"], "x" * 25, 10)
+
+    def test_tracked_sensitive_paths_are_blocked_in_all_modes(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            repo = init_repo(Path(tempdir))
+            (repo / "base.txt").write_text("base\n", encoding="utf-8")
+            git(repo, "add", "base.txt")
+            git(repo, "commit", "-q", "-m", "base")
+            base = git(repo, "rev-parse", "HEAD").strip()
+
+            (repo / ".env").write_text("placeholder=true\n", encoding="utf-8")
+            git(repo, "add", ".env")
+            with self.assertRaisesRegex(SystemExit, "tracked sensitive paths"):
+                self.helper["local_bundle"](repo)
+
+            git(repo, "commit", "-q", "-m", "sensitive path")
+            with self.assertRaisesRegex(SystemExit, "tracked sensitive paths"):
+                self.helper["branch_bundle"](repo, base)
+            with self.assertRaisesRegex(SystemExit, "tracked sensitive paths"):
+                self.helper["commit_bundle"](repo, "HEAD")
+
+    def test_tracked_source_names_and_env_templates_remain_reviewable(self) -> None:
+        for rel in (
+            "tokenizer.py",
+            "token_count.ts",
+            "password_validator.go",
+            ".env.example",
+            "private/parser.py",
+            "design-tokens/colors.json",
+            "token_count/generated.py",
+            ".docker/Dockerfile",
+            ".docker/scripts/build.sh",
+        ):
+            with self.subTest(rel=rel):
+                self.assertIsNone(self.helper["tracked_sensitive_repo_path_risk"](rel))
+
+    def test_suffixed_credential_data_paths_remain_sensitive(self) -> None:
+        for rel in (
+            "credentials-prod.json",
+            "service-account-dev.yaml",
+            "api-key.backup.json",
+            "token-prod.json",
+            "tokens.json",
+            "auth-token.yaml",
+            "prod-credentials.json",
+            "google-service-account.json",
+            "client-secret.yaml",
+            "credentials/prod.json",
+            "prod-credentials/client.conf",
+            "client-secrets/account.ini",
+            "credentials.txt",
+            "client-secret.csv",
+            ".docker/config.json",
+            "deployment/.docker/config.json",
+        ):
+            with self.subTest(rel=rel):
+                self.assertIsNotNone(self.helper["tracked_sensitive_repo_path_risk"](rel))
+
+    def test_normalized_secret_scan_handles_combined_diff_prefixes(self) -> None:
+        value = "Correct-Horse!" + "@Battery$Staple"
+        patch = (
+            "diff --cc settings.json\n"
+            "@@@ -1,1 -1,1 +1,2 @@@\n"
+            '++"api_key":\n'
+            '++  "' + value + '"\n'
+        )
+
+        self.assertTrue(
+            any(
+                self.helper["secret_text_risk"](content)
+                for content in self.helper["unified_diff_contents"](patch)
+            )
+        )
+
+    def test_secret_detector_does_not_treat_code_expressions_as_values(self) -> None:
+        for content in (
+            "token = secrets.token_urlsafe(32)",
+            'password = payload.get("password")',
+            'token_endpoint = "https://accounts.example.com/oauth2/token"',
+            'password_policy = "minimum-twelve-characters"',
+        ):
+            with self.subTest(content=content):
+                self.assertFalse(self.helper["secret_text_risk"](content))
 
     def test_read_text_truncates_without_scanning_tail(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
@@ -164,9 +253,10 @@ class AutoreviewHardeningTests(unittest.TestCase):
             evidence = repo / "evidence.txt"
             evidence.write_text("x" * 600_000, encoding="utf-8")
 
-            _, content = self.helper["validate_evidence_file"](repo, "evidence.txt", "--dataset")
+            _, content, truncated = self.helper["validate_evidence_file"](repo, "evidence.txt", "--dataset")
 
             self.assertIn("[truncated at 180000 characters]", content)
+            self.assertTrue(truncated)
 
     def test_self_test_shortcut_runs_deterministic_checks(self) -> None:
         result = subprocess.run(
