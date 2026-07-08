@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent adds a correctly structured JSON health endpoint and structured JSON request logging (observability), and implements worktree-safe port isolation using directory-path-derived ports with a proper boot poll loop — following the patterns described in the agent-readiness skill.",
+  "context": "Tests whether the agent adds a correctly structured JSON health endpoint and structured JSON request logging (observability), implements worktree-safe port isolation using directory-path-derived ports with a proper boot poll loop, and handles .worktreeinclude for required gitignored local config — following the patterns described in the agent-readiness skill.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -61,6 +61,26 @@
       "name": "Port collision rationale documented",
       "max_score": 7,
       "description": "observability-notes.md explains how the port derivation prevents collisions between different worktrees on the same machine"
+    },
+    {
+      "name": ".worktreeinclude exists",
+      "max_score": 6,
+      "description": "The solution creates a .worktreeinclude file at the repository root"
+    },
+    {
+      "name": ".worktreeinclude is narrow",
+      "max_score": 6,
+      "description": ".worktreeinclude includes .env.local or the required local config path, and does not use broad patterns such as *, .env*, secrets/, node_modules/, or build/cache directories"
+    },
+    {
+      "name": ".gitignore matches worktree include",
+      "max_score": 5,
+      "description": ".gitignore ignores the same local config file that .worktreeinclude includes, so the file is eligible for managed Codex or Claude worktree copying"
+    },
+    {
+      "name": "Worktree include rationale documented",
+      "max_score": 5,
+      "description": "observability-notes.md explains that managed Codex or Claude worktrees copy only matching gitignored files from .worktreeinclude, and that manual worktrees/hooks need their own copy path"
     },
     {
       "name": "Dev environment observability",

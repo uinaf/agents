@@ -1,6 +1,6 @@
 ---
 name: agent-readiness
-description: "Audit and build the infrastructure a repo needs so agents can work autonomously — boot scripts, smoke tests, CI/CD gates, dev environment setup, observability, and isolation. Use when a repo can't boot, tests are broken or missing, there's no dev environment, agents can't verify their work, or agents need human help to get anything done. Do not use for reviewing an existing diff or for documentation-only cleanup."
+description: "Audit and build the infrastructure a repo needs so agents can work autonomously — boot scripts, smoke tests, CI/CD gates, dev environment setup, observability, worktree isolation, and .worktreeinclude handling for Codex or Claude worktrees. Use when a repo can't boot, tests are broken or missing, there's no dev environment, agents can't verify their work, worktrees miss ignored local config, or agents need human help to get anything done. Do not use for reviewing an existing diff or for documentation-only cleanup."
 ---
 
 # Agent-Readiness
@@ -22,7 +22,7 @@ Make a repo ready for autonomous agent work by adding mechanical proof: boot scr
 4. **E2e** — key user flows work end to end
 5. **Enforce** — one local gate plus hooks, CI gates, lint rules, or mechanical checks
 6. **Observe** — logs, health endpoints, traces, machine-readable signals
-7. **Isolate** — worktrees or containers do not collide
+7. **Isolate** — worktrees or containers do not collide; ignored local setup files are available where needed
 
 Concrete examples:
 
@@ -52,6 +52,14 @@ Use [references/grading.md](references/grading.md). Lowest dimension sets the ov
 
 Also scan unattended-run constraints: session independence, explicit artifact paths, resource bounds, infrastructure-enforced permissions, and direct CLI/HTTP/file interfaces for dashboard-only flows. If these are not needed for the current task, keep them as remaining gaps instead of expanding the scope.
 
+When the repo uses Codex or Claude worktrees, audit `.worktreeinclude` too:
+
+- confirm required gitignored local config is present in managed worktrees
+- keep patterns narrow and rooted to files the repo actually ignores
+- do not list tracked files, broad secret directories, generated caches, or dependency folders
+- prefer generated test config, Infisical/CI env, or setup scripts when copying secrets would broaden access
+- note that custom worktree hooks and manual `git worktree add` flows need their own copy step
+
 Example output:
 
 ```text
@@ -74,7 +82,7 @@ Prioritize one canonical local gate (`make verify`, `just verify`, `./scripts/ve
 
 When readiness work includes agent entrypoints, keep `AGENTS.md` as the canonical authored guide and place `CLAUDE.md` beside it as a symlink to `AGENTS.md` rather than maintaining two separate guidance files.
 
-See [references/setup-patterns.md](references/setup-patterns.md) for local gates, boot scripts, e2e, observability, isolation, containerized stacks, and tooling-version ownership.
+See [references/setup-patterns.md](references/setup-patterns.md) for local gates, boot scripts, e2e, observability, isolation, `.worktreeinclude`, containerized stacks, and tooling-version ownership.
 
 ### 3. Improve
 
@@ -112,5 +120,5 @@ Keep details compact:
 ## References
 
 - [references/grading.md](references/grading.md) — agent-readiness grading scale with mechanical criteria
-- [references/setup-patterns.md](references/setup-patterns.md) — local gates, boot, smoke, e2e, observability, and isolation patterns
+- [references/setup-patterns.md](references/setup-patterns.md) — local gates, boot, smoke, e2e, observability, isolation, and `.worktreeinclude` patterns
 - [references/industry-examples.md](references/industry-examples.md) — external patterns and justification for readiness investment

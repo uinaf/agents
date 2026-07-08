@@ -35,6 +35,7 @@ Grade a project's readiness for autonomous agent work from F to A. Mechanical cr
 ### A — Excellent
 - All of B, plus:
 - Per-worktree or per-container isolation (parallel agents don't collide)
+- Required gitignored local config is handled by `.worktreeinclude`, setup scripts, or worktree hooks without broad secret/cached-file copying
 - Agent runs are independent of a developer's live terminal, browser tab, or laptop session
 - Custom lint rules with agent-readable error messages that teach how to fix
 - Seed data / fixture scripts for reproducible test state

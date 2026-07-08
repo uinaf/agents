@@ -9,6 +9,8 @@ Concrete patterns for building each readiness layer. Substitute your project's a
 - Datadog DST + observability: https://www.datadoghq.com/blog/ai/harness-first-agents/
 - Ona (infrastructure thesis): https://ona.com/stories/visual-guide-self-driving-codebases
 - Ramp sandbox architecture: https://engineering.ramp.com/inspect
+- Codex app worktrees and `.worktreeinclude`: https://developers.openai.com/codex/app/worktrees
+- Claude Code worktrees and `.worktreeinclude`: https://code.claude.com/docs/en/worktrees
 
 ## Contents
 
@@ -243,6 +245,29 @@ docker compose up -d --wait
 ```
 
 Rules: no hardcoded ports, each worktree gets its own Docker Compose project, tear down after completion.
+
+### Worktree Include Files
+
+Codex app managed worktrees and Claude Code worktrees can copy required gitignored local files from the repository root with `.worktreeinclude`.
+
+Use this when agents can create or enter worktrees but then fail because ignored local setup files are missing, such as `.env.local`, a local tool config, or a dev-only secrets file. Keep the file small:
+
+```gitignore
+# .worktreeinclude
+.env.local
+config/dev-secrets.json
+```
+
+Audit rules:
+
+- Patterns use `.gitignore` syntax and should name specific paths whenever possible.
+- Only include files that are already ignored by Git; tracked files are already present in the checkout.
+- Do not include broad patterns such as `*`, `.env*`, `secrets/`, caches, build output, dependencies, or machine-global config.
+- If the project should fetch secrets from Infisical, CI, or a setup script, document that path instead of copying a local secret file.
+- Pair `.worktreeinclude` with `.gitignore`; adding one without the other is usually a readiness gap.
+- Codex processes `.worktreeinclude` for local Codex-managed app worktrees, not remote worktrees or worktrees created manually with Git.
+- Claude Code processes `.worktreeinclude` for default `--worktree`, subagent worktrees, and desktop parallel sessions.
+- For custom Claude `WorktreeCreate` hooks or manual `git worktree add`, do not assume `.worktreeinclude` is processed. Copy required files in the hook or setup script instead.
 
 ## Unattended Run Constraints
 

@@ -7,7 +7,7 @@ interface:
     Goal: make the repo verifiable by agents with the smallest useful readiness improvement.
 
     Success criteria:
-    - Current boot, smoke, test, observability, and isolation gaps are identified from repo evidence.
+    - Current boot, smoke, test, observability, isolation, and .worktreeinclude gaps are identified from repo evidence.
     - Missing readiness layers are added or improved only when they are needed for reliable verification.
     - A canonical local gate exists or is named as the highest-impact gap.
     - The repo has a clear next verification path.

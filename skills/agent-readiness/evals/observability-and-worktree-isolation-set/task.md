@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-An engineering team runs three agents concurrently on the same Flask API repository, each working on different features in separate git worktrees. The setup is breaking down: agents are crashing each other's instances because they all start the server on port 5000, and when something goes wrong the agents have no machine-readable output they can query — they can only read console logs sprinkled with print statements that are difficult to parse programmatically.
+An engineering team runs three agents concurrently on the same Flask API repository, each working on different features in separate git worktrees. The setup is breaking down: agents are crashing each other's instances because they all start the server on port 5000, and when something goes wrong the agents have no machine-readable output they can query — they can only read console logs sprinkled with print statements that are difficult to parse programmatically. New worktrees also miss the repo's gitignored `.env.local`, which agents need for local-only development configuration.
 
 You have been asked to fix both problems so agents can run reliably in parallel. Produce the updated application and the necessary scripts, along with documentation of the approach in `observability-notes.md`.
 
@@ -16,7 +16,11 @@ Produce the following files:
 
 3. `teardown.sh` — Shell script that stops the service started by worktree-start.sh.
 
-4. `observability-notes.md` — Explanation of: (a) how an agent can programmatically query the health of the service, (b) how the startup script prevents port conflicts between worktrees, and (c) how to tear down after an agent finishes its task.
+4. `.gitignore` — Ignore local environment files and runtime artifacts.
+
+5. `.worktreeinclude` — Narrowly include the gitignored local config file that managed Codex or Claude worktrees need.
+
+6. `observability-notes.md` — Explanation of: (a) how an agent can programmatically query the health of the service, (b) how the startup script prevents port conflicts between worktrees, (c) how ignored local config is made available to managed worktrees, and (d) how to tear down after an agent finishes its task.
 
 ## Input Files
 
