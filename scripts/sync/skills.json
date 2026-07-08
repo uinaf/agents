@@ -33,6 +33,10 @@
       "source": "mattpocock/skills"
     },
     {
+      "name": "improve",
+      "source": "shadcn/improve"
+    },
+    {
       "name": "react-ban-use-effect",
       "source": "uinaf/agents"
     },
