@@ -6,17 +6,9 @@ interface:
 
     Goal: self-check your own completed change before independent review.
 
-    Success criteria:
-    - The changed behavior has the strongest practical guardrail or runtime evidence available.
-    - Local guardrails, focused regression checks, real-surface proof, CI, and live/deploy evidence are reported as separate layers when they differ.
-    - Real-surface checks are used when the repo supports them.
-    - Obvious self-correctable issues found during verification are fixed.
-    - The verdict is exactly one of: ready for review, needs more work, blocked.
+    Run the canonical guardrails, focused regression checks, and the strongest practical real-surface proof. Keep local, runtime, CI, and live/deploy evidence separate. Fix obvious issues discovered during the pass and probe one relevant failure path.
 
-    Constraints:
-    - Report readiness for review; ship decisions are out of scope.
-    - Reviews of someone else's code are out of scope.
-    - Mark checks that could not run as unverified or blocked.
+    Boundaries: report readiness for review, not a ship decision. Existing-code review is out of scope. Mark unavailable proof as unverified or blocked.
 
     Output: no conversational opener. Use bullet labels only: verdict, evidence, fixed during verify when any, unverified gaps, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

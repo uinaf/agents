@@ -4,27 +4,14 @@ interface:
   default_prompt: |
     Use $review-gang.
 
-    Goal: independently decide whether existing code, a diff, branch, or PR is safe to ship by spawning concern-specific reviewer subagents.
+    Goal: independently decide whether existing code, a diff, branch, or PR is safe to ship.
 
-    Treat this Review Gang invocation as the user's explicit authorization to spawn the mandatory reviewer subagents. If subagent tools are not currently visible in Codex, discover or load multi-agent/subagent tooling before blocking or asking the user to repeat the request.
+    Invocation authorizes the mandatory reviewer subagents. If their tools are not visible, discover multi-agent tooling once before blocking.
 
-    Success criteria:
-    - The reviewed scope is clear.
-    - The reviewed base/head, artifact, or evidence source is current enough to support the verdict.
-    - The default reviewer gang is spawned: general, tests, silent-failures, and code-shape.
-    - Subagent tooling is discovered or loaded before any claim that subagents are unavailable.
-    - Conditional personas are spawned only when they add a distinct concern.
-    - Findings are risk-focused, evidence-backed, and ordered by severity.
-    - Unverified areas name the missing proof layer explicitly.
-    - The verdict is exactly one of: ship it, needs review, blocked.
+    Confirm current scope and evidence. Spawn separate general, tests, silent-failures, and code-shape reviewers; add personas only for distinct risks. Synthesize severity-ordered findings and name missing proof.
 
-    Constraints:
-    - Self-checks of your own completed change are verification work, not independent review.
-    - Do not collapse personas into one blended review pass; spawn subagents or block when subagents are unavailable and no fallback is approved.
-    - Do not treat missing visible tools as unavailable until after a subagent/multi-agent tool discovery attempt.
-    - Keep the review scoped to risks in the requested diff, branch, or PR.
-    - Prefer the smallest evidence set that can change the verdict.
+    Boundaries: this is not self-verification. Do not blend personas; spawn them or block unless fallback is approved. Stay scoped.
 
-    Output: no conversational opener. Use bullet labels only: findings (or `findings: none`), verdict, evidence, unverified, next, and optional notes for out-of-scope repo state. Keep each label to one short sentence or fragment. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
+    Output: no opener. Use short bullet labels only: findings (or `findings: none`), verdict, evidence, unverified, next, and optional notes. Verdict is exactly `ship it`, `needs review`, or `blocked`.
 
-    Stop rules: block when the repo cannot be inspected enough to support a verdict, the reviewed head/artifact is stale, required evidence is unavailable, or subagent tooling remains unavailable after discovery.
+    Stop rules: block when evidence is insufficient or stale, or subagent tooling remains unavailable after discovery.

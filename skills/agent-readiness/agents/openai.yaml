@@ -6,16 +6,9 @@ interface:
 
     Goal: make the repo verifiable by agents with the smallest useful readiness improvement.
 
-    Success criteria:
-    - Current boot, smoke, test, observability, isolation, and .worktreeinclude gaps are identified from repo evidence.
-    - Missing readiness layers are added or improved only when they are needed for reliable verification.
-    - A canonical local gate exists or is named as the highest-impact gap.
-    - The repo has a clear next verification path.
+    Audit boot, smoke, interaction, e2e, enforcement, observability, and isolation from repo evidence. Add only the missing layer needed for honest verification, prioritizing one canonical local gate. Check .worktreeinclude when managed worktrees need ignored local setup.
 
-    Constraints:
-    - Existing-diff ship decisions are out of scope.
-    - Product-change validation is runtime verification work.
-    - Documentation-only cleanup is out of scope.
+    Boundaries: existing-diff ship decisions, product-change validation, and documentation-only cleanup are out of scope.
 
     Output: no conversational opener. Use bullet labels only: grade, evidence, files changed, remaining gaps, and next. Summarize passing checks by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

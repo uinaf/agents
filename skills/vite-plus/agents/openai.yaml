@@ -6,16 +6,9 @@ interface:
 
     Goal: migrate or align a frontend repo with the stock Vite+ workflow.
 
-    Success criteria:
-    - Scripts, tests, config, CI, hooks, and packaging use paths owned by Vite+ where the repo can support them.
-    - Repo-specific release, binary, or runtime logic is preserved when Vite+ does not replace it cleanly.
-    - The installed Vite+ behavior is verified before relying on memorized command shapes.
+    Inspect installed Vite+ behavior and repo guidance first. Align scripts, tests, config, CI, hooks, and packaging with Vite+-owned paths where supported. Preserve repo-specific release, binary, and runtime logic that Vite+ does not replace. Verify the migrated commands and artifacts end to end.
 
-    Constraints:
-    - Preserve working release or packaging logic while aligning the surrounding workflow.
-    - Surface unsupported Vite or direct Vitest ecosystem versions as blockers before migration.
-    - Treat the removed `@voidzero-dev/vite-plus-test` wrapper as upgrade cleanup, not something to preserve.
-    - Inspect local guidance files before changing workflows.
+    Boundaries: surface unsupported Vite or Vitest versions before migration. Do not preserve the removed `@voidzero-dev/vite-plus-test` wrapper.
 
     Output: no conversational opener. Use bullet labels only: files changed, Vite+ shape, evidence, exceptions, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

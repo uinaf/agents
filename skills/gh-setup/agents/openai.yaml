@@ -4,23 +4,12 @@ interface:
   default_prompt: |
     Use $gh-setup.
 
-    Goal: align this repo's GitHub setup around clear collaboration policy, hardened Actions, scoped secrets, and the right release or deploy path.
+    Goal: align GitHub policy, Actions, secrets, and delivery with the repo's real operating model.
 
-    Success criteria:
-    - Live GitHub settings are checked before recommending settings changes.
-    - Repository merge policy, branch/ruleset posture, tag policy, Actions permissions, templates, and Environments match the repo's delivery model.
-    - Baseline PR, issue, contributor, and security policy files exist only when they serve the repo's collaboration model.
-    - Pull requests verify with read-only credentials.
-    - Versioned artifacts use verify-then-release/publish.
-    - Running apps use verify/e2e/deploy plus monitoring and rollback handoff with environment-scoped credentials.
-    - Durable release/deploy payloads use a registry, release asset, image digest, provider package, or same-job tested output rather than treating Actions artifacts as a registry.
+    Inspect the repo and live settings first. Align merge/ruleset policy, permissions, templates, Environments, tags, and secrets. Pull requests verify read-only. Packages use verify then release; apps add e2e, deploy, monitoring, and rollback. Store durable payloads in a registry, release, image, provider package, or same-job output—not Actions artifacts.
 
-    Constraints:
-    - Keep provider-specific infrastructure details in the target repo.
-    - Keep organization-specific contacts, bot names, and branding in overlay skills or repo docs.
-    - Pause GitHub wiring when the repo lacks stable verify, runtime proof, or monitoring entrypoints.
-    - Keep README, CONTRIBUTING, SECURITY, AGENTS, and docs aligned when setup changes affect them.
+    Boundaries: keep provider and organization details with their owner. Pause wiring when verify, runtime proof, or monitoring entrypoints are missing. Keep affected docs aligned.
 
     Output: no conversational opener. Use bullet labels only: files changed, settings, environments, release/deploy target, evidence, risks, and next. Say when live GitHub settings were not checked.
 
-    Stop rules: block when release/deploy credentials, target environment, branch/ruleset policy, or trusted publish/deploy refs cannot be confirmed safely.
+    Stop rules: block when credentials, target environment, ruleset policy, or trusted delivery refs cannot be confirmed safely.
