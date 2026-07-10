@@ -15,7 +15,7 @@ jq -r '.name' skills/*/.tessl-plugin/plugin.json
 ## How publishing works
 
 - Each skill directory under `skills/*` has its own `.tessl-plugin/plugin.json`
-- `.github/workflows/publish-skills.yml` runs secretless lint first, then runs authenticated Tessl review and publish through the `release` Environment for secret scoping
+- `.github/workflows/publish-skills.yml` runs the canonical repository verification gate first, including secretless skill lint, then runs authenticated Tessl review and publish through the `release` Environment for secret scoping
 - Pushes to `main` publish only the plugins that changed
 - Manual workflow runs publish all plugins only when the run ref is `main`; non-`main` manual runs can lint, but authenticated review and publish are skipped
 - The publish job runs `scripts/skills/publish.sh`, which detects changed plugin directories, runs `tessl plugin lint`, and publishes with `tessl plugin publish`

@@ -8,7 +8,7 @@ Reusable agent skills, global behavioral rules, and a small sync script for AI c
 - `rules/agents.md` — global behavioral rules.
 - `rules/agents.local.md` — optional private machine-specific overrides, ignored by git.
 - `rules/agents.final.md` — generated combined rules, ignored by git.
-- `scripts/sync/sync.sh` — symlink rules and install manifest skills.
+- `scripts/sync/sync.sh` — stable wrapper for the typed rules and skill sync.
 - `scripts/skills/` — Tessl review and publish helpers.
 - `docs/` — distribution notes.
 
@@ -23,10 +23,23 @@ cd agents
 Sync is additive and manifest-driven. It installs every skill listed in
 `scripts/sync/skills.json` for the supported agents installed on the machine,
 and does not remove globally installed skills that are outside the manifest.
+Run it only from the primary checkout on `main`; it refuses feature branches
+and linked worktrees before pulling or changing global agent state.
 
 The sync script pins the `skills` CLI by default. Override with
 `SKILLS_CLI_VERSION=<version>` only when intentionally testing or rotating the
 installer.
+
+## Verify
+
+```bash
+npm ci
+npm run verify
+```
+
+The local gate typechecks and tests the sync CLI, runs the autoreview tests, and
+lints shell scripts, GitHub Actions workflows, and every local skill. It expects
+ShellCheck on `PATH`; CI runs the same command.
 
 ## Evaluate
 

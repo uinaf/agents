@@ -10,12 +10,10 @@ permissions:
   contents: read
 
 jobs:
-  pull-request-lint:
-    if: ${{ github.event_name == 'pull_request' }}
+  verify:
+    name: Verify repository
     runs-on: ubuntu-latest
-    env:
-      TESSL_AUTO_UPDATE_INTERVAL_MINUTES: "0"
-      TESSL_REVIEW_MODE: lint
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -28,10 +26,16 @@ jobs:
           node-version-file: ".node-version"
           package-manager-cache: false
 
-      - name: Lint skills without Tessl auth
-        run: ./scripts/skills/review.sh
+      - name: Install verification dependencies
+        run: npm ci
+
+      - name: Run repository verification
+        env:
+          TESSL_AUTO_UPDATE_INTERVAL_MINUTES: "0"
+        run: npm run verify
 
   main-review:
+    needs: verify
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:

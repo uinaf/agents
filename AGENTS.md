@@ -7,5 +7,6 @@ Repo-local contributor guidance. Global agent behavior lives in [`rules/agents.m
 - Descriptions should self-activate: what it does, when to use it, and the main boundary.
 - Put shared guidance in one owning skill or reference.
 - Check reality before editing docs or examples; keep commands and paths repo-valid.
+- Run `npm run verify` before handoff; CI uses the same repository gate.
 - Run `npx tessl@0.90.0 review run --workspace uinaf skills/<name>` for skill changes, or `./scripts/skills/review.sh` for broad changes.
 - Use repo-relative links in checked-in Markdown. No absolute local paths, `file://`, or editor URIs.
