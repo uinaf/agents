@@ -23,6 +23,7 @@ type CommandCall = {
 type FixtureOptions = {
   branch?: string;
   commonDir?: string;
+  falseSuccesses?: ReadonlySet<string>;
   failures?: ReadonlyMap<string, FixtureFailure>;
   gitDir?: string;
 };
@@ -48,16 +49,20 @@ class FixtureRuntime implements Runtime {
   readonly installedCommands = new Set(["claude", "codex"]);
   readonly branch: string;
   readonly commonDir: string;
+  readonly falseSuccesses: ReadonlySet<string>;
   readonly failures: ReadonlyMap<string, FixtureFailure>;
   readonly gitDir: string;
+  readonly home: string;
   readonly repoDir: string;
 
   constructor(repoDir: string, home: string, options: FixtureOptions = {}) {
     this.repoDir = repoDir;
     this.branch = options.branch ?? "main";
     this.commonDir = options.commonDir ?? ".git";
+    this.falseSuccesses = options.falseSuccesses ?? new Set();
     this.failures = options.failures ?? new Map();
     this.gitDir = options.gitDir ?? ".git";
+    this.home = home;
     this.env = { HOME: home, SKILLS_CLI_VERSION: "test-version" };
   }
 
@@ -93,9 +98,15 @@ class FixtureRuntime implements Runtime {
         throw new Error("skills installer call must include -s <name>");
       }
       const diagnostic = this.failures.get(skill);
-      return diagnostic === undefined
-        ? { status: 0, stdout: "", stderr: "" }
-        : { status: 1, stdout: diagnostic.stdout, stderr: diagnostic.stderr };
+      if (diagnostic !== undefined) {
+        return { status: 1, stdout: diagnostic.stdout, stderr: diagnostic.stderr };
+      }
+      if (!this.falseSuccesses.has(skill)) {
+        const skillDir = join(this.home, ".agents", "skills", skill);
+        mkdirSync(skillDir, { recursive: true });
+        writeFileSync(join(skillDir, "SKILL.md"), `---\nname: ${skill}\ndescription: Fixture\n---\n`);
+      }
+      return { status: 0, stdout: "", stderr: "" };
     }
 
     return { status: 99, stdout: "", stderr: `Unexpected command: ${command}` };
@@ -183,6 +194,25 @@ test("reports every installer failure after attempting the full manifest", () =>
   assert.match(runtime.stderr.value, /npm error token=\[REDACTED\]/);
   assert.match(runtime.stderr.value, /package source was not found/);
   assert.doesNotMatch(runtime.stderr.value, /stdout-secret|stderr-secret/);
+  assert.doesNotMatch(runtime.stdout.value, /Done\./);
+});
+
+test("rejects a false-success installer result when the installed artifact is missing", () => {
+  const { repoDir, home } = createFixture();
+  const runtime = new FixtureRuntime(repoDir, home, {
+    falseSuccesses: new Set(["ok-middle"]),
+  });
+
+  assert.equal(main([], runtime), 1);
+  assert.deepEqual(installedSkillNames(runtime), [
+    "ok-before",
+    "fails-first",
+    "ok-middle",
+    "fails-second",
+    "ok-after",
+  ]);
+  assert.match(runtime.stderr.value, /ok-middle \(fixture\/middle, invalid installed artifact\)/);
+  assert.match(runtime.stderr.value, /installer reported success but .*SKILL\.md is missing/);
   assert.doesNotMatch(runtime.stdout.value, /Done\./);
 });
 

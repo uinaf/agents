@@ -264,11 +264,36 @@ function sanitizeDiagnostic(stderr: string): string {
   return `${diagnostic.slice(0, MAX_DIAGNOSTIC_LENGTH - 3)}...`;
 }
 
+function installedSkillError(home: string, skill: Skill): string | undefined {
+  const manifestPath = join(home, ".agents", "skills", skill.name, "SKILL.md");
+  if (!existsSync(manifestPath)) {
+    return `installer reported success but ${manifestPath} is missing`;
+  }
+
+  const manifest = readFileSync(manifestPath, "utf8");
+  const frontmatter = manifest.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+  if (frontmatter === null) {
+    return `installer reported success but ${manifestPath} has no YAML frontmatter`;
+  }
+
+  const name = frontmatter[1]
+    ?.split(/\r?\n/)
+    .find((line) => line.startsWith("name:"))
+    ?.slice("name:".length)
+    .trim();
+  if (name !== skill.name) {
+    return `installer reported success but ${manifestPath} declares name ${name ?? "<missing>"}`;
+  }
+
+  return undefined;
+}
+
 function installSkills(
   runtime: Runtime,
   skills: readonly Skill[],
   agents: readonly Agent[],
   cliVersion: string,
+  home: string,
 ): number {
   const failures: SkillFailure[] = [];
 
@@ -294,6 +319,15 @@ function installSkills(
       failures.push({
         diagnostic: sanitizeDiagnostic(`${result.stdout}\n${result.stderr}`),
         summary: `${skill.name} (${skill.source}, exit ${result.status})`,
+      });
+      continue;
+    }
+
+    const artifactError = installedSkillError(home, skill);
+    if (artifactError !== undefined) {
+      failures.push({
+        diagnostic: artifactError,
+        summary: `${skill.name} (${skill.source}, invalid installed artifact)`,
       });
     }
   }
@@ -365,6 +399,7 @@ function sync(runtime: Runtime): number {
     readSkills(manifestPath),
     agents,
     runtime.env.SKILLS_CLI_VERSION || DEFAULT_SKILLS_CLI_VERSION,
+    home,
   );
   if (status !== 0) {
     return status;
