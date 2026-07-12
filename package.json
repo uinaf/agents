@@ -16,7 +16,7 @@
     "verify": "npm run typecheck && npm run lint:shell && npm run lint:actions && npm run test:sync && npm run test:autoreview && npm run lint:skills"
   },
   "devDependencies": {
-    "@types/node": "24.13.3",
+    "@types/node": "26.1.1",
     "github-actionlint": "1.7.12",
     "typescript": "7.0.2"
   }
