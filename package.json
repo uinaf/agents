@@ -11,15 +11,13 @@
     "lint:shell": "shellcheck scripts/skills/*.sh scripts/sync/*.sh",
     "lint:skills": "TESSL_REVIEW_MODE=lint ./scripts/skills/review.sh",
     "test:autoreview": "python3 -m unittest discover -s skills/autoreview/tests -p 'test_*.py'",
-    "test:interfaces": "node --test scripts/skills/validate-openai-manifests.test.ts && node scripts/skills/validate-openai-manifests.ts",
     "test:sync": "node --test scripts/sync/sync.test.ts",
     "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm run lint:shell && npm run lint:actions && npm run test:sync && npm run test:autoreview && npm run test:interfaces && npm run lint:skills"
+    "verify": "npm run typecheck && npm run lint:shell && npm run lint:actions && npm run test:sync && npm run test:autoreview && npm run lint:skills"
   },
   "devDependencies": {
     "@types/node": "24.13.3",
     "github-actionlint": "1.7.12",
-    "typescript": "7.0.2",
-    "yaml": "2.9.0"
+    "typescript": "7.0.2"
   }
 }

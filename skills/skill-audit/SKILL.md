@@ -95,6 +95,12 @@ Use [references/best-practices.md](references/best-practices.md) when the skill 
 
 Check for repo-relative links, stale paths, duplicated guidance, and conflicts with the source repo's conventions.
 
+Treat `agents/openai.yaml` as picker-facing metadata. Keep
+`interface.default_prompt` concise, normally one sentence, and aligned with the
+skill's current scope. Do not add repo-local parsers or CI checks for
+undocumented Codex implementation limits. If deterministic enforcement becomes
+necessary, prefer the real Codex loader or one upstream/shared versioned linter.
+
 ### 6. Synthesize the smallest useful change set
 
 Separate blockers from polish. If edits are requested, fix the highest-leverage issues first, rerun Tessl, and report what improved.
