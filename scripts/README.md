@@ -20,9 +20,8 @@ npm run verify
 ```
 
 The gate expects ShellCheck on `PATH`; actionlint and the TypeScript toolchain
-are installed from the lockfile. It also rejects OpenAI skill interface prompts
-over Codex's 1,024-character limit so they cannot be silently ignored. The
-validator parses YAML before measuring the decoded prompt value.
+are installed from the lockfile. It runs the TypeScript, shell, workflow, sync,
+autoreview, and Tessl plugin checks used by CI.
 
 The sync tests use an isolated fixture runtime. They prove that every manifest
 skill is attempted, installer failures are reported together, a partial failure
