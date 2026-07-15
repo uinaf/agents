@@ -7,7 +7,7 @@ description: "Run structured Codex/Claude autoreview closeout for local changes,
 
 Run the bundled structured review helper as a closeout check. This is code review, not Guardian `auto_review` approval routing.
 
-Codex review is the default when no engine is set. It tries the helper's built-in preferred Codex models unless overridden, usually delivers the best review results, and should remain the normal final closeout engine. Claude review is optional and uses the helper's built-in preferred Claude models unless overridden.
+Codex review is the default when no engine is set. It uses high reasoning and the helper's built-in preferred Codex models unless overridden. Claude review is optional and uses its own preferred model list.
 
 Use when:
 
@@ -23,6 +23,9 @@ Use when:
 - Keep review-triggered fixes inside the original task scope; use [references/scope.md](references/scope.md) before accepting anything broader.
 - If a review-triggered fix changes code, rerun focused proof plus autoreview until the helper exits cleanly; stop there.
 - Honor the requested engine/model, do not invoke nested reviewers, and use review panels only when explicitly requested or risk justifies them.
+- Treat the validated bundle as the reviewer's only repository input. The helper must fail closed on sensitive, incomplete, binary, gitlink, or unsafe linked input rather than widening filesystem access.
+- Split oversized changes into coherent review targets when the helper refuses a bundle; independent chunks cannot safely prove cross-file or cross-chunk contracts.
+- If the source tree changes after bundle creation, discard the result and rerun against the updated tree.
 - Do not push just to review. Push only when the user requested push, ship, or PR update.
 
 Use [references/troubleshooting.md](references/troubleshooting.md) for heartbeat patience, Gitcrawl repair, regression provenance, security-suppression, and conscious-rejection rules.
@@ -113,6 +116,13 @@ clean `main` against `origin/main` is usually an empty diff after push. For a
 small stack, review each commit explicitly or review the branch before merging
 with `--base`.
 
+## Large Review Bundles
+
+The helper scans the full patch before checking its aggregate prompt limit. It
+fails closed when the complete bundle does not fit one review pass, because
+independent chunks can miss defects that span files or chunks. Split the change
+into coherent targets and review each target explicitly.
+
 ## Parallel Closeout
 
 Format first if formatting can change line locations. Then it is OK to run tests and review in parallel:
@@ -121,7 +131,9 @@ Format first if formatting can change line locations. Then it is OK to run tests
 "$AUTOREVIEW" --parallel-tests "<focused test command>"
 ```
 
-Tradeoff: tests may force code changes that stale the review. If tests or review lead to code edits, rerun the affected tests and rerun review until no accepted/actionable findings remain. Once that rerun exits cleanly, stop; do not spend another long review cycle on redundant confirmation.
+Parallel tests receive a temporary home and a sanitized environment. The helper
+also fingerprints the source tree before and after review, so test mutations
+invalidate the result instead of silently producing a stale clean verdict.
 
 ## Review Panels
 
@@ -185,7 +197,9 @@ The helper:
 - chooses dirty local changes first, otherwise PR base, otherwise `origin/main` for non-main branches; branch review does not fetch automatically.
 - supports Codex and Claude only; Codex is the default, and panels are opt-in with `--panel` or `--reviewers`.
 - treats `--prompt-file` and `--dataset` as repo-relative inputs, with sensitive paths, symlinks, oversized content, and secret-looking values guarded.
-- resolves commands safely outside the reviewed checkout and runs reviewers with read-only/tool-isolated settings; see [references/engine-details.md](references/engine-details.md).
+- scans safe patches in full and refuses inputs above the aggregate prompt limit rather than returning a false clean result from independent chunks.
+- resolves commands outside the reviewed checkout and runs reviewers in empty temporary workspaces with only the validated bundle available; see [references/engine-details.md](references/engine-details.md).
+- isolates parallel-test homes and environments, and rejects review results when tests or another process mutate the source tree.
 - prints a clean line and exits 0 when no accepted/actionable findings remain; exits nonzero when accepted/actionable findings are present.
 
 ## Final Report

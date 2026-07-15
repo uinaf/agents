@@ -8,6 +8,6 @@ interface:
 
     Use Codex unless Claude is requested. Let advancing reviews finish, validate every finding against real code, reject speculative or out-of-scope findings, and rerun focused proof plus review after accepted fixes. Panels are opt-in unless risk clearly justifies them.
 
-    Boundaries: review output is advisory; do not push just to review. Keep prompt and dataset inputs repo-relative and resolve the helper from the skill directory.
+    Boundaries: review output is advisory; do not push just to review. Keep prompt and dataset inputs repo-relative and resolve the helper from the skill directory. Let the helper fail closed on unsafe or oversized input, and discard results if the source tree changes during review.
 
     Output: compact closeout with command used, proof run, findings accepted/rejected, and the final clean review result or conscious rejection.
