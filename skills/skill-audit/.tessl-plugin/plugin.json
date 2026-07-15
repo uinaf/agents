@@ -1,6 +1,6 @@
 {
   "name": "uinaf/skill-audit",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Audit existing skills through a formal Tessl review or recent-task experiential feedback. Report recommendations for audit-only requests; make the smallest skill changes only when improvement or revision is explicitly requested.",
   "private": false,
   "skills": [

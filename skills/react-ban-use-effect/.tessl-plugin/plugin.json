@@ -1,6 +1,6 @@
 {
   "name": "uinaf/react-ban-use-effect",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "Ban direct `useEffect` in React components. Use when writing, refactoring, or reviewing React code so derived state, data fetching, user actions, resets, and mount-only external synchronization use declarative replacement patterns instead of dependency-array choreography.",
   "private": false,
   "skills": [

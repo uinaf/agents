@@ -1,6 +1,6 @@
 {
   "name": "uinaf/verify",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Run the builder-owned pre-review verification pass for a completed change using repo guardrails and real-surface evidence. Use a separate evaluator for complex, subjective, or high-risk work; when the repo is not verifiable, report blocked with the exact missing infrastructure and required setup.",
   "private": false,
   "skills": [
