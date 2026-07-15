@@ -5,8 +5,12 @@ import {
   accessSync,
   constants,
   existsSync,
+  lstatSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
+  readlinkSync,
+  renameSync,
   rmSync,
   symlinkSync,
   writeFileSync,
@@ -113,6 +117,10 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
+function isErrnoException(error: unknown): error is NodeJS.ErrnoException {
+  return error instanceof Error && "code" in error && typeof error.code === "string";
+}
+
 function requireSuccess(result: CommandResult, operation: string): void {
   if (result.status === 0) {
     return;
@@ -162,6 +170,40 @@ function requireCanonicalCheckout(runtime: Runtime, repoDir: string): void {
   }
 }
 
+function requireCleanTrackedCheckout(runtime: Runtime, repoDir: string): void {
+  const result = runtime.run(
+    "git",
+    ["-C", repoDir, "status", "--porcelain=v1", "--untracked-files=no"],
+    { stdout: "capture", stderr: "capture" },
+  );
+  requireSuccess(result, "Checking the agents repository for tracked changes");
+
+  const changes = result.stdout.trim();
+  if (changes.length > 0) {
+    throw new Error(
+      "Sync requires a clean tracked checkout before pulling. Commit, stash, or restore these changes:\n" +
+        changes,
+    );
+  }
+}
+
+function requireUpstreamHead(runtime: Runtime, repoDir: string): void {
+  const head = gitValue(runtime, repoDir, ["rev-parse", "HEAD"], "Finding the local HEAD");
+  const upstream = gitValue(
+    runtime,
+    repoDir,
+    ["rev-parse", "@{upstream}"],
+    "Finding the upstream HEAD",
+  );
+
+  if (head !== upstream) {
+    throw new Error(
+      `Local main must exactly match its upstream after pulling (local ${head}, upstream ${upstream}). ` +
+        "Publish or reconcile the local commits, then rerun sync.",
+    );
+  }
+}
+
 function isSkill(value: unknown): value is Skill {
   return (
     typeof value === "object" &&
@@ -197,10 +239,17 @@ function readSkills(manifestPath: string): Skill[] {
   return parsed.skills;
 }
 
-function replaceSymlink(target: string, destination: string): void {
+function replaceSymlinkAtomically(target: string, destination: string): void {
   mkdirSync(dirname(destination), { recursive: true });
-  rmSync(destination, { force: true });
-  symlinkSync(target, destination);
+  const temporaryDirectory = mkdtempSync(join(dirname(destination), ".agents-rules-link-"));
+  const temporaryLink = join(temporaryDirectory, "link");
+
+  try {
+    symlinkSync(target, temporaryLink);
+    renameSync(temporaryLink, destination);
+  } finally {
+    rmSync(temporaryDirectory, { force: true, recursive: true });
+  }
 }
 
 function generateRules(repoDir: string): string {
@@ -214,31 +263,92 @@ function generateRules(repoDir: string): string {
   const localOverrides = existsSync(localRules)
     ? `\n---\n\n## Local Overrides\n\n${readFileSync(localRules, "utf8")}`
     : "";
+  const temporaryDirectory = mkdtempSync(join(dirname(finalRules), ".agents-final-"));
+  const temporaryRules = join(temporaryDirectory, "agents.final.md");
 
-  writeFileSync(finalRules, `${header}${readFileSync(baseRules, "utf8")}${localOverrides}`);
-  return finalRules;
+  try {
+    writeFileSync(temporaryRules, `${header}${readFileSync(baseRules, "utf8")}${localOverrides}`);
+    renameSync(temporaryRules, finalRules);
+    return finalRules;
+  } finally {
+    rmSync(temporaryDirectory, { force: true, recursive: true });
+  }
 }
 
-function configureAgents(runtime: Runtime, home: string, finalRules: string): Agent[] {
-  const agents: Agent[] = [];
+type AgentLink = {
+  agent: Agent;
+  destination: string;
+  label: string;
+};
+
+function findAgentLinks(runtime: Runtime, home: string): AgentLink[] {
+  const links: AgentLink[] = [];
 
   if (runtime.commandExists("claude")) {
-    replaceSymlink(finalRules, join(home, ".claude", "CLAUDE.md"));
-    writeLine(runtime.stdout, "Linked: ~/.claude/CLAUDE.md -> rules/agents.final.md");
-    agents.push("claude-code");
+    links.push({
+      agent: "claude-code",
+      destination: join(home, ".claude", "CLAUDE.md"),
+      label: "~/.claude/CLAUDE.md",
+    });
   } else {
     writeLine(runtime.stdout, "Skipping Claude Code setup: 'claude' is not installed");
   }
 
   if (runtime.commandExists("codex")) {
-    replaceSymlink(finalRules, join(home, ".codex", "AGENTS.md"));
-    writeLine(runtime.stdout, "Linked: ~/.codex/AGENTS.md -> rules/agents.final.md");
-    agents.push("codex");
+    links.push({
+      agent: "codex",
+      destination: join(home, ".codex", "AGENTS.md"),
+      label: "~/.codex/AGENTS.md",
+    });
   } else {
     writeLine(runtime.stdout, "Skipping Codex setup: 'codex' is not installed");
   }
 
-  return agents;
+  return links;
+}
+
+function unmanagedLinkReason(destination: string, target: string): string | undefined {
+  try {
+    const status = lstatSync(destination);
+    if (!status.isSymbolicLink()) {
+      return "it is not a symbolic link";
+    }
+
+    const currentTarget = readlinkSync(destination);
+    if (resolve(dirname(destination), currentTarget) !== resolve(target)) {
+      return `it points to ${currentTarget}`;
+    }
+    return undefined;
+  } catch (error) {
+    if (isErrnoException(error) && error.code === "ENOENT") {
+      return undefined;
+    }
+    throw error;
+  }
+}
+
+function preflightAgentLinks(links: readonly AgentLink[], finalRules: string): void {
+  const conflicts = links.flatMap((link) => {
+    const reason = unmanagedLinkReason(link.destination, finalRules);
+    return reason === undefined ? [] : [`${link.destination}: ${reason}`];
+  });
+
+  if (conflicts.length > 0) {
+    throw new Error(
+      "Refusing to replace unmanaged global agent rules:\n" +
+        conflicts.map((conflict) => `  - ${conflict}`).join("\n") +
+        `\nMove the listed paths aside or link them to ${finalRules}, then rerun sync.`,
+    );
+  }
+}
+
+function configureAgents(runtime: Runtime, links: readonly AgentLink[], finalRules: string): Agent[] {
+  for (const link of links) {
+    replaceSymlinkAtomically(finalRules, link.destination);
+    writeLine(runtime.stdout, `Linked: ${link.label} -> rules/agents.final.md`);
+  }
+
+  return links.map((link) => link.agent);
 }
 
 function sanitizeDiagnostic(stderr: string): string {
@@ -363,6 +473,7 @@ function sync(runtime: Runtime): number {
     throw new Error("Finding the agents repository returned an empty path");
   }
   requireCanonicalCheckout(runtime, repoDir);
+  requireCleanTrackedCheckout(runtime, repoDir);
 
   const home = runtime.env.HOME;
   if (!home) {
@@ -374,13 +485,19 @@ function sync(runtime: Runtime): number {
     runtime.run("git", ["-C", repoDir, "pull", "--ff-only"]),
     "Fast-forwarding the agents repository",
   );
+  requireUpstreamHead(runtime, repoDir);
 
-  const finalRules = generateRules(repoDir);
-  writeLine(runtime.stdout, "Generated: rules/agents.final.md");
-  const agents = configureAgents(runtime, home, finalRules);
   const manifestPath = join(repoDir, "scripts", "sync", "skills.json");
+  const skills = existsSync(manifestPath) ? readSkills(manifestPath) : undefined;
+  const finalRules = join(repoDir, "rules", "agents.final.md");
+  const links = findAgentLinks(runtime, home);
+  preflightAgentLinks(links, finalRules);
 
-  if (!existsSync(manifestPath)) {
+  generateRules(repoDir);
+  writeLine(runtime.stdout, "Generated: rules/agents.final.md");
+  const agents = configureAgents(runtime, links, finalRules);
+
+  if (skills === undefined) {
     writeLine(runtime.stdout, `No skills manifest found at ${manifestPath}`);
     writeLine(runtime.stdout, "Done.");
     return 0;
@@ -396,7 +513,7 @@ function sync(runtime: Runtime): number {
   writeLine(runtime.stdout, `Installing skills for agents: ${agents.join(" ")}`);
   const status = installSkills(
     runtime,
-    readSkills(manifestPath),
+    skills,
     agents,
     runtime.env.SKILLS_CLI_VERSION || DEFAULT_SKILLS_CLI_VERSION,
     home,

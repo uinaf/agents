@@ -12,6 +12,9 @@ Reusable agent skills, global behavioral rules, and a small sync script for AI c
 - `scripts/skills/` — Tessl review and publish helpers.
 - `docs/` — distribution notes.
 
+`agents.local.md` is inserted beneath the generated `## Local Overrides`
+section, so local content should begin at `###` heading depth.
+
 ## Sync (rules + skills together)
 
 ```bash
@@ -20,11 +23,16 @@ cd agents
 ./scripts/sync/sync.sh
 ```
 
-Sync is additive and manifest-driven. It installs every skill listed in
-`scripts/sync/skills.json` for the supported agents installed on the machine,
-and does not remove globally installed skills that are outside the manifest.
-Run it only from the primary checkout on `main`; it refuses feature branches
-and linked worktrees before pulling or changing global agent state.
+Skill installation is additive and manifest-driven. Sync installs every skill
+listed in `scripts/sync/skills.json` for the supported agents on the machine and
+does not remove globally installed skills outside the manifest.
+
+Run sync only from the primary checkout on `main`. Before changing global agent
+state, it requires a clean tracked checkout, fast-forwards, and confirms local
+`main` exactly matches its upstream. Ignored `rules/agents.local.md` and the
+generated `rules/agents.final.md` remain allowed. Sync creates absent global
+rule links or replaces links already managed by this checkout; it refuses to
+overwrite regular files or foreign symlinks.
 
 The sync script pins the `skills` CLI by default. Override with
 `SKILLS_CLI_VERSION=<version>` only when intentionally testing or rotating the

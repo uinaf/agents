@@ -25,13 +25,17 @@ autoreview, and Tessl plugin checks used by CI.
 
 The sync tests use an isolated fixture runtime. They prove that every manifest
 skill is attempted, installer failures are reported together, a partial failure
-exits nonzero, invalid manifests fail clearly, and a fully successful run still
-generates and links the expected rules. CI runs the same verification command
-on pull requests and pushes to `main`.
+exits nonzero, invalid manifests fail before rule mutation, local overrides are
+included, managed links are replaced, and unmanaged global rule files are left
+untouched. CI runs the same verification command on pull requests and pushes to
+`main`.
 
-Sync refuses linked worktrees and non-`main` branches before pulling or changing
-global agent state. Installer failures include a bounded diagnostic with common
-credential-shaped values redacted.
+Sync refuses linked worktrees, non-`main` branches, tracked or staged changes,
+and local `main` commits not published to the configured upstream before
+changing global agent state. Ignored local/generated rule files remain allowed.
+It preflights both global rule destinations and replaces only absent paths or
+symlinks already managed by this checkout. Installer failures include a bounded
+diagnostic with common credential-shaped values redacted.
 
 ## Review
 

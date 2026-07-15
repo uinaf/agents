@@ -6,6 +6,7 @@ import {
   readFileSync,
   readlinkSync,
   rmSync,
+  symlinkSync,
   writeFileSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
@@ -26,6 +27,9 @@ type FixtureOptions = {
   falseSuccesses?: ReadonlySet<string>;
   failures?: ReadonlyMap<string, FixtureFailure>;
   gitDir?: string;
+  head?: string;
+  trackedChanges?: string;
+  upstream?: string;
 };
 
 type FixtureFailure = {
@@ -52,8 +56,11 @@ class FixtureRuntime implements Runtime {
   readonly falseSuccesses: ReadonlySet<string>;
   readonly failures: ReadonlyMap<string, FixtureFailure>;
   readonly gitDir: string;
+  readonly head: string;
   readonly home: string;
   readonly repoDir: string;
+  readonly trackedChanges: string;
+  readonly upstream: string;
 
   constructor(repoDir: string, home: string, options: FixtureOptions = {}) {
     this.repoDir = repoDir;
@@ -62,7 +69,10 @@ class FixtureRuntime implements Runtime {
     this.falseSuccesses = options.falseSuccesses ?? new Set();
     this.failures = options.failures ?? new Map();
     this.gitDir = options.gitDir ?? ".git";
+    this.head = options.head ?? "same-head";
     this.home = home;
+    this.trackedChanges = options.trackedChanges ?? "";
+    this.upstream = options.upstream ?? this.head;
     this.env = { HOME: home, SKILLS_CLI_VERSION: "test-version" };
   }
 
@@ -86,7 +96,16 @@ class FixtureRuntime implements Runtime {
       if (args.includes("--abbrev-ref")) {
         return { status: 0, stdout: `${this.branch}\n`, stderr: "" };
       }
+      if (args.includes("@{upstream}")) {
+        return { status: 0, stdout: `${this.upstream}\n`, stderr: "" };
+      }
+      if (args.includes("HEAD")) {
+        return { status: 0, stdout: `${this.head}\n`, stderr: "" };
+      }
       return { status: 99, stdout: "", stderr: `Unexpected git rev-parse: ${args.join(" ")}` };
+    }
+    if (command === "git" && args.includes("status")) {
+      return { status: 0, stdout: this.trackedChanges, stderr: "" };
     }
     if (command === "git" && args.includes("pull")) {
       return { status: 0, stdout: "", stderr: "" };
@@ -162,6 +181,18 @@ function installedSkillNames(runtime: FixtureRuntime): string[] {
       }
       return skill;
     });
+}
+
+function finalRulesPath(repoDir: string): string {
+  return join(repoDir, "rules", "agents.final.md");
+}
+
+function createManagedRuleLinks(repoDir: string, home: string): void {
+  const finalRules = finalRulesPath(repoDir);
+  mkdirSync(join(home, ".claude"), { recursive: true });
+  mkdirSync(join(home, ".codex"), { recursive: true });
+  symlinkSync(finalRules, join(home, ".claude", "CLAUDE.md"));
+  symlinkSync(finalRules, join(home, ".codex", "AGENTS.md"));
 }
 
 test("reports every installer failure after attempting the full manifest", () => {
@@ -242,6 +273,43 @@ for (const scenario of [
   });
 }
 
+for (const trackedChanges of ["M  rules/agents.md\n", " M scripts/sync/sync.ts\n"]) {
+  test(`refuses tracked checkout dirt before pulling: ${trackedChanges.trim()}`, () => {
+    const { repoDir, home } = createFixture();
+    writeFileSync(finalRulesPath(repoDir), "existing generated rules\n");
+    const runtime = new FixtureRuntime(repoDir, home, { trackedChanges });
+
+    assert.equal(main([], runtime), 1);
+    assert.match(runtime.stderr.value, /clean tracked checkout before pulling/);
+    assert.ok(runtime.stderr.value.includes(trackedChanges.trim()));
+    assert.equal(
+      runtime.calls.some((call) => call.command === "git" && call.args.includes("pull")),
+      false,
+    );
+    assert.equal(readFileSync(finalRulesPath(repoDir), "utf8"), "existing generated rules\n");
+    assert.equal(installedSkillNames(runtime).length, 0);
+  });
+}
+
+test("refuses a local main commit that is not published upstream", () => {
+  const { repoDir, home } = createFixture();
+  writeFileSync(finalRulesPath(repoDir), "existing generated rules\n");
+  const runtime = new FixtureRuntime(repoDir, home, {
+    head: "local-head",
+    upstream: "upstream-head",
+  });
+
+  assert.equal(main([], runtime), 1);
+  assert.match(runtime.stderr.value, /Local main must exactly match its upstream after pulling/);
+  assert.match(runtime.stderr.value, /local local-head, upstream upstream-head/);
+  assert.equal(
+    runtime.calls.some((call) => call.command === "git" && call.args.includes("pull")),
+    true,
+  );
+  assert.equal(readFileSync(finalRulesPath(repoDir), "utf8"), "existing generated rules\n");
+  assert.equal(installedSkillNames(runtime).length, 0);
+});
+
 test("completes a successful sync and preserves rules links", () => {
   const { repoDir, home } = createFixture();
   const runtime = new FixtureRuntime(repoDir, home);
@@ -262,8 +330,61 @@ test("completes a successful sync and preserves rules links", () => {
   assert.equal(readlinkSync(join(home, ".codex", "AGENTS.md")), finalRules);
 });
 
-test("rejects an invalid manifest with an actionable error", () => {
+test("includes ignored local overrides in generated rules", () => {
   const { repoDir, home } = createFixture();
+  writeFileSync(join(repoDir, "rules", "agents.local.md"), "### Private machine override\n");
+  const runtime = new FixtureRuntime(repoDir, home);
+
+  assert.equal(main([], runtime), 0);
+  assert.match(
+    readFileSync(finalRulesPath(repoDir), "utf8"),
+    /## Local Overrides\n\n### Private machine override/,
+  );
+  const statusCall = runtime.calls.find(
+    (call) => call.command === "git" && call.args.includes("status"),
+  );
+  assert.deepEqual(statusCall?.args.slice(-2), ["--porcelain=v1", "--untracked-files=no"]);
+});
+
+test("replaces links already managed by this sync target", () => {
+  const { repoDir, home } = createFixture();
+  writeFileSync(finalRulesPath(repoDir), "old generated rules\n");
+  createManagedRuleLinks(repoDir, home);
+  writeFileSync(join(repoDir, "rules", "agents.md"), "# Updated fixture agent rules\n");
+  const runtime = new FixtureRuntime(repoDir, home);
+
+  assert.equal(main([], runtime), 0);
+  assert.match(readFileSync(finalRulesPath(repoDir), "utf8"), /# Updated fixture agent rules/);
+  assert.equal(readlinkSync(join(home, ".claude", "CLAUDE.md")), finalRulesPath(repoDir));
+  assert.equal(readlinkSync(join(home, ".codex", "AGENTS.md")), finalRulesPath(repoDir));
+});
+
+test("refuses every unmanaged global destination without partial mutation", () => {
+  const { repoDir, home } = createFixture();
+  writeFileSync(finalRulesPath(repoDir), "old generated rules\n");
+  mkdirSync(join(home, ".claude"), { recursive: true });
+  mkdirSync(join(home, ".codex"), { recursive: true });
+  writeFileSync(join(home, ".claude", "CLAUDE.md"), "hand-written Claude rules\n");
+  symlinkSync("../other/AGENTS.md", join(home, ".codex", "AGENTS.md"));
+  const runtime = new FixtureRuntime(repoDir, home);
+
+  assert.equal(main([], runtime), 1);
+  assert.match(runtime.stderr.value, /Refusing to replace unmanaged global agent rules/);
+  assert.match(runtime.stderr.value, /\.claude\/CLAUDE\.md: it is not a symbolic link/);
+  assert.match(runtime.stderr.value, /\.codex\/AGENTS\.md: it points to \.\.\/other\/AGENTS\.md/);
+  assert.equal(readFileSync(finalRulesPath(repoDir), "utf8"), "old generated rules\n");
+  assert.equal(
+    readFileSync(join(home, ".claude", "CLAUDE.md"), "utf8"),
+    "hand-written Claude rules\n",
+  );
+  assert.equal(readlinkSync(join(home, ".codex", "AGENTS.md")), "../other/AGENTS.md");
+  assert.equal(installedSkillNames(runtime).length, 0);
+});
+
+test("rejects an invalid manifest before changing generated or global rules", () => {
+  const { repoDir, home } = createFixture();
+  writeFileSync(finalRulesPath(repoDir), "old generated rules\n");
+  createManagedRuleLinks(repoDir, home);
   writeFileSync(
     join(repoDir, "scripts", "sync", "skills.json"),
     '{"skills":[{"name":"missing-source"}]}',
@@ -273,6 +394,9 @@ test("rejects an invalid manifest with an actionable error", () => {
   assert.equal(main([], runtime), 1);
   assert.match(runtime.stderr.value, /Invalid skills manifest/);
   assert.match(runtime.stderr.value, /expected non-empty name\/source strings/);
+  assert.equal(readFileSync(finalRulesPath(repoDir), "utf8"), "old generated rules\n");
+  assert.equal(readlinkSync(join(home, ".claude", "CLAUDE.md")), finalRulesPath(repoDir));
+  assert.equal(readlinkSync(join(home, ".codex", "AGENTS.md")), finalRulesPath(repoDir));
   assert.equal(installedSkillNames(runtime).length, 0);
 });
 
