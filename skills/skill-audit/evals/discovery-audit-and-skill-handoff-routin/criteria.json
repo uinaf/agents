@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent audits discovery quality (name specificity, description completeness), flags missing overlap boundaries, identifies misplaced content that should be handed off to a different skill, uses Tessl per skill, writes descriptions in third person with what/when/boundary, and avoids calling the optimizer without approval.",
+  "context": "Tests whether the agent audits discovery quality (name specificity, description completeness), flags missing overlap boundaries, identifies misplaced content and its proper capability boundary without inventing another skill, uses Tessl per skill, writes descriptions in third person with what/when/boundary, and avoids calling the optimizer without approval.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -40,12 +40,12 @@
     {
       "name": "Misplaced code review content flagged",
       "max_score": 9,
-      "description": "audit-report.md identifies the Code Review Guidance section in data-pipeline/SKILL.md as out of scope and recommends it be moved or handed off"
+      "description": "audit-report.md identifies the Code Review Guidance section in data-pipeline/SKILL.md as out of scope and recommends moving it to repository-owned review guidance or an existing review workflow if one is present"
     },
     {
-      "name": "Correct handoff skill named",
+      "name": "No skill invented",
       "max_score": 9,
-      "description": "audit-report.md names `review` (or a `review` skill) as the appropriate destination for the code review guidance, rather than leaving it in data-pipeline"
+      "description": "audit-report.md describes the required code-review capability or repository-owned guidance without inventing, naming, or requiring a skill that is absent from the supplied portfolio"
     },
     {
       "name": "Evidence over taste",

@@ -2,7 +2,9 @@
 
 ## Problem/Feature Description
 
-A React repository wants to enforce the no-direct-`useEffect` policy. It uses ESLint flat config and already has a shared `src/hooks/` directory. Add a policy that blocks direct `useEffect` imports and `React.useEffect(...)` namespace calls in application code, while allowing one narrow wrapper file for mount-only external synchronization.
+A React repository wants to enforce the no-direct-`useEffect` policy. It uses ESLint flat config and already has a shared `src/hooks/` directory. Add a policy that blocks direct `useEffect` imports and `React.useEffect(...)` namespace calls in application code, while allowing one reviewed domain-specific hook for its chat connection.
+
+The hook must call the existing `connectChat({ serverUrl, roomId })` API, open the returned connection, close it during cleanup, and reconnect when either `serverUrl` or `roomId` changes. Do not add a generic effect-callback wrapper, accept a dependency array from callers, or suppress exhaustive-deps.
 
 Do not disable hooks linting globally. Do not block unrelated APIs like `useLayoutEffect` unless asked.
 
@@ -11,7 +13,7 @@ Do not disable hooks linting globally. Do not block unrelated APIs like `useLayo
 Produce:
 
 - `eslint.config.ts` with the policy
-- `src/hooks/useMountEffect.ts` as the allowed escape hatch
+- `src/hooks/useChatConnection.ts` as the allowed external-integration hook
 - `policy-report.md` explaining the enforcement boundary and verification
 
 ## Input Files
@@ -34,4 +36,15 @@ export default tseslint.config(
     },
   },
 );
+=============== END FILE ===============
+
+=============== FILE: src/chat/connectChat.ts ===============
+export type ChatConnection = {
+  open(): void;
+  close(): void;
+};
+
+export function connectChat(input: { serverUrl: string; roomId: string }): ChatConnection {
+  throw new Error(`runtime implementation omitted for ${input.serverUrl}/${input.roomId}`);
+}
 =============== END FILE ===============

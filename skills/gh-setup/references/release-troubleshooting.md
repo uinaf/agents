@@ -11,7 +11,7 @@ Common failure modes when standing up or operating this pipeline. Check here bef
 ## Bump commit triggers a second release (infinite loop)
 
 - Cause: the `[skip ci]` guard is missing on the release job's `if:`, or the bump message no longer contains `[skip ci]`.
-- Verify: open the bump commit on `main`. Message must contain `[skip ci]`. Workflow must have `if: ${{ … !contains(github.event.head_commit.message, '[skip ci]') }}` on **both** verify and release.
+- Check: open the bump commit on `main`. Message must contain `[skip ci]`. Workflow must have `if: ${{ … !contains(github.event.head_commit.message, '[skip ci]') }}` on **both** verification and release jobs.
 
 ## "fatal: could not read Username for 'https://github.com'" during `@semantic-release/git` push
 
@@ -33,17 +33,17 @@ Common failure modes when standing up or operating this pipeline. Check here bef
 ## Two releases racing produced duplicate tags or a dangling release
 
 - Cause: the release job's concurrency group is missing or has `cancel-in-progress: true`.
-- Fix: set `concurrency: { group: release-${{ github.repository }}-main, cancel-in-progress: false }` at the **job** level. The verify job's cancellable group is separate.
+- Fix: set `concurrency: { group: release-${{ github.repository }}-main, cancel-in-progress: false }` at the **job** level. The verification job's cancellable group is separate.
 
-## Verify passes locally but fails on the bot's bump commit
+## Verification passes locally but fails on the bot's bump commit
 
-- Cause: the verify job is not skipping `[skip ci]` commits and is re-running the suite on the bump.
-- Fix: add the `[skip ci]` guard to verify too. The bot commit changes generated files (`CHANGELOG.md`, lockfiles); re-running verify on it is wasted CI minutes at best and a flake source at worst.
+- Cause: the verification job is not skipping `[skip ci]` commits and is re-running the suite on the bump.
+- Fix: add the `[skip ci]` guard to the verification job too. The bot commit changes generated files (`CHANGELOG.md`, lockfiles); re-running verification on it is wasted CI minutes at best and a flake source at worst.
 
 ## Semantic-release computes the wrong version
 
 - Cause: shallow checkout — semantic-release walks history, and `fetch-depth: 1` (the default) hides previous tags.
-- Fix: `actions/checkout@<full-sha> # v6.0.2` with `fetch-depth: 0` on **both** verify and release.
+- Fix: `actions/checkout@<full-sha> # v6.0.2` with `fetch-depth: 0` on **both** verification and release jobs.
 
 ## npm publish fails with "ENEEDAUTH" or 403
 

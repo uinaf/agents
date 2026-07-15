@@ -63,7 +63,7 @@ For OSS or published libraries, prefer build-first. For a purely internal demo w
 
 ## Migrate Scripts Deliberately
 
-`vp run -r` and `vp run -t` earn their keep when there is cross-package ordering or a transitive dependency to walk. For leaf-only tasks that just fan out the same command in every package — `test`, `check`, `verify` — `pnpm -r run <task>` (or the equivalent for the active package manager) is the same shape with one less abstraction. Real-world reference from a verified two-package repo:
+Use `vp run -r` for root scripts that fan out a Vite+-owned task such as `test`, `check`, or `verify`. This keeps the repo on one task surface, preserves topological ordering, and allows Vite Task to inline nested `vp run` calls. Keep the package manager's recursive runner only for a proven task Vite+ does not own, and document that exception.
 
 ```json
 {
@@ -72,14 +72,14 @@ For OSS or published libraries, prefer build-first. For a purely internal demo w
     "build:example": "vp run -t @scope/example#build",
     "dev:example": "vp run <lib>#build && vp run -r --parallel dev",
     "preview:example": "vp run @scope/example#preview",
-    "test": "pnpm -r run test",
-    "check": "pnpm -r run check",
-    "verify": "pnpm -r run verify"
+    "test": "vp run -r test",
+    "check": "vp run -r check",
+    "verify": "vp run -r verify"
   }
 }
 ```
 
-The split is intentional: anything that walks the workspace graph goes through `vp run`; anything that just iterates leaves stays on the package manager's recursive runner.
+All workspace task orchestration goes through `vp run`; the package manager remains responsible for dependency installation and workspace declaration.
 
 ## Caching and nested `vp run`
 

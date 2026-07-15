@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the docs skill writes checked-in documentation from target-repo evidence while keeping machine-local, private-workspace, account, and one-off tool observations out of durable repo policy.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Repo-owned setup used",
+      "max_score": 12,
+      "description": "README.md or AGENTS.md documents `npm ci` and `npm run setup` from package.json and docs/setup.md rather than the local helper"
+    },
+    {
+      "name": "Repo-owned verification used",
+      "max_score": 10,
+      "description": "AGENTS.md documents the checked-in `npm run verify` command as the handoff gate"
+    },
+    {
+      "name": "Canonical setup linked",
+      "max_score": 8,
+      "description": "README.md links to docs/setup.md instead of duplicating the full setup guide or pointing to an untracked note"
+    },
+    {
+      "name": "No absolute paths or local helper",
+      "max_score": 14,
+      "description": "README.md and AGENTS.md contain no /Users path and do not recommend bootstrap-widget or another one-off local executable"
+    },
+    {
+      "name": "No host or user identity",
+      "max_score": 8,
+      "description": "Checked-in docs and the report do not reproduce the local username or hostname"
+    },
+    {
+      "name": "No private sibling or dashboard",
+      "max_score": 12,
+      "description": "Checked-in docs and the report do not name the private sibling repository or reproduce the internal dashboard URL"
+    },
+    {
+      "name": "No account profile",
+      "max_score": 10,
+      "description": "Checked-in docs and the report do not reproduce the local account/profile identifier or imply it is required repo configuration"
+    },
+    {
+      "name": "Source boundary reported",
+      "max_score": 10,
+      "description": "doc-report.md distinguishes target-repo evidence from excluded local/private evidence and names excluded categories without repeating their sensitive values"
+    },
+    {
+      "name": "Promotion requires approval",
+      "max_score": 8,
+      "description": "doc-report.md states that promoting a local helper, private dependency, host/account setup, or internal route into repo policy requires explicit maintainer direction"
+    },
+    {
+      "name": "No invented policy",
+      "max_score": 8,
+      "description": "The solution stays within README.md, AGENTS.md, and doc-report.md, preserves repo-owned facts, and does not invent secrets, contacts, infrastructure requirements, or replacement commands"
+    }
+  ]
+}

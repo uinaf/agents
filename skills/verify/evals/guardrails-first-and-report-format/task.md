@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A developer on the data team has updated a shared Python calculator utility that is used across several internal reporting scripts. The update added a `calculate` dispatcher function that routes operations by name, and the developer says all the tests pass. Before the change is merged and the library is published to the internal package registry, another engineer needs to independently verify it.
+You have updated a shared Python calculator utility that is used across several internal reporting scripts. The update added a `calculate` dispatcher function that routes operations by name. Before handing the change to an independent reviewer, run the builder-owned verification pass and confirm the claim that all tests pass.
 
 The team uses pytest and a Makefile for their standard verification workflow. Your job is to verify the changes, exercise the real behavior (not just read the code), and produce a complete verification report. The previous version of this library had a silent failure bug where division errors were swallowed — so error path coverage is important.
 
@@ -10,10 +10,10 @@ The team uses pytest and a Makefile for their standard verification workflow. Yo
 
 Produce a file named `verification-report.md` containing a complete report with all of the following sections:
 
-- **Verdict**: one of `ready for review`, `needs more work`, or `blocked` (verify is the builder's gate before review; the ship decision belongs to `review`)
+- **Verdict**: one of `ready for review`, `needs more work`, or `blocked` (this is the builder's gate before independent review and must not make a ship decision)
 - **Change Verified**: what was tested and confirmed
 - **Surfaces Exercised**: the exact commands or calls used
-- **Self-Corrections Applied**: any cheap, obvious issues you fixed during verification (or "none")
+- **Self-Corrections Applied**: any cheap, obvious issues you fixed when the task authorized edits (or "none")
 - **Top Findings**: substantive issues left for review, with severity
 - **Exact Evidence**: commands run and output received
 - **Readiness Gaps**: any gaps in test coverage or infrastructure

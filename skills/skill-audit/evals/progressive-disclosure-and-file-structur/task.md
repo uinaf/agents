@@ -30,7 +30,7 @@ last_updated: 2024-01-15
 
 # Release Coordinator
 
-This skill helps coordinate software releases. It is used by the devops team. It should not be used for hotfixes or rollbacks — those go to the incident-responder skill.
+This skill helps coordinate software releases. It is used by the devops team. It should not be used for hotfixes or rollbacks — follow the repository's incident-response process for those cases.
 
 ## Release Scoring Rubric
 

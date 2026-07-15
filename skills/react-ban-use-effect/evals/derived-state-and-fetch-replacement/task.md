@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A React component uses direct `useEffect` for two jobs: deriving filtered rows from props and fetching server state. The repository already uses TanStack Query and has a `queryOptions` helper pattern.
+A React component uses direct `useEffect` for two jobs: deriving filtered rows from props and fetching server state. The repository already uses the TanStack Query library and has a `queryOptions` helper pattern.
 
 Refactor the component so the touched surface has no direct `useEffect` import or call. Preserve behavior and use the existing data layer pattern instead of adding a new dependency.
 

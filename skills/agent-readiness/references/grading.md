@@ -62,7 +62,8 @@ Grade a project's readiness for autonomous agent work from F to A. Mechanical cr
 - Grade based on what an agent can actually use, not what exists in theory
 - A test suite requiring manual setup to run = grade D, not C
 - CI-only checks without a local command agents can run before push are a verifiability gap
-- Mocked unit tests count zero toward testability — detect via mock imports at test file level
+- A mock-only suite cannot establish C-grade testability because it never exercises a real process or boundary. Mocked unit tests may still prove isolated logic; count them as supporting evidence, not real-surface readiness proof
+- Do not infer that an entire test file is worthless from one mock import or delete useful unit tests merely to raise the readiness grade
 - Grade each dimension independently (bootable / testable / observable / verifiable), take the lowest as overall grade
 - Treat user-session dependence, dashboard-only verification, unbounded cost, or prompt-only permissions as explicit autonomy gaps
 - Cite specific files, commands, or configs as evidence for each grade

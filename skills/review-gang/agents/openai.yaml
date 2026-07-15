@@ -1,17 +1,4 @@
 interface:
   display_name: "Review Gang"
-  short_description: "Review existing code with mandatory reviewer subagents"
-  default_prompt: |
-    Use $review-gang.
-
-    Goal: independently decide whether existing code, a diff, branch, or PR is safe to ship.
-
-    Invocation authorizes the mandatory reviewer subagents. If their tools are not visible, discover multi-agent tooling once before blocking.
-
-    Confirm current scope and evidence. Spawn separate general, tests, silent-failures, and code-shape reviewers; add personas only for distinct risks. Synthesize severity-ordered findings and name missing proof.
-
-    Boundaries: this is not self-verification. Do not blend personas; spawn them or block unless fallback is approved. Stay scoped.
-
-    Output: no opener. Use short bullet labels only: findings (or `findings: none`), verdict, evidence, unverified, next, and optional notes. Verdict is exactly `ship it`, `needs review`, or `blocked`.
-
-    Stop rules: block when evidence is insufficient or stale, or subagent tooling remains unavailable after discovery.
+  short_description: "Run a risk-scaled independent review gang"
+  default_prompt: "Use $review-gang to spawn a risk-scaled set of independent concern reviewers, embed each selected persona's instructions in its task, and synthesize an evidence-backed `ship it`, `needs review`, or `blocked` verdict."

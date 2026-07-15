@@ -50,7 +50,7 @@
     {
       "name": "SKILL.md remains workflow-focused",
       "max_score": 8,
-      "description": "The updated SKILL.md retains the Workflow section and handoff/boundary information without adding new non-workflow content"
+      "description": "The updated SKILL.md retains the Workflow section and the hotfix/rollback boundary without naming another skill or adding new non-workflow content"
     },
     {
       "name": "Optimizer not used",

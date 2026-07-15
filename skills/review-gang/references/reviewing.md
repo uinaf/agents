@@ -11,8 +11,8 @@ Review existing code with independent subagent lenses, then collapse the result 
 ## Workflow
 
 1. Load the repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, plus local review doctrine, when present
-2. Spawn the mandatory default reviewer gang: general, tests, silent-failures, and code-shape
-3. Add conditional reviewer subagents only when they add a distinct concern
+2. Select the smallest honest risk tier from [reviewer-selection.md](reviewer-selection.md)
+3. Load each selected persona from the active skill package and embed its instructions in the subagent task
 4. Run personas independently, preferably in parallel
 5. Refresh stale evidence before trusting it
 6. Merge findings into one prioritized verdict
@@ -52,8 +52,10 @@ Cached review artifacts, old screenshots, stale local build output, or a green C
 
 ## Anti-Patterns
 
-- Skipping the mandatory default gang
-- Adding conditional personas that repeat the default gang's concerns
+- Using fewer than two independent reviewers
+- Asking subagents to resolve reviewer instructions relative to the target repository
+- Using the small tier when runtime, contract, security, configuration, persistence, release, or external-service behavior changed
+- Adding specialists that repeat the core gang's concerns
 - Reporting stylistic nits as if they were defects
 - Treating screenshots or passing tests as a substitute for code reasoning
 - Treating local proof as live/deploy proof, or CI as a real-behavior proof lane

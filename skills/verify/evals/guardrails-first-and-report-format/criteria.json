@@ -20,7 +20,7 @@
     {
       "name": "Verdict field present",
       "max_score": 10,
-      "description": "Report contains a 'Verdict' section using exactly one of: 'ready for review', 'needs more work', or 'blocked'. Does NOT use 'ship it' (that verdict belongs to review, not verify)."
+      "description": "Report contains a 'Verdict' section using exactly one of: 'ready for review', 'needs more work', or 'blocked'. It does not use 'ship it' or make a ship-or-not decision."
     },
     {
       "name": "Change Verified section",
@@ -35,7 +35,7 @@
     {
       "name": "Self-Corrections section",
       "max_score": 8,
-      "description": "Report lists cheap, obvious fixes made during verification when they happened, and omits this line when none happened. Substantive code-shape concerns are deferred to review, not pre-fixed here."
+      "description": "Report lists cheap, obvious fixes only when the surrounding task authorized edits and they happened, and omits this line when none happened. In a verify-only/report task, issues are reported rather than silently edited."
     },
     {
       "name": "Exact Evidence section",

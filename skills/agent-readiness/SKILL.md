@@ -88,7 +88,7 @@ See [references/setup-patterns.md](references/setup-patterns.md) for local gates
 
 Tighten weak or flaky layers:
 
-- remove mock-only confidence theater
+- add real-surface proof alongside mock-only suites; preserve useful unit tests, but do not treat them as integration evidence
 - replace one-off checks with a canonical local gate, then reuse it from hooks and CI
 - add dead-code or unused-symbol enforcement where the stack supports it
 - add logs and health signals agents can query
@@ -96,7 +96,7 @@ Tighten weak or flaky layers:
 
 ### 4. Stop
 
-When the repo reaches C+ and can be judged honestly, stop readiness work and report the next natural phase.
+When the repo reaches C and can be judged honestly, stop readiness work and report the next natural phase.
 If changes created doc drift, report the documentation gap instead of expanding the scope.
 
 ## Output

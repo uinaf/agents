@@ -1,6 +1,6 @@
 ---
 name: review-gang
-description: "Independently audit existing code, diffs, branches, or pull requests by spawning mandatory concern-specific reviewer subagents, then synthesizing their evidence into a ship decision. Use when triaging PR risk, deciding whether someone else's change is safe to ship, or following up after runtime proof. Invocation is explicit authorization to use reviewer subagents. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored."
+description: "Review an existing diff, branch, pull request, or codebase with at least two independent reviewer subagents, scale the reviewer set to the risk, then synthesize their evidence into a ship decision. Use when the user asks to review this PR, check this diff independently, decide whether someone else's change is safe to merge, triage PR risk, or follow up after runtime proof. Produces a `ship it` / `needs review` / `blocked` verdict. Do not use to self-check a change you just authored."
 ---
 
 # Review Gang
@@ -9,10 +9,9 @@ Independently audit existing code by spawning concern-specific reviewer subagent
 
 ## Contract
 
-- Spawn reviewer personas as separate subagents every time; if subagents are unavailable, the review is `blocked` unless the user explicitly allows a sequential fallback
-- Treat invocation of `review-gang`, `$review-gang`, or the Review Gang tile as the user's explicit request to spawn mandatory reviewer subagents
-- Before saying subagents are unavailable, discover or load the harness's subagent/multi-agent tool once; only block after the tool is truly absent or unusable
-- Always run the default gang: `general`, `tests`, `silent-failures`, and `code-shape`
+- Spawn at least two reviewer personas as separate subagents every time
+- Treat invocation of `review-gang`, `$review-gang`, or the Review Gang tile as authorization to use reviewer subagents; if their tooling is not visible, discover or load it once, then report `blocked` if it remains unavailable unless the user explicitly allows a sequential fallback
+- Scale the reviewer set to the change: a tiny low-risk diff gets `general` plus one relevant specialist; normal changes get `general`, `tests`, `silent-failures`, and `code-shape`; high-risk changes add only distinct specialists
 - Keep findings risk-focused, evidence-backed, severity-ordered, and free of low-value nits
 - Block when missing context or proof prevents an honest verdict; otherwise name the unverified surface and adjust the verdict
 - Do not use this lane to self-check a change you just authored
@@ -21,10 +20,9 @@ Independently audit existing code by spawning concern-specific reviewer subagent
 
 1. Define the scope: file, diff, branch, commit range, or PR
 2. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
-3. Confirm the reviewed base/head or live artifact is current; stale review artifacts are evidence to refresh, not evidence to trust
-4. Discover or load subagent tooling if it is not already visible in the harness
-5. Spawn the mandatory default reviewer subagents from [references/reviewer-selection.md](references/reviewer-selection.md)
-6. Add conditional reviewer subagents when the change shape calls for them
+3. Confirm the reviewed base/head or live artifact is current
+4. Select the risk tier and reviewer set from [references/reviewer-selection.md](references/reviewer-selection.md)
+5. Load each selected persona file relative to this `SKILL.md`, then spawn the reviewer with those instructions embedded in its task
 
 Add conditional personas only when they add a distinct concern; use [references/reviewer-selection.md](references/reviewer-selection.md) for shortcuts and criteria.
 
@@ -40,12 +38,15 @@ Refresh the source of truth before judging branches or PRs: base branch, head SH
 
 Spawn one subagent per selected persona. Run them in parallel when the environment supports it, and keep each persona concern-focused and independent. Do not collapse the gang into one blended self-review pass.
 
-For Codex specifically: if no subagent tool is currently visible, search for multi-agent or subagent tooling before blocking or asking the user to repeat the request. The skill invocation already satisfies Codex's explicit-delegation requirement.
+Before spawning, load `references/reviewers/<persona>.md` relative to this skill package and embed its contents in the task. Never ask the subagent to resolve a source-repo path from the target repository.
 
-Use this prompt shape for each subagent, filling in the persona and scope:
+Use this prompt shape for each subagent, filling in the persona, scope, and loaded instructions:
 
 ```text
-You are the <persona> reviewer. Read the target repo guidance, then review only <scope> against your persona concerns from skills/review-gang/reviewers/<persona>.md.
+You are the <persona> reviewer. Read the target repo guidance, then review only <scope>.
+
+Persona instructions:
+<contents loaded from references/reviewers/<persona>.md>
 
 Return only material findings with file/line evidence, severity, confidence, and the proof or missing proof that changes the verdict. If you find nothing material, say "none" and name any residual unverified surface.
 ```
@@ -80,11 +81,9 @@ After review, report in this compact bullet shape:
 - `- next:` one of `implementation`, runtime verification, readiness setup, documentation cleanup, or `none`
 - `- notes:` only for out-of-scope repo state the user must act on
 
-Use those labels explicitly. Keep the verdict label exact and omit opener, closer, apology, status preface, or conversational recap.
-
 Prefer the active harness's best native review representation instead of a prose-heavy wall of text.
 
-Keep detailed issue text in native findings or fallback finding bullets. Keep the verdict footer to 4 labeled lines or fewer after findings.
+Keep detailed issue text in native findings or fallback finding bullets. After findings, keep the remaining labels to four lines or fewer. Omit opener, closer, apology, status preface, and conversational recap.
 
 See [references/reviewing.md](references/reviewing.md) for stale evidence handling and presentation details.
 
@@ -101,4 +100,4 @@ Example:
 ## References
 
 - [references/reviewing.md](references/reviewing.md) — reviewer subagent workflow, evidence expectations, and verdict synthesis
-- [references/reviewer-selection.md](references/reviewer-selection.md) — mandatory and conditional reviewer subagents
+- [references/reviewer-selection.md](references/reviewer-selection.md) — risk tiers and reviewer selection

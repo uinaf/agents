@@ -11,6 +11,7 @@ Treat these as must-fix before calling the skill ready:
 - commands, paths, or links are stale or broken
 - workflow has no clear start, no evidence loop, or no completion criteria
 - the skill conflicts with the target repo's guidance or conventions
+- the package names, invokes, imports, routes to, or requires a sibling skill instead of stating its own prerequisite or boundary
 
 ## Major Findings
 
@@ -18,7 +19,7 @@ These usually lower trust or activation even if the skill technically works:
 
 - `name` is vague, generic, or forgettable
 - `SKILL.md` is bloated with detail that belongs in `references/`
-- boundaries and handoffs are missing or muddy
+- boundaries are missing, muddy, or depend on an unnamed external workflow
 - the skill asks the model to invent deterministic steps that should be scripted
 - examples are abstract instead of practical
 - optimizer use is suggested without explicit approval
@@ -41,7 +42,7 @@ Score each dimension qualitatively as `strong`, `mixed`, or `weak`:
 - Progressive disclosure: is detail placed in the right file
 - Repo fit: does it match local conventions and links
 - Verification: does it use Tessl or another concrete loop instead of taste-only review
-- Boundaries: does it say when not to use the skill and where to hand off
+- Boundaries: does it state its limits and required next steps without assuming another skill exists
 
 ## Compact Review Template
 

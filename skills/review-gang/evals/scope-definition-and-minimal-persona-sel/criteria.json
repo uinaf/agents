@@ -1,15 +1,15 @@
 {
-  "context": "Tests whether the agent still spawns the mandatory default reviewer gang for a tiny documentation-only change, avoids unnecessary conditional persona spam, adds the comments persona for doc-heavy risk, produces a valid verdict, and does not over-inflate minor findings into defects.",
+  "context": "Tests whether the agent selects the small low-risk tier for a tiny documentation-only change, uses separate general and comments reviewers without irrelevant persona fanout, produces a valid verdict, and does not inflate documentation corrections into defects.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Default gang spawned",
-      "max_score": 12,
-      "description": "The report uses the mandatory default personas: general, tests, silent-failures, and code-shape"
+      "name": "Small tier selected",
+      "max_score": 14,
+      "description": "The report treats this two-file documentation-only change as the small low-risk tier rather than a normal or high-risk review"
     },
     {
       "name": "General persona used",
-      "max_score": 8,
+      "max_score": 10,
       "description": "The report includes the general reviewer persona (or equivalent broad code review lens)"
     },
     {
@@ -18,14 +18,9 @@
       "description": "The report includes the comments reviewer persona (or equivalent documentation/docstring lens) — appropriate given docstring change"
     },
     {
-      "name": "Tests persona included",
-      "max_score": 8,
-      "description": "The report applies the tests reviewer persona as part of the mandatory default gang, while keeping any test-related conclusion brief for a doc-only change"
-    },
-    {
-      "name": "Code-shape persona included",
-      "max_score": 8,
-      "description": "The report applies the code-shape reviewer persona as part of the mandatory default gang, while keeping any architecture/modularity conclusion brief for a doc-only change"
+      "name": "Irrelevant personas omitted",
+      "max_score": 12,
+      "description": "The report does not spawn tests, silent-failures, code-shape, types, or cleanup reviewers for this documentation-only change"
     },
     {
       "name": "Verdict present",
@@ -33,14 +28,9 @@
       "description": "The report contains exactly one verdict label: 'ship it', 'needs review', or 'blocked'"
     },
     {
-      "name": "Scope stated",
+      "name": "Separate reviewers evidenced",
       "max_score": 8,
-      "description": "The report names the reviewed scope only when needed to disambiguate the review; it does not add a noisy scope line after clear findings"
-    },
-    {
-      "name": "Personas listed in output",
-      "max_score": 8,
-      "description": "The report shows spawned personas in compact metadata or evidence; it does not force persona details into the verdict footer"
+      "description": "The report shows that general and comments were separate reviewer subagents rather than one blended persona pass"
     },
     {
       "name": "No nit inflation",
@@ -54,12 +44,12 @@
     },
     {
       "name": "Unverified areas or residual risk",
-      "max_score": 8,
+      "max_score": 6,
       "description": "The report mentions any residual risk or unverified surfaces, OR explicitly states there are none (either outcome is acceptable — silence is not)"
     },
     {
       "name": "Recommended follow-up",
-      "max_score": 10,
+      "max_score": 4,
       "description": "The report includes a recommended follow-up action such as implementation, runtime verification, readiness setup, documentation cleanup, or none"
     },
     {

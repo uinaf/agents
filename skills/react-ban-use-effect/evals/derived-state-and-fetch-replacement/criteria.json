@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether react-ban-use-effect replaces direct effects used for derived state and fetching with render-time derivation plus the repo's existing TanStack Query pattern.",
+  "context": "Tests whether react-ban-use-effect replaces direct effects used for derived state and fetching with render-time derivation plus the repo's existing TanStack Query library pattern.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -15,7 +15,7 @@
     {
       "name": "Existing query pattern used",
       "max_score": 16,
-      "description": "Server data fetching uses TanStack Query and the existing `projectsQuery`/`queryOptions` pattern rather than a fetch-in-effect or new dependency"
+      "description": "Server data fetching uses the TanStack Query library and the existing `projectsQuery`/`queryOptions` pattern rather than a fetch-in-effect or new dependency"
     },
     {
       "name": "Abort signal preserved",

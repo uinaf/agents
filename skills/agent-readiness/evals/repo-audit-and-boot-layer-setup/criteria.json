@@ -28,9 +28,9 @@
       "description": "audit-report.md states an overall grade that corresponds to the lowest-rated individual dimension (not an average)"
     },
     {
-      "name": "Mocks identified as zero testability",
+      "name": "Mock-only suite below C",
       "max_score": 8,
-      "description": "audit-report.md identifies the existing mock-based test suite as not counting toward testability (mocked tests score zero)"
+      "description": "audit-report.md identifies that the existing mock-only suite cannot establish C-grade testability or real-surface readiness because it never exercises a running process"
     },
     {
       "name": "Background app start in init.sh",
@@ -58,9 +58,9 @@
       "description": "improvements.md or audit-report.md references addressing Boot before Smoke, and Smoke before higher layers — no higher layers built before boot is resolved"
     },
     {
-      "name": "No mock tests credited",
+      "name": "No mock tests treated as real-surface proof",
       "max_score": 7,
-      "description": "The report does NOT suggest the existing mock-based jest tests provide meaningful test coverage or constitute passing testability"
+      "description": "The report does not treat the mock-only Jest suite as passing testability or a substitute for real-process proof; it may still acknowledge isolated unit-level evidence"
     }
   ]
 }

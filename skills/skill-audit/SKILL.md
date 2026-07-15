@@ -7,8 +7,6 @@ description: "Audit, score, or improve existing skills with Tessl review output,
 
 Audit a skill before calling it ready. Favor Tessl output, repo conventions, and the skill's actual file shape over taste.
 
-`Tessl` is the skill-evaluation CLI this repo uses to review skills, score their quality, and suggest improvements. See [tessl.io](https://tessl.io/) and the [CLI docs](https://docs.tessl.io/reference/cli-commands). If `npx tessl ...` or `tessl ...` is unavailable, install or initialize Tessl before running the audit loop.
-
 ## Principles
 
 - Evidence beats hunches
@@ -17,45 +15,34 @@ Audit a skill before calling it ready. Favor Tessl output, repo conventions, and
 - Prefer the smallest change set that improves activation, clarity, or verification
 - Audit only the requested scope; flag adjacent issues separately
 
-## Handoffs
+## Boundaries
 
-- Updating AGENTS, README, or other repo docs beyond the skill surface is documentation work.
-- Proving a product or code change works on real surfaces is runtime verification work.
-- Reviewing general code or a PR instead of a skill package is outside this skill's scope.
+- Do not expand an audit into unrelated repo documentation, product/runtime verification, or general code review.
+- Report an out-of-scope gap as a capability and required next step. Do not add cross-package invocation, routing, or requirements to the audited package.
 
 ## Before You Start
 
 1. Define scope: one skill folder or the whole skills repo
-2. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
-3. Read the target `SKILL.md` first, then nearby `references/`, `scripts/`, and `agents/openai.yaml` only as needed
-4. Run the common single-skill audit path first:
+2. Choose the mode before collecting evidence:
+   - **Formal audit** for scoring, publish readiness, general quality review, or edits not anchored to a concrete recent failure
+   - **Experiential feedback** only when the ask is explicitly about what a skill failed to guide in a recent task
+3. Load the target repo's guidance files such as `AGENTS.md`, `CLAUDE.md`, or repo rules, when present
+4. Read the target `SKILL.md` first, then nearby `references/`, `scripts/`, and `agents/openai.yaml` only as needed
 
-```bash
-skill_dir="skills/<name>"
-npx tessl@0.90.0 plugin lint "$skill_dir"
-npx tessl@0.90.0 review run --workspace uinaf --threshold 0 --json "$skill_dir"
-```
-
-For a full repo batch, use the repo wrapper such as `./scripts/skills/review.sh` when present; otherwise repeat the direct Tessl review per skill. Use optimizer only when explicitly requested:
-
-```bash
-npx tessl@0.90.0 skill review --optimize --yes --max-iterations 1 skills/<name>
-```
+For formal audit commands, batch behavior, and the explicitly requested optimizer path, follow [references/tessl.md](references/tessl.md). Never let a fallback silently resolve the latest Tessl CLI.
 
 ## Workflow
 
-### Quick experiential feedback mode
+### 1. Collect mode-appropriate evidence
 
-Use this when the ask is "what did the skills fail to guide well during the last task?" rather than a formal skill audit.
+For a formal audit, capture the Tessl score, summary, and concrete suggestions before proposing edits. Prefer per-skill `--json` for a narrow or structured audit loop. If Tessl is missing, install the repo's audited version or follow the official docs before continuing.
 
-1. Skip Tessl unless the user asks for scoring or the proposed edits touch trigger text.
-2. Reconstruct the task failure from actual run evidence: wrong tool selected, bespoke script invented, missing hardening gate, unclear boundary, stale path, or excessive ceremony.
-3. Map each failure to the smallest repo-owned skill/doc update that would have changed agent behavior.
-4. Edit only those surfaces, then run the repo's normal skill review gate if available.
+For experiential feedback:
 
-### 1. Run Tessl first
-
-Capture the score, summary, and concrete suggestions before proposing edits. Prefer per-skill `--json` when you need a narrow audit loop or structured output. If Tessl is missing, use `npx tessl ...` first or follow the official docs before continuing.
+- Reconstruct the concrete failure from run evidence: wrong tool selected, bespoke script invented, missing hardening gate, unclear boundary, stale path, or excessive ceremony
+- Map each failure to the smallest repo-owned skill or doc update that would have changed behavior
+- Skip Tessl scoring unless the user asks for it or the proposed edit touches `name` or `description`
+- After edits, still run plugin lint and the repo's normal skill gate when available
 
 ### 2. Audit discovery
 
@@ -74,12 +61,7 @@ Quick example:
 
 Check that the skill tells the agent how to start, what evidence to gather, what not to change, and what "done" looks like.
 
-Concrete failure signs:
-
-- vague verbs like "help" without a workflow
-- missing output expectations
-- commands or paths that cannot be run as written
-- a fragile task described with high-level prose instead of tighter guardrails
+Use the scorecard's major findings as the detailed rubric. Treat unrunnable commands or paths, missing output gates, and vague or fragile workflows as blockers.
 
 ### 4. Audit progressive disclosure
 
@@ -95,11 +77,9 @@ Use [references/best-practices.md](references/best-practices.md) when the skill 
 
 Check for repo-relative links, stale paths, duplicated guidance, and conflicts with the source repo's conventions.
 
-Treat `agents/openai.yaml` as picker-facing metadata. Keep
-`interface.default_prompt` concise, normally one sentence, and aligned with the
-skill's current scope. Do not add repo-local parsers or CI checks for
-undocumented Codex implementation limits. If deterministic enforcement becomes
-necessary, prefer the real Codex loader or one upstream/shared versioned linter.
+Treat `agents/openai.yaml` as picker-facing metadata: keep `interface.default_prompt` to one scope-aligned sentence. Do not invent undocumented Codex limits; use the real loader or a shared versioned linter when deterministic enforcement is necessary.
+
+Require package independence across frontmatter, picker metadata, bodies, references, scripts, and evals. A skill may state prerequisites and boundaries, but it must explain them locally instead of naming or requiring sibling skills.
 
 ### 6. Synthesize the smallest useful change set
 
@@ -120,8 +100,10 @@ Keep details compact:
 - Report the Tessl score and actionable suggestions; summarize long output
 - Keep the footer to 5 labeled lines or fewer
 - If edits were made, name the behavioral change and verification
+- For a portfolio audit, name the compared packages in the report and distinguish metadata overlap from duplication that merits a merge, split, or new package; do not encode those comparisons as package dependencies
 
 ## References
 
 - [references/scorecard.md](references/scorecard.md) — audit dimensions, severity, and a compact review template
 - [references/best-practices.md](references/best-practices.md) — distilled skill-authoring guidance from common repo conventions and Claude's skill best-practices guide
+- [references/tessl.md](references/tessl.md) — pinned formal-review, batch, and optimizer commands

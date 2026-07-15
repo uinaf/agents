@@ -1,7 +1,7 @@
 {
   "name": "uinaf/autoreview",
   "version": "1.2.6",
-  "description": "Run structured Codex/Claude autoreview closeout: choose the target, collect schema-validated findings, and rerun tests plus review until clean.",
+  "description": "Run the bundled Codex/Claude autoreview helper as a structured second-model closeout. Use for explicit autoreview or tool-backed final-review requests after builder proof exists; it validates findings and reruns focused tests but does not issue a ship decision.",
   "private": false,
   "skills": [
     "SKILL.md"

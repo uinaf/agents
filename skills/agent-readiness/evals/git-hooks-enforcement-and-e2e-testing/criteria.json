@@ -43,9 +43,9 @@
       "description": "setup-notes.md recommends npx knip (not a different tool) as the dead-code detection command for this TypeScript project"
     },
     {
-      "name": "No mock tests treated as coverage",
+      "name": "No mock tests treated as sufficient readiness",
       "max_score": 8,
-      "description": "setup-notes.md does NOT claim the existing jest mock tests provide meaningful coverage or replace the need for e2e tests"
+      "description": "setup-notes.md does not claim the existing mock-only Jest suite replaces real CLI e2e proof; it may acknowledge useful isolated unit coverage"
     },
     {
       "name": "legacyParseCsv identified as dead code",

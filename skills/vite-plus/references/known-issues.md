@@ -1,13 +1,6 @@
 # Known Issues (beta)
 
-Vite+ is in beta and still moving quickly. These are real, recent caveats observed against the upstream issue tracker. Surface them only if the repo actually hits them — do not preemptively work around something a stock setup is fine with. Re-check this list against [the issue tracker](https://github.com/voidzero-dev/vite-plus/issues) when adopting a newer release.
-
-## `vp check --fix` on a single file
-
-Single-file invocations can emit spurious `TS2591` errors for `node:*` imports while a full-project `vp check --fix` passes.
-
-- If `staged` runs per-file `vp check --fix`, fall back to a `vp check --fix` over the staged set, or scope `staged` to non-TS globs until upstream lands a fix.
-- Tracking: [voidzero-dev/vite-plus#1443](https://github.com/voidzero-dev/vite-plus/issues/1443).
+Vite+ is in beta and still moving quickly. Carry a caveat only when its failure reproduces on the installed release. Inspect the upstream issue or release notes to identify the first fixed version and preferred upgrade path; a closed report can still describe a bug in an older pinned release. Document the exact affected version and reproduction, then re-check the exception when upgrading.
 
 ## TanStack Start / SSR `instanceof` failures
 
@@ -15,13 +8,6 @@ Some package managers (notably bun, sometimes npm) install two physical copies o
 
 - If SSR fails after migration, run `vp dedupe` and confirm only one `@voidzero-dev/vite-plus-core` exists under `node_modules`.
 - Tracking: [voidzero-dev/vite-plus#1391](https://github.com/voidzero-dev/vite-plus/issues/1391).
-
-## Cloudflare Workers tests
-
-`@cloudflare/vitest-pool-workers` currently fails under `vp test` (`Cannot read properties of undefined (reading 'config')`) while plain `vitest run` passes.
-
-- Keep the legacy `vitest` invocation for Workers packages until the upstream fix lands.
-- Tracking: [voidzero-dev/vite-plus#1076](https://github.com/voidzero-dev/vite-plus/issues/1076).
 
 ## Vite+ 0.2.x Vitest wrapper removal
 

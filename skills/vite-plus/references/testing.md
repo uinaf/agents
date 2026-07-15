@@ -53,4 +53,4 @@ After rewriting imports, remove the standalone `vitest` dependency for node-mode
 ## Caveats
 
 - Adding `@vitest/coverage-v8` means the repo now directly participates in Vitest dependency resolution. Pin it to the bundled Vitest version and verify the lockfile resolves a single Vitest version.
-- `@cloudflare/vitest-pool-workers` currently fails under `vp test` (`Cannot read properties of undefined (reading 'config')`) while plain `vitest run` works. For Workers packages, keep the legacy `vitest` invocation until the upstream fix lands (tracking: voidzero-dev/vite-plus#1076).
+- Preserve a legacy test invocation only when the incompatibility reproduces on the installed Vite+ release. Document the exact affected version, the command that proves the exception, and the upstream resolution or first fixed version so the workaround can be removed after an upgrade.

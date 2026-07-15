@@ -9,8 +9,8 @@ interface:
     Success criteria:
     - Direct useEffect calls in the touched surface are removed or flagged.
     - Each effect is classified by intent before replacement.
-    - Derived state, data fetching, user actions, resets, and mount-only sync use the repo's existing patterns.
-    - Any useMountEffect escape hatch is narrow and tied to an external system.
+    - Derived state, data fetching, user actions, and resets use the repo's existing declarative patterns.
+    - Any effect escape hatch is a reviewed domain-specific external-integration hook with explicit reactive inputs and cleanup; never a generic callback wrapper or exhaustive-deps suppression.
 
     Constraints:
     - Do not add a new data-fetching dependency without approval.

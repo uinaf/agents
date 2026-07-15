@@ -6,7 +6,7 @@ A product team has three skills that have been underperforming. Users keep trigg
 
 Additionally, the team recently added a fourth skill, `data-pipeline`, and wants to know whether its description is written in a style consistent with the others. They also noticed that a pull request last week added some application code review guidance directly to the `data-pipeline` skill, which they suspect is out of place.
 
-Your task is to audit all four skills for discovery and boundary clarity, identify which ones are most at risk of poor activation, and write a report with concrete rewrite suggestions for the names and descriptions. Also flag any content that belongs in a different skill or a different tool entirely.
+Your task is to audit all four skills for discovery and boundary clarity, identify which ones are most at risk of poor activation, and write a report with concrete rewrite suggestions for the names and descriptions. Also flag content that is outside the owning package and describe the required review capability or repository-owned guidance without inventing another skill.
 
 ## Output Specification
 

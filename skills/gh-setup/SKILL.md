@@ -21,7 +21,7 @@ It also owns baseline existence and template shape for GitHub-facing collaborati
    - `SECURITY.md`
    - `CONTRIBUTING.md`
    - `docs/`
-   - package, build, release, deploy, and verify scripts
+   - package, build, release, deploy, and verification scripts
 2. Check live GitHub settings before recommending changes: default branch, merge methods, branch/ruleset policy, Actions permissions, allowed GitHub Actions, Environments, Environment protection rules, secrets/vars locations, protected tags, and allowed push actors.
    Useful probes:
    - `gh repo view --json defaultBranchRef,mergeCommitAllowed,rebaseMergeAllowed,squashMergeAllowed,deleteBranchOnMerge`
@@ -32,14 +32,14 @@ It also owns baseline existence and template shape for GitHub-facing collaborati
    - **Versioned artifact**: package, library, CLI, GitHub Action, Homebrew-published binary, or registry publish -> read [release workflows](references/release-workflows.md) and [release targets](references/release-targets.md).
    - **Running app or service**: Pages, Cloudflare, SST, container, static app, backend, or hosted service -> read [deploy workflows](references/deploy-workflows.md), [deploy environments](references/deploy-environments.md), and [deploy secrets](references/deploy-secrets.md).
    - **Both**: publish the durable artifact first, then deploy from that published boundary. Read both release and deploy references.
-4. Use repo-local commands as the source of truth. If a release repo lacks stable verify/package proof, or a deploy repo lacks stable verify, e2e, monitoring, or rollback hooks, pause GitHub wiring until the repo has durable readiness proof.
+4. Use repo-local commands as the source of truth. If a release repo lacks stable verification/package proof, or a deploy repo lacks stable verification, e2e, monitoring, or rollback hooks, pause GitHub wiring until the repo has durable readiness proof.
 5. Keep `README.md`, `CONTRIBUTING.md`, `SECURITY.md`, `AGENTS.md`, and `docs/` current when GitHub changes affect contributor or operator workflows.
 
 ## Baseline Shape
 
 - `main` is continuously releasable or deployable after verification passes.
-- Pull requests run verify with read-only credentials.
-- Merges to `main` run verify before release or deploy.
+- Pull requests run verification with read-only credentials.
+- Merges to `main` run verification before release or deploy.
 - Release/publish/deploy jobs are non-cancellable at the secret-bearing boundary.
 - GitHub Environments hold release/deploy secrets and variables; repo-level secrets are bootstrap-only.
 - Manual secret-bearing workflows validate inputs in a secretless job before checkout or credential loading.
@@ -57,7 +57,7 @@ Default posture:
 - Preserve existing approval, status-check, signed-commit, actor, and tag restrictions unless the user explicitly asks to change them.
 - Prefer signed-commit requirements on protected/default branches when the plan and automation path support them.
 - If direct pushes to `main` must remain allowed, prefer branch protection with conversation resolution rather than forcing all default-branch changes through PRs by accident.
-- For release bump commits, verify the token actor is allowed by branch/ruleset policy before relying on bot metadata.
+- For release bump commits, confirm the token actor is allowed by branch/ruleset policy before relying on bot metadata.
 
 ## Templates
 
@@ -91,8 +91,8 @@ Use this route for versioned packages, libraries, CLIs, marketplace actions, Hom
 Core shape:
 
 ```text
-pull request -> verify
-push to main -> verify -> release/publish -> version bump or release PR
+pull request -> verification
+push to main -> verification -> release/publish -> version bump or release PR
 ```
 
 Read only the target-specific references needed:
@@ -111,7 +111,7 @@ Core shape:
 ```text
 push to main
   -> detect changes
-  -> verify lane and build immutable payload
+  -> run lane verification and build immutable payload
   -> e2e against that payload
   -> deploy through GitHub Environment
   -> monitoring and rollback handoff

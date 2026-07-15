@@ -1,13 +1,4 @@
 interface:
   display_name: "Autoreview"
-  short_description: "Run structured review closeout"
-  default_prompt: |
-    Use $autoreview.
-
-    Goal: run structured review closeout against the correct dirty, branch/PR, or commit target.
-
-    Use Codex unless Claude is requested. Let advancing reviews finish, validate every finding against real code, reject speculative or out-of-scope findings, and rerun focused proof plus review after accepted fixes. Panels are opt-in unless risk clearly justifies them.
-
-    Boundaries: review output is advisory; do not push just to review. Keep prompt and dataset inputs repo-relative and resolve the helper from the skill directory. Let the helper fail closed on unsafe or oversized input, and discard results if the source tree changes during review.
-
-    Output: compact closeout with command used, proof run, findings accepted/rejected, and the final clean review result or conscious rejection.
+  short_description: "Run a tool-backed second-model closeout"
+  default_prompt: "Use $autoreview to confirm prerequisite proof exists, run the bundled Codex/Claude second-model closeout on the correct target, validate every finding, rerun focused proof after accepted fixes, and report the final clean result without issuing a ship decision."

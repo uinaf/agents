@@ -2,7 +2,7 @@
 
 ## Problem/Feature Description
 
-A small backend team has just shipped a new user management REST API written in Python. The API handles listing users, fetching individual users, and creating new users. The engineer who built it has done some local testing but the team now needs an independent verification before the service is promoted to the staging environment.
+You have just completed a new user management REST API written in Python. The API handles listing users, fetching individual users, and creating new users. You did some local testing and now need the builder-owned verification pass before handing it to an independent reviewer and later promoting it to staging.
 
 The team lead wants concrete evidence — not just a read-through of the code — that the endpoints behave as expected under normal conditions and also under error conditions such as requesting a missing resource or sending malformed input. Previous incidents have been caused by untested error paths that appeared to work but returned unhelpful or incorrect responses.
 
@@ -10,7 +10,7 @@ The team lead wants concrete evidence — not just a read-through of the code �
 
 Produce a file named `verification-report.md` containing:
 
-- The verdict on whether the API is ready to hand off for review (`ready for review`, `needs more work`, or `blocked`). The actual ship-or-not call belongs to `review`, not verify.
+- The verdict on whether the API is ready to hand off for independent review (`ready for review`, `needs more work`, or `blocked`). Do not make a ship-or-not call.
 - A "Surfaces Exercised" section naming each endpoint tested
 - A section with the exact commands you ran and the actual responses received
 - A section covering any findings, each with severity, what the issue is, and the impact

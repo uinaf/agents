@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent produces an evidence-backed review report with correct verdict shape, ordered findings, explicit unverified markers, file references with line numbers, and incorporates repo guidance from CLAUDE.md. Also tests mandatory default reviewer gang spawning, including code-shape and silent-failures, plus cleanup persona application.",
+  "context": "Tests whether the agent produces an evidence-backed review report with correct verdict shape, ordered findings, explicit unverified markers, file references with line numbers, and incorporates repo guidance from CLAUDE.md. Also tests core reviewer gang selection, including code-shape and silent-failures, plus cleanup persona application.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -65,7 +65,7 @@
     {
       "name": "Reviewer gang listed",
       "max_score": 8,
-      "description": "The report shows the spawned default reviewer gang in compact metadata or evidence; it does not force persona details into the verdict footer"
+      "description": "The report shows the spawned core reviewer gang in compact metadata or evidence; it does not force persona details into the verdict footer"
     },
     {
       "name": "Compact verdict block",

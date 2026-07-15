@@ -13,7 +13,7 @@ Use it when an audit finds weak activation, a bloated `SKILL.md`, or unclear wor
 
 - `name` should be concrete and easy to say out loud
 - `description` should be in third person and include both what the skill does and when to use it
-- the main overlap boundary should be explicit so similar skills do not all half-trigger
+- the main overlap boundary should be explicit without naming another skill
 - generic names like `helper`, `tools`, or `utils` are usually a discovery smell
 
 ## Body Shape
@@ -34,6 +34,7 @@ Use it when an audit finds weak activation, a bloated `SKILL.md`, or unclear wor
 - use scripts for repeated deterministic work instead of rewriting the same logic in prose
 - if a reference is not worth loading on demand, it probably does not belong in the skill
 - if a skill only repeats broad behavior rules, move that guidance to `AGENTS.md`, `CLAUDE.md`, or the owning repo docs instead
+- keep each package independently usable: state prerequisite evidence and out-of-scope next steps locally rather than invoking or requiring sibling skills
 
 ## Repo Conventions To Enforce
 
@@ -41,6 +42,7 @@ Use it when an audit finds weak activation, a bloated `SKILL.md`, or unclear wor
 - checked-in Markdown should use repo-relative links for local files
 - practical, review-oriented examples beat generic filler
 - if a mechanical check exists, prefer it over prose
+- metadata, bodies, references, scripts, and evals must not invoke, route to, import, require, or assume sibling skills, or reference their package paths; ordinary package and technology names remain valid
 - after changing a skill, rerun Tessl and tighten wording from the findings
 
 ## Audit Questions

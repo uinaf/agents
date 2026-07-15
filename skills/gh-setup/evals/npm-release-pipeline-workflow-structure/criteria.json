@@ -73,9 +73,9 @@
       "description": "The semantic-release npm publish path uses npm Trusted Publishing/OIDC and does not set `registry-url` or expose `NPM_TOKEN`"
     },
     {
-      "name": "release needs verify",
+      "name": "Release gated by CI verification job",
       "max_score": 6,
-      "description": "The release job declares `needs: [verify]` (or equivalent), making verify the gate to publish"
+      "description": "The release job depends on the CI verification job, for example through a `needs` entry targeting a job ID such as `verify`, so publishing cannot start before verification passes"
     },
     {
       "name": "GitHub token on step",

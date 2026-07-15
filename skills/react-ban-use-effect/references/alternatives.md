@@ -67,23 +67,23 @@ Prefer:
 - lazy `useState` initialization for expensive initial local values
 - deriving cheap values inline instead of memoizing them
 
-Only apply performance primitives when they map to a real bottleneck, React Doctor diagnostic, or existing repo standard.
+Only apply performance primitives when they map to a real bottleneck, profiler evidence, or an existing repo standard.
 
 ## Verification and Diagnostics
 
-Run the repo's normal guardrails first. When React Doctor is available, add:
+Run the repo's normal guardrails first. When the optional React Doctor CLI is available, add:
 
 ```bash
 npx react-doctor@latest --verbose --diff
 ```
 
-Use React Doctor's explanation mode for unclear diagnostics or suppressions:
+Use its explanation mode for unclear diagnostics or suppressions:
 
 ```bash
 npx react-doctor@latest --explain src/App.tsx:42
 ```
 
-Relevant effect-adjacent diagnostics include derived-state effects, fetch-in-effect, missing cleanup, stale closure capture, async without cleanup, exhaustive dependencies, and giant components created by trying to centralize too much orchestration in one component.
+Then exercise the changed component or hook. Inspect for derived-state effects, fetch-in-effect, missing cleanup, stale closure capture, async work without cleanup, exhaustive-dependency violations, and giant components created by centralizing too much orchestration.
 
 Suppress only when the code is intentionally unusual, and keep suppressions line-local and rule-specific.
 
@@ -99,6 +99,5 @@ Suppress only when the code is intentionally unusual, and keep suppressions line
 - React: https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-effect
 - TanStack Query: https://tanstack.com/query/latest/docs/framework/react/overview
 - TanStack Query options: https://tanstack.com/query/latest/docs/framework/react/guides/query-options
-- Vercel React Best Practices: https://vercel.com/blog/introducing-react-best-practices
 - Vercel React Server Components: https://vercel.com/blog/understanding-react-server-components
-- React Doctor: https://www.react.doctor/docs
+- React Doctor CLI: https://www.react.doctor/docs

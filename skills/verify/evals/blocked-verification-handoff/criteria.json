@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether verify refuses to call a change ready when the repo has no reliable boot/test/runtime surface, reports exact attempted commands, and recommends readiness setup instead of pretending static inspection is proof.",
+  "context": "Tests whether verify refuses to call a change ready when the repo has no reliable boot/test/runtime surface, reports exact attempted commands, and specifies the missing infrastructure instead of pretending static inspection is proof.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -28,9 +28,9 @@
       "description": "The report names the missing readiness pieces, such as lockfile/install path, test script, boot command, smoke check, or service entrypoint"
     },
     {
-      "name": "Readiness follow-up",
+      "name": "Infrastructure next steps",
       "max_score": 14,
-      "description": "The recommended follow-up is a readiness-building task before review, such as adding a lockfile/install path, test script, boot command, smoke check, or service entrypoint"
+      "description": "The required next steps identify the concrete infrastructure needed before verification can resume, such as a lockfile/install path, test script, boot command, smoke check, or service entrypoint"
     },
     {
       "name": "Surfaces not exercised honestly",

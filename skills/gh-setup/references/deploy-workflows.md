@@ -34,6 +34,12 @@ on:
     types: [opened, synchronize, reopened, ready_for_review]
   merge_group:
 
+jobs:
+  verify:
+    # Event types select PR activities; they do not exclude draft PRs.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    # ...
+
 # deploy.yml
 on:
   workflow_dispatch:
@@ -44,7 +50,7 @@ on:
 ```
 
 - `merge_group:` covers the GitHub merge queue. Without it the queue blocks PRs that depend on green checks from this workflow.
-- `pull_request: { types: [...ready_for_review] }` keeps draft PRs out of CI but picks them up the moment they're marked ready.
+- Pull-request activity types do not filter by draft state: `opened`, `synchronize`, and `reopened` can still fire for draft PRs. Gate each PR entry job, or a shared root job and all of its dependents, on `github.event.pull_request.draft == false`; keep `ready_for_review` so verification starts when the PR becomes ready.
 - Do **not** add `push:` to `verify.yml` — the verify gate runs inside `main.yml` for push events.
 - Secret-bearing manual deploys validate `inputs.ref`, `inputs.environment`, and `inputs.lane` in a secretless step before checkout or secret loading. Prefer `main`, protected release tags, or exact SHAs with a matching durable payload.
 - Environment branch/tag rules constrain the workflow run ref; validate any separately checked-out `inputs.ref` as its own trust boundary.
@@ -324,7 +330,7 @@ runs:
 
 For Node deploy workflows, check in `.node-version` with the latest active LTS line, currently Node 24.x. Use `.node-version` consistently across local setup and CI.
 
-For a Vite+ workspace:
+For a workspace using the Vite+ toolchain:
 
 ```yaml
 - uses: voidzero-dev/setup-vp@<full-sha> # v1.10.0
@@ -338,14 +344,16 @@ For a Vite+ workspace:
 For a plain pnpm + Node workspace:
 
 ```yaml
+- uses: pnpm/action-setup@<full-sha> # v6.0.8
+  with: { run_install: false }
 - uses: actions/setup-node@<full-sha> # v6.4.0
   with:
     node-version-file: .node-version
     cache: pnpm
-- uses: pnpm/action-setup@<full-sha> # v6.0.8
-  with: { run_install: false }
 - run: pnpm install --frozen-lockfile
 ```
+
+Install pnpm before asking `setup-node` to cache its store; the cache integration invokes the selected package manager to discover that store.
 
 For a container build (api/backend lane), push to the repo's chosen registry with the narrowest write token or OIDC-supported identity available:
 

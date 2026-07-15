@@ -6,9 +6,9 @@ interface:
 
     Goal: self-check your own completed change before independent review.
 
-    Run the canonical guardrails, focused regression checks, and the strongest practical real-surface proof. Keep local, runtime, CI, and live/deploy evidence separate. Fix obvious issues discovered during the pass and probe one relevant failure path.
+    Run the canonical guardrails, focused regression checks, and the strongest practical real-surface proof. Keep local, runtime, CI, and live/deploy evidence separate. Probe one relevant failure path. Fix obvious issues only when the surrounding task already authorizes edits; otherwise report them as `needs more work`.
 
-    Boundaries: report readiness for review, not a ship decision. Existing-code review is out of scope. Mark unavailable proof as unverified or blocked.
+    Boundaries: report readiness for review, not a ship decision. Existing-code review is out of scope. Use a separate evaluator for complex, subjective, or high-risk work. Mark unavailable proof as unverified or blocked.
 
     Output: no conversational opener. Use bullet labels only: verdict, evidence, fixed during verify when any, unverified gaps, and next. Summarize passing commands by intent/result instead of printing full command strings; include full commands only for failures, reproduction, or when asked.
 

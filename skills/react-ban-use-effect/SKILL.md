@@ -19,7 +19,7 @@ Default stance: do not import or call `useEffect` directly in React components. 
    - external-system synchronization
 3. Replace it with the narrowest declarative pattern from [references/replacements.md](references/replacements.md).
 4. For data, forms, external stores, or performance work, also check the stronger alternative map in [references/alternatives.md](references/alternatives.md).
-5. Keep behavior proof concrete: run the repo's lint/type/test gate, React Doctor diff scan when available, plus the smallest runtime or component check that exercises the changed path.
+5. Keep behavior proof concrete: run the repo's lint/type/test gate, the optional `react-doctor` CLI diff scan when available, plus the smallest runtime or component check that exercises the changed path. Fix failures and rerun before completion.
 
 ## Replacement Ladder
 
@@ -30,30 +30,33 @@ Use the highest applicable layer:
 3. server-state library such as TanStack Query, SWR, Relay, or Apollo
 4. event handler, form action, or mutation
 5. keyed component boundary
-6. `useSyncExternalStore`, approved mount sync, or a reviewed dependency-aware external-sync exception
+6. `useSyncExternalStore` or a reviewed domain-specific external-system hook with explicit reactive inputs
 
 If none of these fit, stop and explain why the code truly needs an effect instead of adding direct `useEffect`.
 
 ## Allowed Escape Hatches
 
-Prefer existing repo wrappers. If the repo has no standard, add mount-only sync close to shared React hooks:
+Prefer an existing repo integration hook. If the repo has no standard, add a domain-specific hook that names the external system, owns its setup and cleanup, accepts every reactive input explicitly, and keeps those inputs in the effect dependency list. See [the external-system replacement](references/replacements.md#5-synchronize-external-systems) for the concrete shape.
 
-```tsx
-import { useEffect } from "react";
-
-export function useMountEffect(effect: () => void | (() => void)) {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(effect, []);
-}
-```
-
-Good mount uses are browser API setup, DOM focus/scroll integration, and third-party widget lifecycles. Prefer `useSyncExternalStore` for external stores or browser values that change over time. If an external system must resync when a prop or state value changes, require an explicit reviewed exception or dependency-aware wrapper that keeps dependencies honest. Do not use wrappers to hide dependency problems, fetch server state, copy props into state, or relay user actions.
+Do not expose a generic effect callback or dependency list to callers, and do not suppress `react-hooks/exhaustive-deps`. A truly mount-only integration may use an empty dependency list only when its setup reads no reactive value from props, state, or the component closure. Prefer `useSyncExternalStore` for external stores or browser values that change over time. Never use an exception hook to fetch server state, copy props into state, or relay user actions.
 
 ## Enforcement
 
-For new policy work, prefer the repo's existing ESLint shape. The usual rule is `no-restricted-imports` against `useEffect` from `react`, with the message pointing developers to declarative replacements and approved wrappers. Also block namespace calls such as `React.useEffect(...)` with `no-restricted-syntax` or a custom rule. Allow shared wrapper files as the only direct-import/call exceptions. If the repo already uses another lint shape, preserve that local convention.
+For new policy work, prefer the repo's existing ESLint shape. The usual rule is `no-restricted-imports` against `useEffect` from `react`, with the message pointing developers to declarative replacements and reviewed external-integration hooks. Also block namespace calls such as `React.useEffect(...)` with `no-restricted-syntax` or a custom rule. Allow only named, reviewed external-integration hook files as direct-import/call exceptions; do not create a general-purpose wrapper exemption. If the repo already uses another lint shape, preserve that local convention.
 
-If the repo uses React Doctor, prefer its native rules for effect smells (`no-fetch-in-effect`, `no-derived-state-effect`) in addition to the import ban. Keep suppressions line-local and rule-specific.
+```ts
+{
+  "no-restricted-imports": ["error", {
+    name: "react",
+    importNames: ["useEffect"],
+    message: "Use a declarative replacement or reviewed external-integration hook.",
+  }],
+  "no-restricted-syntax": ["error", {
+    selector: "CallExpression[callee.object.name='React'][callee.property.name='useEffect']",
+    message: "Do not call React.useEffect directly.",
+  }],
+}
+```
 
 For reviews, treat new direct `useEffect` as a finding unless the diff also introduces a clear, reviewed exception. Ask for a replacement plan rather than dependency-array tuning.
 
@@ -64,7 +67,7 @@ For upstream provenance and uinaf tailoring notes, use [references/upstream.md](
 - Scope the change to the touched path or requested migration slice.
 - Preserve the repo's existing data, lint, hook, and framework conventions.
 - Leave `useLayoutEffect`, framework lifecycle APIs, and non-React effect systems alone unless requested.
-- Use performance primitives only for real UI/perf evidence, React Doctor findings, or established repo patterns.
+- Use performance primitives only for real UI/perf evidence or established repo patterns.
 
 ## Sources
 

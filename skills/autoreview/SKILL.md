@@ -1,26 +1,29 @@
 ---
 name: autoreview
-description: "Run structured Codex/Claude autoreview closeout for local changes, pull requests, branch diffs, or commits: choose the target, validate findings, rerun focused tests, and repeat review until clean. Use when asked for autoreview, second-model review, pre-merge review, or readiness-to-ship review."
+description: "Run the bundled Codex/Claude autoreview helper as a structured second-model closeout for local changes, pull requests, branch diffs, or commits: choose the target, validate findings, rerun focused tests, and repeat until clean. Use when explicitly asked for autoreview, Codex/Claude review, or a tool-backed final review after implementation. Do not use for builder verification or an independent multi-agent ship decision."
 ---
 
 # Auto Review
 
 Run the bundled structured review helper as a closeout check. This is code review, not Guardian `auto_review` approval routing.
 
-Codex review is the default when no engine is set. It uses high reasoning and the helper's built-in preferred Codex models unless overridden. Claude review is optional and uses its own preferred model list.
-
 Use when:
 
 - user asks for Codex review / Claude review / autoreview / second-model review
-- after non-trivial code edits, before final/commit/ship
+- after non-trivial code edits and builder verification, when a tool-backed second-model closeout is wanted
 - reviewing a local branch or PR branch after fixes
+
+## Boundaries
+
+- Require completed builder guardrails and real-surface proof before starting; cite the existing evidence or report the missing prerequisite.
+- Report advisory findings and closeout cleanliness. Do not turn this pass into an independent ship decision or invoke additional reviewer workflows.
 
 ## Contract
 
 - Treat review output as advisory: verify every finding against real code, adjacent files, and dependency docs/types when relevant.
 - Reject speculative or over-broad findings; fix accepted issues with the smallest change at the right ownership boundary.
 - When a finding exposes a repeated bug class, inspect the current PR scope for sibling instances before fixing.
-- Keep review-triggered fixes inside the original task scope; use [references/scope.md](references/scope.md) before accepting anything broader.
+- Keep review-triggered fixes inside the original task scope.
 - If a review-triggered fix changes code, rerun focused proof plus autoreview until the helper exits cleanly; stop there.
 - Honor the requested engine/model, do not invoke nested reviewers, and use review panels only when explicitly requested or risk justifies them.
 - Treat the validated bundle as the reviewer's only repository input. The helper must fail closed on sensitive, incomplete, binary, gitlink, or unsafe linked input rather than widening filesystem access.
@@ -32,7 +35,7 @@ Use [references/troubleshooting.md](references/troubleshooting.md) for heartbeat
 
 ## Scope And Release Guardrails
 
-Use [references/scope.md](references/scope.md) before accepting review-triggered fixes that could expand the task, touch release process, or exceed two patch cycles.
+Use [references/scope.md](references/scope.md) before accepting a fix that could expand the task, touch release process, or start a third review-triggered patch cycle.
 
 ## Core Workflow
 
@@ -161,8 +164,9 @@ Inline syntax is also supported for simple model IDs:
 "$AUTOREVIEW" --reviewers codex:gpt-5.6-sol:high,claude:claude-fable-5:max
 ```
 
-Codex maps thinking to `model_reasoning_effort` and accepts `low`, `medium`,
-`high`, or `xhigh`. Claude maps thinking to `--effort` and also accepts `max`.
+Codex maps thinking to `model_reasoning_effort` and accepts `none`, `minimal`,
+`low`, `medium`, `high`, `xhigh`, or `max`. Claude maps thinking to `--effort`
+and accepts `low`, `medium`, `high`, `xhigh`, or `max`.
 
 For models with slashes or extra colons, prefer keyed form:
 
@@ -191,16 +195,6 @@ The smoke harness has thin shell wrappers over a shared Python implementation:
 ```bash
 "$AUTOREVIEW_HARNESS" --fixture benign --engine codex
 ```
-
-The helper:
-
-- chooses dirty local changes first, otherwise PR base, otherwise `origin/main` for non-main branches; branch review does not fetch automatically.
-- supports Codex and Claude only; Codex is the default, and panels are opt-in with `--panel` or `--reviewers`.
-- treats `--prompt-file` and `--dataset` as repo-relative inputs, with sensitive paths, symlinks, oversized content, and secret-looking values guarded.
-- scans safe patches in full and refuses inputs above the aggregate prompt limit rather than returning a false clean result from independent chunks.
-- resolves commands outside the reviewed checkout and runs reviewers in empty temporary workspaces with only the validated bundle available; see [references/engine-details.md](references/engine-details.md).
-- isolates parallel-test homes and environments, and rejects review results when tests or another process mutate the source tree.
-- prints a clean line and exits 0 when no accepted/actionable findings remain; exits nonzero when accepted/actionable findings are present.
 
 ## Final Report
 

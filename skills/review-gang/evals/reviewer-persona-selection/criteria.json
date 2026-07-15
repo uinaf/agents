@@ -1,16 +1,16 @@
 {
-  "context": "Tests whether the agent spawns the mandatory default reviewer gang for a refactor that touches types, error handling, dead code, and auth, adds relevant conditional personas, avoids unnecessary extra personas, loads the repo's AGENTS.md, and produces a well-structured output with verdict and evidence without a noisy footer.",
+  "context": "Tests whether the agent selects the core reviewer gang for a high-risk refactor that touches types, error handling, dead code, and auth, adds relevant specialists, avoids unnecessary personas, loads the repo's AGENTS.md, and produces a well-structured output with verdict and evidence without a noisy footer.",
   "type": "weighted_checklist",
   "checklist": [
     {
       "name": "Default gang spawned",
       "max_score": 8,
-      "description": "The report mentions spawning all four default reviewer personas: general, tests, silent-failures, and code-shape"
+      "description": "The report mentions spawning all four core reviewer personas for this high-risk change: general, tests, silent-failures, and code-shape"
     },
     {
       "name": "Subagent authorization honored",
       "max_score": 8,
-      "description": "The agent treats review-gang invocation as explicit authorization for mandatory subagents, and does not block for unavailable subagents without first discovering or loading the harness's subagent tooling"
+      "description": "The agent treats review-gang invocation as authorization for reviewer subagents, and does not block for unavailable subagents without first discovering or loading the harness's subagent tooling"
     },
     {
       "name": "Types persona included",

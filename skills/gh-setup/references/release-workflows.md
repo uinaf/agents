@@ -4,17 +4,17 @@ Use when aligning GitHub Actions release workflow files.
 
 ## File Layout
 
-- Default: a single `.github/workflows/ci.yml` with `verify` and `release` jobs.
-- Split into `verify.yml` + `release.yml` only when verify must run on a different cadence (e.g., scheduled) or when release needs a runner the verify path does not.
+- Default: a single `.github/workflows/ci.yml` with verification and release jobs.
+- Split into `verify.yml` + `release.yml` only when verification must run on a different cadence (e.g., scheduled) or when release needs a runner the verification path does not.
 - Keep a single release workflow by default. Add a third "tag-driven backstop" workflow only with a documented reason, because two active release paths make provenance and retry behavior harder to reason about.
 - Before changing layout, read existing workflows and any same-org repo that already publishes the same artifact type. Keep its action choice, token naming, and tap handling when the target matches.
 
 ## Triggers
 
-- Verify: `pull_request`, `merge_group` when the repo uses merge queue, and `push` to `main`.
-- Release: `push` to `main` only. Encode this as an `if:` on the release job rather than a separate `on:` block, so verify and release stay coupled.
+- Verification: `pull_request`, `merge_group` when the repo uses merge queue, and `push` to `main`.
+- Release: `push` to `main` only. Encode this as an `if:` on the release job rather than a separate `on:` block, so verification and release stay coupled.
 - Do not use `pull_request_target` for any workflow that checks out, installs, builds, tests, packages, signs, publishes, or otherwise executes project code. Keep fork and outsider code on `pull_request` with read-only credentials and no release secrets.
-- Manual `workflow_dispatch` is fine to add for verify; release paths still honor the `[skip ci]` gate.
+- Manual `workflow_dispatch` is fine to add for verification; release paths still honor the `[skip ci]` gate.
 - Secret-bearing manual release/backfill workflows use trusted checkout refs: `main`, a published `v*` tag, or a separately validated protected ref.
 - GitHub Environment branch/tag policies gate the workflow run ref; they do not prove that a later `actions/checkout` `with.ref` or `git checkout` input is trusted. Treat run ref and checkout ref as separate trust boundaries.
 
@@ -27,7 +27,7 @@ Use when aligning GitHub Actions release workflow files.
 
 ## Concurrency
 
-- Workflow-level cancellable group for verify:
+- Workflow-level cancellable group for verification:
 
   ```yaml
   concurrency:
@@ -94,7 +94,7 @@ Both jobs must short-circuit when the head commit is the bot's bump commit:
 if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
 ```
 
-Apply on **both** verify and release. Skipping it on verify means the bump commit re-runs the verify suite for nothing; skipping it on release means the bump commit recursively triggers a new release.
+Apply on **both** verification and release jobs. Skipping it on verification means the bump commit re-runs the verification suite for nothing; skipping it on release means the bump commit recursively triggers a new release.
 
 ## Bot Identity
 
@@ -115,7 +115,7 @@ Use a `noreply.github.com` address or a dedicated bot account so bump commits ar
 
 ## Caches
 
-- Verify jobs may use dependency caches. Secret-bearing release, publish, signing, and promotion jobs do fresh dependency installs by default.
+- Verification jobs may use dependency caches. Secret-bearing release, publish, signing, and promotion jobs do fresh dependency installs by default.
 - Do not share package-manager caches between `pull_request` and privileged `push: main`, `workflow_dispatch`, or tag-driven jobs. The dangerous shape is outsider-controlled code populating a cache that a later publish job consumes.
 - Release caches are only for unavoidable download/tool caches, not package-manager stores, generated dependency trees, or build outputs that become signed/published artifacts.
 - Regenerate or verify generated trees such as `Pods/`, `vendor/`, `dist/`, build directories, or packaged runtime bundles inside secret-bearing release jobs.
@@ -130,7 +130,7 @@ Use a `noreply.github.com` address or a dedicated bot account so bump commits ar
 
 ## Pipeline optimization
 
-- Add explicit `timeout-minutes` to verify and release jobs so stuck package managers, signing tools, or registry calls do not burn the default six-hour window.
+- Add explicit `timeout-minutes` to verification and release jobs so stuck package managers, signing tools, or registry calls do not burn the default six-hour window.
 - Use `fail-fast: false` for release matrices when every OS/archive result is useful evidence; use `max-parallel` when signing services, package registries, or tap repos rate-limit concurrent publishes.
 - Keep one stable required check for conditional or matrixed release workflows. Use an internal no-op/result job instead of trigger-level path filters when branch protection requires the workflow.
 - If same-run Actions artifacts are unavoidable before publish, keep `retention-days` to `1-3`, set `if-no-files-found: error`, use lane/package-specific names, and record the artifact digest.
@@ -142,20 +142,20 @@ Use a `noreply.github.com` address or a dedicated bot account so bump commits ar
 - npm trusted publishing is the default for public npm packages published from GitHub-hosted Actions: configure the package on npm for the repo, workflow filename, and optional Environment; grant `id-token: write`; remove `NPM_TOKEN`; and rely on npm's automatic provenance for public packages from public repos.
 - SLSA or npm provenance proves the package came from a workflow identity, not that the workflow runner was clean. Keep provenance, but do not let it replace trusted refs, fresh release installs, and cache separation.
 
-## Multi-Verify Composition
+## Multi-Job Verification Composition
 
-When the verify path has parallel jobs (e.g., `verify-unit`, `verify-consumer-surface`):
+When the verification path has parallel jobs (e.g., `verify-unit`, `verify-consumer-surface`):
 
 ```yaml
 release:
   needs: [verify-unit, verify-consumer-surface]
 ```
 
-Release waits for **all** verify jobs. Adding a new verify job means adding it to `needs:` explicitly.
+Release waits for **all** verification jobs. Adding a new verification job means adding it to `needs:` explicitly.
 
 ## Bootstrap Snippets
 
-Pick one matching the repo's toolchain and place it after `actions/checkout`. Use the repo's existing verify command (`make verify`, `vp run verify`, `mise run verify`, etc.).
+Pick one matching the repo's toolchain and place it after `actions/checkout`. Use the repo's existing verification command (`make verify`, `vp run verify`, `mise run verify`, etc.).
 
 For Node / TypeScript workflows, check in `.node-version` with the latest active LTS line, currently Node 24.x. Use `.node-version` consistently; do not introduce alternate Node version files or hardcode an older Node major in workflow YAML.
 
@@ -167,7 +167,7 @@ For Node / TypeScript workflows, check in `.node-version` with the latest active
 ```
 
 ```yaml
-# Node via Vite+
+# Node via the Vite+ toolchain
 - uses: voidzero-dev/setup-vp@<full-sha> # v1.10.0
   with: { node-version-file: ".node-version", cache: false, run-install: false }
 - run: vp install

@@ -1,6 +1,6 @@
 ---
 name: vite-plus
-description: "Migrate or align frontend repositories to the stock Vite+ workflow. Use when standardizing package or monorepo repos around `vp`, `voidzero-dev/setup-vp`, `vite-plus/test`, and Vite+ native CI, test, packaging, and hook flows. Default to replacing direct package-manager and Vitest wiring with the Vite+ equivalents unless the repo has a proven exception."
+description: "Migrate or align frontend package and monorepo repositories to Vite+. Use when the user asks to migrate to Vite+, standardize on `vp`, clean up a Vite+ setup, or move CI, tests, packaging, and hooks onto the stock Vite+ workflow. Prefer Vite+ commands over direct package-manager and Vitest wiring unless the repo has a proven exception."
 ---
 
 # Vite+
@@ -89,4 +89,4 @@ export default defineConfig({
 
 ## Known Caveats
 
-See [references/known-issues.md](references/known-issues.md) for current upstream caveats (single-file `vp check --fix`, SSR `instanceof` failures, Cloudflare Workers tests, Vite+ 0.2.x Vitest wrapper removal).
+See [references/known-issues.md](references/known-issues.md) for current upstream caveats (SSR `instanceof` failures and Vite+ 0.2.x Vitest wrapper removal). Before preserving legacy wiring, reproduce the caveat on the installed release and inspect the upstream resolution for the first fixed version or upgrade path. A closed issue does not prove an older pinned release is unaffected.

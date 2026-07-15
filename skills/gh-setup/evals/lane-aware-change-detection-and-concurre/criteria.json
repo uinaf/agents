@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent sets up lane-independent change detection that only builds/deploys affected apps, uses correct concurrency settings (non-cancellable deploy, cancellable verify/e2e, same group key across main.yml and deploy.yml), and uses the correct job condition syntax for deploy gates.",
+  "context": "Tests whether the agent sets up lane-independent change detection that only builds/deploys affected apps, uses correct concurrency settings (non-cancellable deploy, cancellable verification/e2e, same group key across main.yml and deploy.yml), and uses the correct job condition syntax for deploy gates.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -20,7 +20,7 @@
     {
       "name": "Lane conditional build",
       "max_score": 8,
-      "description": "Each verify/build job has an `if:` condition that gates it on the corresponding lane being detected as changed (referencing the changes job output)"
+      "description": "Each verification/build job has an `if:` condition that gates it on the corresponding lane being detected as changed (referencing the changes job output)"
     },
     {
       "name": "Deploy non-cancellable",
@@ -28,9 +28,9 @@
       "description": "The deploy job(s) include `concurrency: { cancel-in-progress: false }` (or equivalent)"
     },
     {
-      "name": "Verify/e2e cancellable",
+      "name": "Verification/e2e cancellable",
       "max_score": 8,
-      "description": "At least one verify or e2e job includes `concurrency: { cancel-in-progress: true }` (or equivalent)"
+      "description": "At least one verification or e2e job includes `concurrency: { cancel-in-progress: true }` (or equivalent)"
     },
     {
       "name": "Concurrency group lane-scoped",
@@ -50,7 +50,7 @@
     {
       "name": "Manual deploy workflow",
       "max_score": 8,
-      "description": "A separate workflow_dispatch workflow exists (deploy.yml or equivalent) for manually re-deploying a verified artifact or image for a validated ref without re-running verify"
+      "description": "A separate workflow_dispatch workflow exists (deploy.yml or equivalent) for manually re-deploying a verified artifact or image for a validated ref without re-running verification"
     },
     {
       "name": "validated redeploy ref",

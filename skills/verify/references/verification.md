@@ -25,11 +25,10 @@ Prove your own changes work on real surfaces. Independent ship decisions belong 
 
 ## Before You Start
 
-1. Check readiness grade: C+ = proceed. D/F = add readiness setup first
-2. Can you boot the app?
-3. Can you interact with it? (Playwright CLI for UI, curl for APIs, CLI invocation)
-4. Can you verify your own work from a fresh evaluator context or separate subagent?
-5. If not, flag it as a readiness gap and define the durable check the repo needs
+1. Confirm dependencies install, the repo boots, and a stable check or interaction path can exercise the changed surface. If any prerequisite is missing, report `blocked` and name the exact setup required.
+2. Can you interact with it? (Playwright CLI for UI, curl for APIs, CLI invocation)
+3. Does the change need a fresh evaluator context or separate subagent because it is complex, subjective, or high risk?
+4. If the repo cannot support the required proof, define the durable check it needs instead of substituting static inspection
 
 ## Proof Boundary
 
@@ -103,6 +102,8 @@ When the requested proof surface is unavailable, report the best evidence you ga
 ## Evaluator Pattern
 
 Anthropic's GAN-inspired approach: separate generation from evaluation entirely.
+
+Use this escalation for complex, subjective, or high-risk verification. It is optional for routine changes with decisive deterministic and real-surface checks, and it does not replace the later independent ship review.
 
 **Three roles**: Planner → Generator → Evaluator
 - **Evaluator** is always independent from the builder
