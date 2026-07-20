@@ -8,21 +8,23 @@ Before picking an action, inspect the repo's current release files and at least 
 
 Default to npm Trusted Publishing from GitHub Actions. Configure the package on npm with the GitHub organization/repo, workflow filename, and `release` Environment when used; then grant the release job `id-token: write` and remove `NPM_TOKEN`. Trusted publishing uses short-lived OIDC credentials and automatically produces npm provenance for public packages from public repos.
 
-Use the npm CLI when enabling trusted publishing for one or many packages. `npm trust` requires npm `11.10.0` or newer, so pin the operator command to `npm@^11.10.0` instead of relying on the local npm version. Login once with a package owner/admin account, then register each package's GitHub workflow identity:
+Use the npm CLI when enabling trusted publishing for one or many packages. `npm trust` requires npm `11.10.0` or newer; use the local npm when it meets that floor, otherwise pin the operator command with `npx -y npm@^11.10.0`. Login once with a package owner/admin account, then register each package's GitHub workflow identity:
 
 ```bash
-npx -y npm@^11.10.0 login
-npx -y npm@^11.10.0 trust github <package-name> --repo <owner>/<repo> --file <workflow-file> --env <environment> --yes
+npm login
+npm trust github <package-name> --repo <owner>/<repo> --file <workflow-file> --env <environment> --allow-publish --yes
 ```
 
 Examples:
 
 ```bash
-npx -y npm@^11.10.0 trust github @scope/library --repo scope/library --file ci.yml --env release --yes
-npx -y npm@^11.10.0 trust github cli-package --repo scope/cli-package --file release.yml --yes
+npm trust github @scope/library --repo scope/library --file ci.yml --env release --allow-publish --yes
+npm trust github cli-package --repo scope/cli-package --file release.yml --allow-publish --yes
 ```
 
-Use `--env release` when the release job declares `environment: release` or `environment: { name: release }`. Omit `--env` only when the publishing job does not use a GitHub Environment.
+- At least one permission flag is required or `npm trust` errors: `--allow-publish` for regular publishes, `--allow-stage-publish` only when the workflow uses npm's staged-release flow.
+- Use `--env release` when the release job declares `environment: release` or `environment: { name: release }`. Omit `--env` only when the publishing job does not use a GitHub Environment.
+- `npm trust` registers publishers on existing packages only; it fails with "package not found" for a first release. Bootstrap order for a new package: ensure the scope's npm org exists, do a one-time manual `npm publish` from a clean clone with 2FA/web login (no automation token — a `prepack` script should own verify plus a clean build), then register the trusted publisher and let the workflow own every later release.
 
 Plugins:
 
