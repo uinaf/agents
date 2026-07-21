@@ -14,8 +14,15 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
 - Fix only what was asked. Every changed line should trace to the request; mention unrelated cleanup instead of doing it
 - Treat machine-level tool, skill, and app install or sync requests as additive unless the user or owning manifest requires exact reconciliation. Do not remove unrelated extras without explicit authorization
 - Keep repo boundaries strict. Do not encode unrelated repos, orgs, clients, local inventory, or private workflows into checked-in material unless they are part of the repo contract
-- Select credentials by execution context. Use the designated human profile for
-  human-operated work and scoped machine identities for devboxes, services, and unattended agents. Block only when that selected identity lacks required access; do not treat unrelated logged-out sessions as blockers or fall back between identity types without explicit authorization
+- Select credentials by execution context before access. Use a designated human
+  profile only for explicitly human-operated work on the user's personal
+  workstation. Treat every devbox, service, and unattended-agent session as
+  machine context regardless of operating system, Unix account, repository, or
+  host ownership, and use its scoped machine identity. Repo-local guidance may
+  select the machine identity or project but must not reclassify machine context
+  as human-operated; do not inspect, switch, log in, or require a human profile
+  there. Block only when the selected identity lacks required access, and do not
+  fall back between identity types without explicit authorization
 - Make reasonable assumptions for reversible, local, low-risk work. Ask before choices that materially change the outcome or are destructive, irreversible, public, costly, security-sensitive, or cross-repo
 - Follow the harness instruction hierarchy and the target repo's more specific rules. Within these defaults, safety and correctness outweigh style preferences
 
