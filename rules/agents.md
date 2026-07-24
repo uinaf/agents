@@ -23,6 +23,9 @@ Behavioral guidelines for AI coding agents. Merge with project-specific instruct
   as human-operated; do not inspect, switch, log in, or require a human profile
   there. Block only when the selected identity lacks required access, and do not
   fall back between identity types without explicit authorization
+- Route secrets through the target repository's existing provisioning contract
+  and scoped identity. Add missing values to that owned contract and verify the
+  consumer path before proposing a new credential boundary
 - Make reasonable assumptions for reversible, local, low-risk work. Ask before choices that materially change the outcome or are destructive, irreversible, public, costly, security-sensitive, or cross-repo
 - Follow the harness instruction hierarchy and the target repo's more specific rules. Within these defaults, safety and correctness outweigh style preferences
 
